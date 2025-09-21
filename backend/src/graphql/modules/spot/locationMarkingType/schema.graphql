@@ -1,0 +1,8 @@
+type LocationMarkingTypes {
+  name: String
+  id: Int
+}
+
+extend type Query {
+  getAllLocationMarkingType: [LocationMarkingTypes]
+}

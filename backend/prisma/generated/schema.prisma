@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider      = "prisma-client-js"
+  output        = "./generated"
+  binaryTargets = ["native", "linux-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String @unique() @default(uuid())
+  email    String @unique
+  name     String
+  password String
+  spot     Spot[]
+}
+
+model Spot {
+  id                    String              @unique() @default(uuid())
+  name                  String
+  description           String
+  author                User                @relation(fields: [authorId], references: [id])
+  authorId              String
+  modality              String
+  equipmentRequired     Boolean
+  isPaid                Boolean
+  alwaysOpen            Boolean
+  entryAmount           String?
+  hasCoverage           Boolean
+  coordinates           Json
+  images                String[]
+  locationMarkingType   LocationMarkingType @relation(fields: [locationMarkingTypeId], references: [id])
+  locationMarkingTypeId Int
+}
+
+model LocationMarkingType {
+  id   Int    @unique() @default(autoincrement())
+  name String
+  spot Spot[]
+}

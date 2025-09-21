@@ -1,0 +1,17 @@
+input ILoginInput {
+  email: String!
+  password: String!
+}
+
+type TokenData {
+  token: String
+  exp: Int
+  createdAt: Int
+  name: String
+  email: String
+  id: String
+}
+
+extend type Mutation {
+  login(props: ILoginInput): TokenData
+}

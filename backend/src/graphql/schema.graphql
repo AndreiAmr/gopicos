@@ -1,0 +1,10 @@
+directive @Authenticated on FIELD_DEFINITION
+
+type Query {
+  _empty: String
+}
+
+type Mutation {
+  _empty: String
+  sendImage(file: Upload!): String!
+}
