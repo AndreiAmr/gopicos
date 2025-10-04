@@ -17,9 +17,12 @@ type ICreateSpotProps = {
   hasCoverage?: string;
   isPaid?: boolean;
   modality?: EModality;
+  entryAmount?: string;
+  openingHours?: string;
 };
 
 export const fetchCreateSpot = async (props: ICreateSpotProps) => {
+  console.log('🚀 ~ fetchCreateSpot ~ props:', props);
   const formData = new FormData();
 
   const operations = JSON.stringify({
@@ -49,7 +52,7 @@ export const fetchCreateSpot = async (props: ICreateSpotProps) => {
     formData.append(`${i}`, file);
   });
 
-  const res = await http.post('http://localhost:4000/graphql', formData, {
+  await http.post('http://localhost:4000/graphql', formData, {
     headers: {
       'x-apollo-operation-name': 'createSpot',
     },

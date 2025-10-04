@@ -12,6 +12,7 @@ input NewSpotInput {
   equipmentRequired: Boolean
   entryAmount: String
   coordinates: JSON
+  openingHours: String
 }
 
 type Spot {

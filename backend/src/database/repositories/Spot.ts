@@ -7,6 +7,9 @@ type CreateSpotProps = {
   data: NewSpotInput;
   authorId: string;
 };
+const test: Spot = {
+  op,
+};
 
 type ISpotRepository = IRepository<Spot, CreateSpotProps, Spot, Spot> & {
   insertImage(spotId: string, url: string): Promise<Spot>;
@@ -51,6 +54,7 @@ export class SpotRepository implements ISpotRepository {
       entryAmount: data.entryAmount || '',
       hasCoverage: data.hasCoverage || false,
       coordinates: data.coordinates,
+      openingHours: data.openingHours,
     };
 
     const result = await prisma.spot.create({
@@ -59,6 +63,11 @@ export class SpotRepository implements ISpotRepository {
         author: {
           connect: {
             id: authorId,
+          },
+        },
+        locationMarkingType: {
+          connect: {
+            id: 1,
           },
         },
       },

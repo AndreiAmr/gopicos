@@ -55,6 +55,7 @@ export const DinamicFields = ({ fields }: DinamicFieldsProps) => {
             name="testing"
             options={field.options || []}
             value=""
+            className="not-dark:bg-white"
             disabled={field.fieldRequiredRule && !isRuleValid}
             onChange={(value: string) =>
               formMethods.setValue(field.name as keyof NewSpotProps, value)
@@ -67,9 +68,15 @@ export const DinamicFields = ({ fields }: DinamicFieldsProps) => {
         component = (
           <ControlledInput
             label={field.label}
-            name={field.label}
+            name={field.name as string}
             placeholder="testing"
             disabled={field.fieldRequiredRule && !isRuleValid}
+            onChange={(e) =>
+              formMethods.setValue(
+                field.name as keyof NewSpotProps,
+                e.target.value
+              )
+            }
           />
         );
       }

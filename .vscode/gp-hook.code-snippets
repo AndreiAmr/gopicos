@@ -5,11 +5,10 @@
       "",
       "type ${TM_FILENAME_BASE}Props = {}",
       "",
-      "const ${TM_FILENAME_BASE} = ({}:${TM_FILENAME_BASE}Props) => {",
+      "export const ${TM_FILENAME_BASE} = ({}:${TM_FILENAME_BASE}Props) => {",
       "  return {}",
       "};",
-      "",
-      "export default ${TM_FILENAME_BASE};"
+      ""
     ],
     "description": "Cria um componente React com base no nome do arquivo"
   }

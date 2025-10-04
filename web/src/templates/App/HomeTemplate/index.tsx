@@ -41,7 +41,7 @@ const HomeTemplate = ({ spots }: HomeTemplateProps) => {
   return (
     <div
       ref={containerRef}
-      className=" max-w-screen  h-[calc(100%-80px)] w-full bg-background border border-white"
+      className=" max-w-screen  h-full w-full bg-background border border-white"
     >
       <Map
         ref={mapRef}
@@ -74,7 +74,6 @@ const HomeTemplate = ({ spots }: HomeTemplateProps) => {
           } as const;
 
           const center = turf.center(feature).geometry.coordinates;
-          console.log('🚀 ~ center:', center);
 
           return (
             <React.Fragment key={spot.name + Date.now()}>

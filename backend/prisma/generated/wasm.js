@@ -137,6 +137,7 @@ exports.Prisma.SpotScalarFieldEnum = {
   isPaid: 'isPaid',
   alwaysOpen: 'alwaysOpen',
   entryAmount: 'entryAmount',
+  openingHours: 'openingHours',
   hasCoverage: 'hasCoverage',
   coordinates: 'coordinates',
   images: 'images',

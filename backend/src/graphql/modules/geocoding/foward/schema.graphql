@@ -1,0 +1,15 @@
+type FowardResponse {
+  name: String
+  lat: Float
+  lng: Float
+  road: String
+  district: String
+  suburb: String
+  city: String
+  state: String
+  boundingBox: [Float]
+}
+
+extend type Query {
+  getFowardGeocoding(search: String!): [FowardResponse]
+}

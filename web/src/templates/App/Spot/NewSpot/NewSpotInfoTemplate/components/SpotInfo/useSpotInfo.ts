@@ -32,8 +32,9 @@ export const useSpotInfo = () => {
       entryAmount: formValues.entryAmount,
       hasCoverage: formValues.hasCoverage,
       coordinates: formValues.address.coordinates,
+      openingHours: formValues.openingHours,
     };
-  }, [formMethods]);
+  }, [formMethods, formMethods.getValues()]);
 
   const handleValidateFields = useCallback(() => {
     return validationSchema.parse(fieldsValues);
@@ -50,6 +51,7 @@ export const useSpotInfo = () => {
   const handleSubmit = useCallback(async () => {
     try {
       const values = formMethods.getValues();
+      console.log('🚀 ~ useSpotInfo ~ values:', values);
 
       if (!isFieldsValid) return;
       setIsLoading(true);
