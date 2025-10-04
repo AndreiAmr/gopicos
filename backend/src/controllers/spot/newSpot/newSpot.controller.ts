@@ -24,6 +24,7 @@ export type NewSpotInput = {
   equipmentRequired: boolean;
   entryAmount?: string;
   coordinates: number[];
+  openingHours?: string;
 };
 
 export const newSpotController = async (

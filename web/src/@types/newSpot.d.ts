@@ -44,4 +44,5 @@ type NewSpotProps = {
   alwaysOpen: boolean;
   openingHours?: string;
   hasCoverage?: string;
+  boundingBox?: number[];
 };

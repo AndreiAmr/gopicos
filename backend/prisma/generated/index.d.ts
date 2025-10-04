@@ -2186,6 +2186,7 @@ export namespace Prisma {
     isPaid: boolean | null
     alwaysOpen: boolean | null
     entryAmount: string | null
+    openingHours: string | null
     hasCoverage: boolean | null
     locationMarkingTypeId: number | null
   }
@@ -2200,6 +2201,7 @@ export namespace Prisma {
     isPaid: boolean | null
     alwaysOpen: boolean | null
     entryAmount: string | null
+    openingHours: string | null
     hasCoverage: boolean | null
     locationMarkingTypeId: number | null
   }
@@ -2214,6 +2216,7 @@ export namespace Prisma {
     isPaid: number
     alwaysOpen: number
     entryAmount: number
+    openingHours: number
     hasCoverage: number
     coordinates: number
     images: number
@@ -2240,6 +2243,7 @@ export namespace Prisma {
     isPaid?: true
     alwaysOpen?: true
     entryAmount?: true
+    openingHours?: true
     hasCoverage?: true
     locationMarkingTypeId?: true
   }
@@ -2254,6 +2258,7 @@ export namespace Prisma {
     isPaid?: true
     alwaysOpen?: true
     entryAmount?: true
+    openingHours?: true
     hasCoverage?: true
     locationMarkingTypeId?: true
   }
@@ -2268,6 +2273,7 @@ export namespace Prisma {
     isPaid?: true
     alwaysOpen?: true
     entryAmount?: true
+    openingHours?: true
     hasCoverage?: true
     coordinates?: true
     images?: true
@@ -2371,6 +2377,7 @@ export namespace Prisma {
     isPaid: boolean
     alwaysOpen: boolean
     entryAmount: string | null
+    openingHours: string | null
     hasCoverage: boolean
     coordinates: JsonValue
     images: string[]
@@ -2406,6 +2413,7 @@ export namespace Prisma {
     isPaid?: boolean
     alwaysOpen?: boolean
     entryAmount?: boolean
+    openingHours?: boolean
     hasCoverage?: boolean
     coordinates?: boolean
     images?: boolean
@@ -2424,6 +2432,7 @@ export namespace Prisma {
     isPaid?: boolean
     alwaysOpen?: boolean
     entryAmount?: boolean
+    openingHours?: boolean
     hasCoverage?: boolean
     coordinates?: boolean
     images?: boolean
@@ -2442,6 +2451,7 @@ export namespace Prisma {
     isPaid?: boolean
     alwaysOpen?: boolean
     entryAmount?: boolean
+    openingHours?: boolean
     hasCoverage?: boolean
     coordinates?: boolean
     images?: boolean
@@ -2460,13 +2470,14 @@ export namespace Prisma {
     isPaid?: boolean
     alwaysOpen?: boolean
     entryAmount?: boolean
+    openingHours?: boolean
     hasCoverage?: boolean
     coordinates?: boolean
     images?: boolean
     locationMarkingTypeId?: boolean
   }
 
-  export type SpotOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "authorId" | "modality" | "equipmentRequired" | "isPaid" | "alwaysOpen" | "entryAmount" | "hasCoverage" | "coordinates" | "images" | "locationMarkingTypeId", ExtArgs["result"]["spot"]>
+  export type SpotOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "authorId" | "modality" | "equipmentRequired" | "isPaid" | "alwaysOpen" | "entryAmount" | "openingHours" | "hasCoverage" | "coordinates" | "images" | "locationMarkingTypeId", ExtArgs["result"]["spot"]>
   export type SpotInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     author?: boolean | UserDefaultArgs<ExtArgs>
     locationMarkingType?: boolean | LocationMarkingTypeDefaultArgs<ExtArgs>
@@ -2496,6 +2507,7 @@ export namespace Prisma {
       isPaid: boolean
       alwaysOpen: boolean
       entryAmount: string | null
+      openingHours: string | null
       hasCoverage: boolean
       coordinates: Prisma.JsonValue
       images: string[]
@@ -2934,6 +2946,7 @@ export namespace Prisma {
     readonly isPaid: FieldRef<"Spot", 'Boolean'>
     readonly alwaysOpen: FieldRef<"Spot", 'Boolean'>
     readonly entryAmount: FieldRef<"Spot", 'String'>
+    readonly openingHours: FieldRef<"Spot", 'String'>
     readonly hasCoverage: FieldRef<"Spot", 'Boolean'>
     readonly coordinates: FieldRef<"Spot", 'Json'>
     readonly images: FieldRef<"Spot", 'String[]'>
@@ -4451,6 +4464,7 @@ export namespace Prisma {
     isPaid: 'isPaid',
     alwaysOpen: 'alwaysOpen',
     entryAmount: 'entryAmount',
+    openingHours: 'openingHours',
     hasCoverage: 'hasCoverage',
     coordinates: 'coordinates',
     images: 'images',
@@ -4642,6 +4656,7 @@ export namespace Prisma {
     isPaid?: BoolFilter<"Spot"> | boolean
     alwaysOpen?: BoolFilter<"Spot"> | boolean
     entryAmount?: StringNullableFilter<"Spot"> | string | null
+    openingHours?: StringNullableFilter<"Spot"> | string | null
     hasCoverage?: BoolFilter<"Spot"> | boolean
     coordinates?: JsonFilter<"Spot">
     images?: StringNullableListFilter<"Spot">
@@ -4660,6 +4675,7 @@ export namespace Prisma {
     isPaid?: SortOrder
     alwaysOpen?: SortOrder
     entryAmount?: SortOrderInput | SortOrder
+    openingHours?: SortOrderInput | SortOrder
     hasCoverage?: SortOrder
     coordinates?: SortOrder
     images?: SortOrder
@@ -4681,6 +4697,7 @@ export namespace Prisma {
     isPaid?: BoolFilter<"Spot"> | boolean
     alwaysOpen?: BoolFilter<"Spot"> | boolean
     entryAmount?: StringNullableFilter<"Spot"> | string | null
+    openingHours?: StringNullableFilter<"Spot"> | string | null
     hasCoverage?: BoolFilter<"Spot"> | boolean
     coordinates?: JsonFilter<"Spot">
     images?: StringNullableListFilter<"Spot">
@@ -4699,6 +4716,7 @@ export namespace Prisma {
     isPaid?: SortOrder
     alwaysOpen?: SortOrder
     entryAmount?: SortOrderInput | SortOrder
+    openingHours?: SortOrderInput | SortOrder
     hasCoverage?: SortOrder
     coordinates?: SortOrder
     images?: SortOrder
@@ -4723,6 +4741,7 @@ export namespace Prisma {
     isPaid?: BoolWithAggregatesFilter<"Spot"> | boolean
     alwaysOpen?: BoolWithAggregatesFilter<"Spot"> | boolean
     entryAmount?: StringNullableWithAggregatesFilter<"Spot"> | string | null
+    openingHours?: StringNullableWithAggregatesFilter<"Spot"> | string | null
     hasCoverage?: BoolWithAggregatesFilter<"Spot"> | boolean
     coordinates?: JsonWithAggregatesFilter<"Spot">
     images?: StringNullableListFilter<"Spot">
@@ -4833,6 +4852,7 @@ export namespace Prisma {
     isPaid: boolean
     alwaysOpen: boolean
     entryAmount?: string | null
+    openingHours?: string | null
     hasCoverage: boolean
     coordinates: JsonNullValueInput | InputJsonValue
     images?: SpotCreateimagesInput | string[]
@@ -4850,6 +4870,7 @@ export namespace Prisma {
     isPaid: boolean
     alwaysOpen: boolean
     entryAmount?: string | null
+    openingHours?: string | null
     hasCoverage: boolean
     coordinates: JsonNullValueInput | InputJsonValue
     images?: SpotCreateimagesInput | string[]
@@ -4865,6 +4886,7 @@ export namespace Prisma {
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     alwaysOpen?: BoolFieldUpdateOperationsInput | boolean
     entryAmount?: NullableStringFieldUpdateOperationsInput | string | null
+    openingHours?: NullableStringFieldUpdateOperationsInput | string | null
     hasCoverage?: BoolFieldUpdateOperationsInput | boolean
     coordinates?: JsonNullValueInput | InputJsonValue
     images?: SpotUpdateimagesInput | string[]
@@ -4882,6 +4904,7 @@ export namespace Prisma {
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     alwaysOpen?: BoolFieldUpdateOperationsInput | boolean
     entryAmount?: NullableStringFieldUpdateOperationsInput | string | null
+    openingHours?: NullableStringFieldUpdateOperationsInput | string | null
     hasCoverage?: BoolFieldUpdateOperationsInput | boolean
     coordinates?: JsonNullValueInput | InputJsonValue
     images?: SpotUpdateimagesInput | string[]
@@ -4898,6 +4921,7 @@ export namespace Prisma {
     isPaid: boolean
     alwaysOpen: boolean
     entryAmount?: string | null
+    openingHours?: string | null
     hasCoverage: boolean
     coordinates: JsonNullValueInput | InputJsonValue
     images?: SpotCreateimagesInput | string[]
@@ -4913,6 +4937,7 @@ export namespace Prisma {
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     alwaysOpen?: BoolFieldUpdateOperationsInput | boolean
     entryAmount?: NullableStringFieldUpdateOperationsInput | string | null
+    openingHours?: NullableStringFieldUpdateOperationsInput | string | null
     hasCoverage?: BoolFieldUpdateOperationsInput | boolean
     coordinates?: JsonNullValueInput | InputJsonValue
     images?: SpotUpdateimagesInput | string[]
@@ -4928,6 +4953,7 @@ export namespace Prisma {
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     alwaysOpen?: BoolFieldUpdateOperationsInput | boolean
     entryAmount?: NullableStringFieldUpdateOperationsInput | string | null
+    openingHours?: NullableStringFieldUpdateOperationsInput | string | null
     hasCoverage?: BoolFieldUpdateOperationsInput | boolean
     coordinates?: JsonNullValueInput | InputJsonValue
     images?: SpotUpdateimagesInput | string[]
@@ -5122,6 +5148,7 @@ export namespace Prisma {
     isPaid?: SortOrder
     alwaysOpen?: SortOrder
     entryAmount?: SortOrder
+    openingHours?: SortOrder
     hasCoverage?: SortOrder
     coordinates?: SortOrder
     images?: SortOrder
@@ -5142,6 +5169,7 @@ export namespace Prisma {
     isPaid?: SortOrder
     alwaysOpen?: SortOrder
     entryAmount?: SortOrder
+    openingHours?: SortOrder
     hasCoverage?: SortOrder
     locationMarkingTypeId?: SortOrder
   }
@@ -5156,6 +5184,7 @@ export namespace Prisma {
     isPaid?: SortOrder
     alwaysOpen?: SortOrder
     entryAmount?: SortOrder
+    openingHours?: SortOrder
     hasCoverage?: SortOrder
     locationMarkingTypeId?: SortOrder
   }
@@ -5552,6 +5581,7 @@ export namespace Prisma {
     isPaid: boolean
     alwaysOpen: boolean
     entryAmount?: string | null
+    openingHours?: string | null
     hasCoverage: boolean
     coordinates: JsonNullValueInput | InputJsonValue
     images?: SpotCreateimagesInput | string[]
@@ -5567,6 +5597,7 @@ export namespace Prisma {
     isPaid: boolean
     alwaysOpen: boolean
     entryAmount?: string | null
+    openingHours?: string | null
     hasCoverage: boolean
     coordinates: JsonNullValueInput | InputJsonValue
     images?: SpotCreateimagesInput | string[]
@@ -5612,6 +5643,7 @@ export namespace Prisma {
     isPaid?: BoolFilter<"Spot"> | boolean
     alwaysOpen?: BoolFilter<"Spot"> | boolean
     entryAmount?: StringNullableFilter<"Spot"> | string | null
+    openingHours?: StringNullableFilter<"Spot"> | string | null
     hasCoverage?: BoolFilter<"Spot"> | boolean
     coordinates?: JsonFilter<"Spot">
     images?: StringNullableListFilter<"Spot">
@@ -5706,6 +5738,7 @@ export namespace Prisma {
     isPaid: boolean
     alwaysOpen: boolean
     entryAmount?: string | null
+    openingHours?: string | null
     hasCoverage: boolean
     coordinates: JsonNullValueInput | InputJsonValue
     images?: SpotCreateimagesInput | string[]
@@ -5722,6 +5755,7 @@ export namespace Prisma {
     isPaid: boolean
     alwaysOpen: boolean
     entryAmount?: string | null
+    openingHours?: string | null
     hasCoverage: boolean
     coordinates: JsonNullValueInput | InputJsonValue
     images?: SpotCreateimagesInput | string[]
@@ -5762,6 +5796,7 @@ export namespace Prisma {
     isPaid: boolean
     alwaysOpen: boolean
     entryAmount?: string | null
+    openingHours?: string | null
     hasCoverage: boolean
     coordinates: JsonNullValueInput | InputJsonValue
     images?: SpotCreateimagesInput | string[]
@@ -5777,6 +5812,7 @@ export namespace Prisma {
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     alwaysOpen?: BoolFieldUpdateOperationsInput | boolean
     entryAmount?: NullableStringFieldUpdateOperationsInput | string | null
+    openingHours?: NullableStringFieldUpdateOperationsInput | string | null
     hasCoverage?: BoolFieldUpdateOperationsInput | boolean
     coordinates?: JsonNullValueInput | InputJsonValue
     images?: SpotUpdateimagesInput | string[]
@@ -5792,6 +5828,7 @@ export namespace Prisma {
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     alwaysOpen?: BoolFieldUpdateOperationsInput | boolean
     entryAmount?: NullableStringFieldUpdateOperationsInput | string | null
+    openingHours?: NullableStringFieldUpdateOperationsInput | string | null
     hasCoverage?: BoolFieldUpdateOperationsInput | boolean
     coordinates?: JsonNullValueInput | InputJsonValue
     images?: SpotUpdateimagesInput | string[]
@@ -5807,6 +5844,7 @@ export namespace Prisma {
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     alwaysOpen?: BoolFieldUpdateOperationsInput | boolean
     entryAmount?: NullableStringFieldUpdateOperationsInput | string | null
+    openingHours?: NullableStringFieldUpdateOperationsInput | string | null
     hasCoverage?: BoolFieldUpdateOperationsInput | boolean
     coordinates?: JsonNullValueInput | InputJsonValue
     images?: SpotUpdateimagesInput | string[]
@@ -5823,6 +5861,7 @@ export namespace Prisma {
     isPaid: boolean
     alwaysOpen: boolean
     entryAmount?: string | null
+    openingHours?: string | null
     hasCoverage: boolean
     coordinates: JsonNullValueInput | InputJsonValue
     images?: SpotCreateimagesInput | string[]
@@ -5837,6 +5876,7 @@ export namespace Prisma {
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     alwaysOpen?: BoolFieldUpdateOperationsInput | boolean
     entryAmount?: NullableStringFieldUpdateOperationsInput | string | null
+    openingHours?: NullableStringFieldUpdateOperationsInput | string | null
     hasCoverage?: BoolFieldUpdateOperationsInput | boolean
     coordinates?: JsonNullValueInput | InputJsonValue
     images?: SpotUpdateimagesInput | string[]
@@ -5853,6 +5893,7 @@ export namespace Prisma {
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     alwaysOpen?: BoolFieldUpdateOperationsInput | boolean
     entryAmount?: NullableStringFieldUpdateOperationsInput | string | null
+    openingHours?: NullableStringFieldUpdateOperationsInput | string | null
     hasCoverage?: BoolFieldUpdateOperationsInput | boolean
     coordinates?: JsonNullValueInput | InputJsonValue
     images?: SpotUpdateimagesInput | string[]
@@ -5868,6 +5909,7 @@ export namespace Prisma {
     isPaid?: BoolFieldUpdateOperationsInput | boolean
     alwaysOpen?: BoolFieldUpdateOperationsInput | boolean
     entryAmount?: NullableStringFieldUpdateOperationsInput | string | null
+    openingHours?: NullableStringFieldUpdateOperationsInput | string | null
     hasCoverage?: BoolFieldUpdateOperationsInput | boolean
     coordinates?: JsonNullValueInput | InputJsonValue
     images?: SpotUpdateimagesInput | string[]

@@ -34,6 +34,7 @@ model Spot {
   isPaid Boolean
   alwaysOpen Boolean
   entryAmount String?
+  openingHours String?
   hasCoverage Boolean
   coordinates Json
   images String[]

@@ -11,9 +11,9 @@ export const NewSpotTemplate = () => {
         name="Marcação e endereço"
         title="Selecione o local e o tipo de marcação que gostaria de fazer  e verifique o endereço:"
       />
-      <div className="flex flex-col flex-1 gap-3 mt-14 md:flex-row ">
-        <NewSpotMapControls />
+      <div className=" relative flex flex-col flex-1 mt-5">
         <NewSpotMap />
+        <NewSpotMapControls />
       </div>
     </div>
   );

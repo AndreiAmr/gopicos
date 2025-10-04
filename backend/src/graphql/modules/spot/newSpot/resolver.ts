@@ -2,7 +2,7 @@ import {
   newSpotController,
   NewSpotInput,
 } from '../../../../controllers/spot/newSpot/newSpot.controller';
-import { IAuthentication } from '../../../../models/authentication/authenticationModel';
+
 import { ContextType } from '../../../directives/authenticationDirective';
 
 type CreateSpotResolverProps = {
@@ -17,14 +17,6 @@ export const newSpotResolver = {
       { auth }: ContextType
     ) => {
       return newSpotController(input, auth);
-
-      // for (const image of input.images) {
-      //   await cloudinaryModel.uploadImage(image);
-      // }
-
-      // return {
-      //   name: 'test',
-      // };
     },
   },
 };

@@ -4,7 +4,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import '../lib/mixpanel';
 import { ApolloProvider } from '@apollo/client';
-import { client } from '@/lib/apollo-client';
+import { apolloClient } from '@/lib/apollo-client';
 
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { ThemeProvider } from '@/components/ui/theme-provider';
@@ -47,7 +47,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <SidebarProvider defaultOpen={true}>
-            <ApolloProvider client={client}>
+            <ApolloProvider client={apolloClient}>
               {children}
               <UnauthorizedModal
                 isOpen={isOpenUnauthorizedModal}

@@ -22,7 +22,7 @@ export const Input = ({
       </label>
       <InputCn
         className={cn(
-          'bg-background',
+          'not-dark:bg-white',
           error && 'border border-red-700 bg-red-50 m-0'
         )}
         placeholder={placeholder}

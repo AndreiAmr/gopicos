@@ -27,8 +27,6 @@ export const Map = ({ lat, lon, onClick, children }: MapProps) => {
 
   useEffect(() => {
     if (lat && lon) {
-      console.log({ lat, lon });
-
       mapRef.current?.flyTo({
         center: [Number(lon), Number(lat)],
         zoom: 17,
@@ -42,7 +40,7 @@ export const Map = ({ lat, lon, onClick, children }: MapProps) => {
       console.log({ error, image });
       if (!mapRef.current?.hasImage('custom-skater') && image) {
         mapRef.current?.addImage('custom-skater', image, {
-          // sdf: true,
+          sdf: false,
         });
       }
     });
@@ -63,6 +61,8 @@ export const Map = ({ lat, lon, onClick, children }: MapProps) => {
         pitch: 0,
         bearing: 0,
       }}
+      // attributionControl={false}
+      // customAttribution={'andri amarla'}
       onClick={onClick}
       mapStyle={
         theme === 'dark'

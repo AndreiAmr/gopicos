@@ -81,7 +81,7 @@ const fields: FieldProps[] = [
     additionalField: {
       label: 'Horário de funcionamento',
       type: 'input',
-      name: 'entryAmount',
+      name: 'openingHours',
       fieldRequiredRule: {
         fieldName: 'alwaysOpen',
         valueExpected: true,
@@ -123,7 +123,7 @@ export const BasicData = () => {
         name="text"
         label="Descrição"
         placeholder="Conte um pouco sobre o local"
-        className="resize-none"
+        className="resize-none not-dark:bg-white"
         value={description}
         onChange={(e) => handleChange('description', e.target.value)}
       />

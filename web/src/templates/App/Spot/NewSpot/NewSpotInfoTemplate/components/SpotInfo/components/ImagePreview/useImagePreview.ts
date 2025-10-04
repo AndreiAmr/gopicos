@@ -1,4 +1,4 @@
-import { ChangeEvent, DragEvent, useMemo } from 'react';
+import { ChangeEvent, useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 const MAX_IMAGES = 8;
@@ -13,7 +13,10 @@ export const useImagePreview = () => {
   }, [imagesSelected]);
 
   const images = useMemo(() => {
-    return imagesSelected.map((i) => URL.createObjectURL(i));
+    return imagesSelected.map((i) => ({
+      url: URL.createObjectURL(i),
+      name: i.name,
+    }));
   }, [imagesSelected]);
 
   const handleSelectImage = (event: ChangeEvent<HTMLInputElement>) => {
@@ -32,7 +35,9 @@ export const useImagePreview = () => {
   };
 
   const handleRemoveImage = (imgString: string) => {
-    // setImages((actual) => actual.filter((img) => img !== imgString));
+    const newImages = imagesSelected.filter((item) => item.name !== imgString);
+
+    formMethods.setValue('images', newImages);
   };
 
   return {
