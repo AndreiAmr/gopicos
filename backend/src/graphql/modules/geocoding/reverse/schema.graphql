@@ -1,0 +1,14 @@
+input GeoProps {
+  lat: Float
+  lng: Float
+}
+
+type ReverseGeocoding {
+  road: String
+  quarter: String
+  suburb: String
+}
+
+extend type Query {
+  getReverseGeocoding(input: GeoProps): ReverseGeocoding
+}

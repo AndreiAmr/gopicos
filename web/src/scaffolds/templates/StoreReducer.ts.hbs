@@ -1,0 +1,62 @@
+import { produce } from 'immer';
+
+import {
+  {{pascalCase nameStore}}ActionTypes,
+  I{{pascalCase nameStore}}Payload,
+  I{{pascalCase nameStore}}State,
+  I{{pascalCase nameStore}}Reducer,
+  I{{pascalCase nameStore}}Action,
+} from './{{camelCase nameStore}}Types';
+
+const INITIAL_STATE: I{{pascalCase nameStore}}State = {
+  {{camelCase nameModule}}: { data: null, isLoading: false, isError: false },
+};
+
+const set{{pascalCase nameModule}}: I{{pascalCase nameStore}}Reducer = (
+  state: I{{pascalCase nameStore}}State,
+  payload?: I{{pascalCase nameStore}}Payload,
+) =>
+  produce(state, draft => {
+    draft.{{camelCase nameModule}}.data = payload?.{{camelCase nameModule}} || null;
+  });
+
+const setIsLoading{{pascalCase nameModule}}: I{{pascalCase nameStore}}Reducer = (
+  state: I{{pascalCase nameStore}}State,
+  payload?: I{{pascalCase nameStore}}Payload,
+) =>
+  produce(state, draft => {
+    draft.{{camelCase nameModule}}.isLoading = payload?.isLoading || false;
+  });
+
+const setIsError{{pascalCase nameModule}}: I{{pascalCase nameStore}}Reducer = (
+  state: I{{pascalCase nameStore}}State,
+  payload?: I{{pascalCase nameStore}}Payload,
+) =>
+  produce(state, draft => {
+    draft.{{camelCase nameModule}}.isError = payload?.isError || false;
+  });
+
+
+const {{camelCase nameStore}}ReducerMap = new Map<
+  {{pascalCase nameStore}}ActionTypes,
+  I{{pascalCase nameStore}}Reducer
+>([
+  [{{pascalCase nameStore}}ActionTypes.SET_{{constantCase nameModule}}, set{{pascalCase nameModule}}],
+  [{{pascalCase nameStore}}ActionTypes.SET_IS_ERROR_{{constantCase nameModule}}, setIsError{{pascalCase nameModule}}],
+  [
+    {{pascalCase nameStore}}ActionTypes.SET_IS_LOADING_{{constantCase nameModule}},
+    setIsLoading{{pascalCase nameModule}},
+  ],
+]);
+
+const {{camelCase nameStore}}Reducer = (
+  state: I{{pascalCase nameStore}}State = INITIAL_STATE,
+  action = {} as I{{pascalCase nameStore}}Action,
+): I{{pascalCase nameStore}}State => {
+  const reducer = {{camelCase nameStore}}ReducerMap.get(action.type);
+  if (reducer) return reducer(state, action.payload);
+
+  return state;
+};
+
+export default {{camelCase nameStore}}Reducer;

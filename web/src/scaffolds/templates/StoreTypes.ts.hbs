@@ -1,0 +1,37 @@
+export enum {{pascalCase nameStore}}ActionTypes {
+  GET_{{constantCase nameModule}}_ASYNC = '@{{camelCase nameStore}}/{{camelCase nameModule}}/GET_{{constantCase nameModule}}_ASYNC',
+  SET_{{constantCase nameModule}} = '@{{camelCase nameStore}}/{{camelCase nameModule}}/SET_{{constantCase nameModule}}',
+  SET_IS_LOADING_{{constantCase nameModule}} = '@{{camelCase nameStore}}/{{camelCase nameModule}}/SET_IS_LOADING_{{constantCase nameModule}}',
+  SET_IS_ERROR_{{constantCase nameModule}} = '@{{camelCase nameStore}}/{{camelCase nameModule}}/SET_IS_ERROR_{{constantCase nameModule}}',
+}
+
+export interface I{{pascalCase nameModule}} {
+  propOne: string;
+  propTwo: string;
+}
+
+export interface I{{pascalCase nameModule}}Module {
+  data: I{{pascalCase nameModule}} | null;
+  isLoading: boolean;
+  isError: boolean;
+}
+
+export interface I{{pascalCase nameStore}}State {
+  {{camelCase nameModule}}: I{{pascalCase nameModule}}Module;
+}
+
+export interface I{{pascalCase nameStore}}Payload {
+  {{camelCase nameModule}}?: I{{pascalCase nameModule}};
+  isLoading?: boolean;
+  isError?: boolean;
+}
+
+export type I{{pascalCase nameStore}}Action = {
+  type: {{pascalCase nameStore}}ActionTypes;
+  payload?: I{{pascalCase nameStore}}Payload;
+};
+
+export type I{{pascalCase nameStore}}Reducer = (
+  state: I{{pascalCase nameStore}}State,
+  payload?: I{{pascalCase nameStore}}Payload,
+) => I{{pascalCase nameStore}}State;

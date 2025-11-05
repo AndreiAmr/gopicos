@@ -1,0 +1,14 @@
+input SignupProp {
+  name: String!
+  password: String!
+  email: String!
+  nickname: String
+}
+
+type Response {
+  message: String
+}
+
+extend type Mutation {
+  signup(props: SignupProp): Response
+}

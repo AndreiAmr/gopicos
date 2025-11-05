@@ -1,0 +1,21 @@
+scalar Upload
+scalar JSON
+
+input NewSpotInput {
+  name: String
+  description: String
+  modality: String
+  isPaid: Boolean
+  alwaysOpen: Boolean
+  hasCoverage: Boolean
+  images: [Upload!]
+  equipmentRequired: Boolean
+  entryAmount: String
+  coordinates: JSON
+  openingHours: String
+  markingType: String
+}
+
+extend type Mutation {
+  createSpot(input: NewSpotInput!): Spot!
+}

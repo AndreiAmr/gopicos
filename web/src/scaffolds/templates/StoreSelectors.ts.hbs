@@ -1,0 +1,22 @@
+import { ApplicationState } from '@/store/types';
+
+import { I{{pascalCase nameModule}}, I{{pascalCase nameStore}}State } from './{{camelCase nameStore}}Types';
+
+const getState = (state: ApplicationState): I{{pascalCase nameStore}}State =>
+  state.{{pascalCase nameStore}};
+
+const get{{pascalCase nameModule}} = (state: ApplicationState): I{{pascalCase nameModule}} | null =>
+  getState(state).{{camelCase nameModule}}.data;
+
+const getIsLoading{{pascalCase nameModule}} = (state: ApplicationState): boolean =>
+  getState(state).{{camelCase nameModule}}.isLoading;
+
+const getIsError{{pascalCase nameModule}} = (state: ApplicationState): boolean =>
+  getState(state).{{camelCase nameModule}}.isError;
+
+export const {{camelCase nameStore}}Selectors = {
+  getState,
+  get{{pascalCase nameModule}},
+  getIsLoading{{pascalCase nameModule}},
+  getIsError{{pascalCase nameModule}},
+};

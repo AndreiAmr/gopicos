@@ -1,0 +1,14 @@
+input SpotReview {
+  spotId: String!
+  title: String!
+  description: String!
+}
+
+type SpotReviewReturn {
+  title: String
+  description: String
+}
+
+extend type Mutation {
+  createSpotReview(data: SpotReview): SpotReviewReturn @Authenticated
+}

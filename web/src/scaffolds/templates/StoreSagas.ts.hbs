@@ -1,0 +1,30 @@
+import { call, put, takeLatest } from 'redux-saga/effects';
+
+import { {{camelCase nameStore}}Actions } from './{{camelCase nameStore}}Actions';
+import { {{camelCase nameStore}}Repository } from './{{camelCase nameStore}}Repository';
+import { I{{pascalCase nameModule}}, {{pascalCase nameStore}}ActionTypes } from './{{camelCase nameStore}}Types';
+
+export function* get{{pascalCase nameModule}}Async() {
+  try {
+    yield put({{camelCase nameStore}}Actions.setIsLoading{{pascalCase nameModule}}(true));
+    yield put({{camelCase nameStore}}Actions.setIsError{{pascalCase nameModule}}(false));
+    const {{camelCase nameModule}}: I{{pascalCase nameModule}} = yield call(
+      {{camelCase nameStore}}Repository.get{{pascalCase nameModule}},
+    );
+
+    yield put({{camelCase nameStore}}Actions.set{{pascalCase nameModule}}({{camelCase nameModule}}));
+  } catch  {
+    yield put({{camelCase nameStore}}Actions.setIsError{{pascalCase nameModule}}(true));
+  } finally {
+    yield put({{camelCase nameStore}}Actions.setIsLoading{{pascalCase nameModule}}(false));
+  }
+}
+
+const {{camelCase nameStore}}Sagas = [
+  takeLatest(
+    {{pascalCase nameStore}}ActionTypes.GET_{{constantCase nameModule}}_ASYNC,
+    get{{pascalCase nameModule}}Async,
+  ),
+];
+
+export default {{camelCase nameStore}}Sagas;

@@ -1,0 +1,19 @@
+import apolloClientInstance from '@models/ApolloClient';
+
+import { I{{pascalCase nameModule}} } from './{{camelCase nameStore}}Types';
+import { get{{pascalCase nameModule}}Query } from './{{camelCase nameStore}}Queries';
+
+const get{{pascalCase nameModule}} = async (): Promise<I{{pascalCase nameModule}} | null> => {
+  const { data } = await apolloClientInstance().query<{
+    get{{pascalCase nameModule}}: I{{pascalCase nameModule}};
+  }>({
+    fetchPolicy: 'no-cache',
+    query: get{{pascalCase nameModule}}Query,
+  });
+
+  return data.get{{pascalCase nameModule}};
+};
+
+export const {{camelCase nameStore}}Repository = {
+  get{{pascalCase nameModule}},
+};

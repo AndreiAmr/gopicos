@@ -1,0 +1,34 @@
+import {
+  I{{pascalCase nameModule}},
+  {{pascalCase nameStore}}ActionTypes,
+  I{{pascalCase nameStore}}Action,
+} from './{{camelCase nameStore}}Types';
+
+const get{{pascalCase nameModule}}Async = (): I{{pascalCase nameStore}}Action => ({
+  type: {{pascalCase nameStore}}ActionTypes.GET_{{constantCase nameModule}}_ASYNC,
+});
+
+const set{{pascalCase nameModule}} = (
+  {{camelCase nameModule}}: I{{pascalCase nameModule}},
+): I{{pascalCase nameStore}}Action => ({
+  payload: { {{camelCase nameModule}} },
+  type: {{pascalCase nameStore}}ActionTypes.SET_{{constantCase nameModule}},
+});
+
+const setIsLoading{{pascalCase nameModule}} = (isLoading: boolean): I{{pascalCase nameStore}}Action => ({
+  payload: { isLoading },
+  type: {{pascalCase nameStore}}ActionTypes.SET_IS_LOADING_{{constantCase nameModule}},
+});
+
+const setIsError{{pascalCase nameModule}} = (isError: boolean): I{{pascalCase nameStore}}Action => ({
+  payload: { isError },
+  type: {{pascalCase nameStore}}ActionTypes.SET_IS_ERROR_{{constantCase nameModule}},
+});
+
+
+export const {{camelCase nameStore}}Actions = {
+  get{{pascalCase nameModule}}Async,
+  set{{pascalCase nameModule}},
+  setIsLoading{{pascalCase nameModule}},
+  setIsError{{pascalCase nameModule}},
+};

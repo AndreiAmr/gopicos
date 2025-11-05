@@ -1,0 +1,52 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "./generated"
+  binaryTargets = ["native", "linux-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String       @unique() @default(uuid())
+  email    String       @unique
+  name     String
+  password String
+  spot     Spot[]
+  reviews  SpotReview[]
+}
+
+model Spot {
+  id                String       @unique() @default(uuid())
+  name              String
+  description       String
+  author            User         @relation(fields: [authorId], references: [id])
+  authorId          String
+  modality          String
+  equipmentRequired Boolean
+  isPaid            Boolean
+  alwaysOpen        Boolean
+  entryAmount       String?
+  openingHours      String?
+  hasCoverage       Boolean
+  coordinates       Json
+  images            String[]
+  reviews           SpotReview[] @relation("SpotReviews")
+  createdAt         DateTime     @default(now())
+}
+
+model SpotReview {
+  id          String       @unique() @default(uuid())
+  title       String
+  description String
+  author      User         @relation(fields: [authorId], references: [id])
+  authorId    String
+  spot        Spot         @relation("SpotReviews", fields: [spotId], references: [id])
+  spotId      String
+  parent      SpotReview?  @relation("ReviewReplies", fields: [parentId], references: [id])
+  parentId    String?
+  replies     SpotReview[] @relation("ReviewReplies")
+  createdAt   DateTime     @default(now())
+}

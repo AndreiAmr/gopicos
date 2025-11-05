@@ -1,0 +1,36 @@
+type Author {
+  id: String
+  email: String
+  name: String
+}
+
+type Review {
+  id: String
+  title: String
+  description: String
+  authorId: String
+  spotId: String
+  createdAt: String
+  author: Author
+}
+
+type SpotDetails {
+  id: String
+  name: String
+  description: String
+  modality: String
+  isPaid: Boolean
+  alwaysOpen: Boolean
+  hasCoverage: Boolean
+  images: [String]
+  equipmentRequired: Boolean
+  entryAmount: String
+  coordinates: JSON
+  openingHours: String
+  markingType: String
+  reviews: [Review]
+}
+
+extend type Query {
+  getSpotById(id: String!): SpotDetails @Authenticated
+}
