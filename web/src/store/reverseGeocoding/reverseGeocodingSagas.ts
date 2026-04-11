@@ -21,15 +21,10 @@ export function* getReverseGeocodingAsync({
       lat: payload.lat,
       lng: payload.lng,
     };
-    console.log('🚀 ~ getReverseGeocodingAsync ~ params:', params);
 
     const reverseGeocoding: IReverseGeocoding = yield call(
       reverseGeocodingRepository.getReverseGeocoding,
-      params
-    );
-    console.log(
-      '🚀 ~ getReverseGeocodingAsync ~ reverseGeocoding:',
-      reverseGeocoding
+      params,
     );
 
     yield put(reverseGeocodingActions.setReverseGeocoding(reverseGeocoding));
@@ -43,7 +38,7 @@ export function* getReverseGeocodingAsync({
 const reverseGeocodingSagas = [
   takeLatest(
     ReverseGeocodingActionTypes.GET_REVERSE_GEOCODING_ASYNC,
-    getReverseGeocodingAsync
+    getReverseGeocodingAsync,
   ),
 ];
 

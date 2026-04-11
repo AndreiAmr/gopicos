@@ -22,7 +22,6 @@ const getReverseGeocoding = async ({
       },
     },
   });
-  console.log('🚀 ~ getReverseGeocoding ~ data:', data);
 
   return data.getReverseGeocoding;
 };

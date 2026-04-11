@@ -3,7 +3,7 @@ import { ISearchPlace } from './searchPlaceTypes';
 import { getSearchPlaceQuery } from './searchPlaceQueries';
 
 const getSearchPlace = async (
-  search: string
+  search: string,
 ): Promise<ISearchPlace[] | null> => {
   const { data } = await apolloClient.query<{
     getFowardGeocoding: ISearchPlace[];
@@ -14,7 +14,6 @@ const getSearchPlace = async (
       search,
     },
   });
-  console.log('🚀 ~ getSearchPlace ~ data:', data);
 
   return data.getFowardGeocoding;
 };

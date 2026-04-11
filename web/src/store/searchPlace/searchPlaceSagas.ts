@@ -9,7 +9,6 @@ import {
 } from './searchPlaceTypes';
 
 export function* getSearchPlaceAsync({ payload }: ISearchPlaceAction) {
-  console.log('🚀 ~ getSearchPlaceAsync ~ payload:', payload);
   try {
     if (!payload || !payload.searchValue) return;
 
@@ -17,9 +16,8 @@ export function* getSearchPlaceAsync({ payload }: ISearchPlaceAction) {
     yield put(searchPlaceActions.setIsErrorSearchPlace(false));
     const searchPlace: ISearchPlace[] = yield call(
       searchPlaceRepository.getSearchPlace,
-      payload.searchValue
+      payload.searchValue,
     );
-    console.log('🚀 ~ getSearchPlaceAsync ~ searchPlace:', searchPlace);
 
     yield put(searchPlaceActions.setSearchPlace(searchPlace));
   } catch {
@@ -32,7 +30,7 @@ export function* getSearchPlaceAsync({ payload }: ISearchPlaceAction) {
 const searchPlaceSagas = [
   takeLatest(
     SearchPlaceActionTypes.GET_SEARCH_PLACE_ASYNC,
-    getSearchPlaceAsync
+    getSearchPlaceAsync,
   ),
 ];
 
