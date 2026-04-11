@@ -3,6 +3,7 @@ import { AppSidebar } from '@/atomic/molecules/sidebar';
 import { Header } from '@/components/header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { NavigationSetter } from '@/NavigationSetter';
+import { AuthGuard } from '@/routes/AuthGuard';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Outlet } from 'react-router';
 
@@ -17,19 +18,21 @@ export const AppLayout = () => {
   });
 
   return (
-    <FormProvider {...formMethods}>
-      <NavigationSetter />
-      <SidebarProvider defaultOpen className="h-full">
-        <AppSidebar />
-        <div className="w-full h-full flex flex-col">
-          <Header />
-          <div className="flex flex-col h-full flex-1 overflow-y-scroll">
-            <SidebarInset className="flex-1">
-              <Outlet />
-            </SidebarInset>
+    <AuthGuard>
+      <FormProvider {...formMethods}>
+        <NavigationSetter />
+        <SidebarProvider defaultOpen className="h-full">
+          <AppSidebar />
+          <div className="w-full h-full flex flex-col">
+            <Header />
+            <div className="flex flex-col h-full flex-1 overflow-y-scroll">
+              <SidebarInset className="flex-1">
+                <Outlet />
+              </SidebarInset>
+            </div>
           </div>
-        </div>
-      </SidebarProvider>
-    </FormProvider>
+        </SidebarProvider>
+      </FormProvider>
+    </AuthGuard>
   );
 };

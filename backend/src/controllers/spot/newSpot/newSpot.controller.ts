@@ -32,13 +32,14 @@ export const newSpotController = async (
   data: NewSpotInput,
   auth: IAuthentication,
 ) => {
+  console.log('🚀 ~ newSpotController ~ auth:', auth?.id);
   try {
     const result = await newSpotServices.createSpotService({ data, auth });
 
     for (const image of data.images) {
       const imageUrl = await cloudinaryModel.uploadImage(
         image,
-        'a996c0af-96aa-4fc8-bb6a-dae4280904ea',
+        auth.id,
         result.id,
       );
 

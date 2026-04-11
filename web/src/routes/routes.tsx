@@ -5,6 +5,7 @@ import { HomePage } from '@/pages/app/home';
 import { LoginPage } from '@/pages/auth/login';
 import { PageNotFound } from '@/pages/error/PageNotFound';
 import { createBrowserRouter } from 'react-router';
+
 import { spotRoutes } from './spot.routes';
 
 const router = createBrowserRouter([

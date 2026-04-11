@@ -1,10 +1,13 @@
+import { ApolloError } from 'apollo-server-errors';
 import { create } from 'domain';
+import { GraphQLError } from 'graphql';
 import jwt, { SignOptions } from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET || '';
+console.log('🚀 ~ JWT_SECRET:', JWT_SECRET);
 
 export const generateToken = (
   payload: object,
-  expiresIn: SignOptions['expiresIn'] = '20m'
+  expiresIn: SignOptions['expiresIn'] = '20m',
 ) => {
   if (!JWT_SECRET) throw new Error('JWT_SECRET must be string');
   const expiresInSeconds =
@@ -24,8 +27,9 @@ export const generateToken = (
 
 export const getTokenData = (token: string) => {
   try {
-    return jwt.verify(token, JWT_SECRET);
-  } catch {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    return decoded;
+  } catch (error) {
     return null;
   }
 };

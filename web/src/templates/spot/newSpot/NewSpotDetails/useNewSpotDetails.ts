@@ -1,88 +1,32 @@
 import { reverseGeocodingActions } from '@/store/reverseGeocoding/reverseGeocodingActions';
 import { reverseGeocodingSelectors } from '@/store/reverseGeocoding/reverseGeocodingSelectors';
-import { createSpotSelectors } from '@/store/spot/modules/createSpot/createSpotSelectors';
+
 import { useCreateSpotMutation } from '@/mutations/createSpotMutation/useCreateSpotMutation';
 
 import { ISpot } from '@/store/spot/spotTypes';
 import bbox from '@turf/bbox';
 import { AllGeoJSON } from '@turf/helpers';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import {
   LngLatBoundsLike,
   MapRef,
   SourceSpecification,
 } from 'react-map-gl/mapbox';
 import { useDispatch, useSelector } from 'react-redux';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+
 import { toast } from 'sonner';
-
-const validationSchema = yup.object().shape({
-  name: yup
-    .string()
-    .required('Nome é obrigatório')
-    .min(3, 'Mínimo 3 caracteres'),
-  images: yup
-    .number()
-    .min(1, 'Selecione ao menos uma imagem')
-    .required('Imagens é obrigatório'),
-  description: yup
-    .string()
-    .required('Descrição é obrigatória')
-    .min(20, 'Mínimo 20 caracteres'),
-  road: yup.string().required('Rua é obrigatória'),
-  suburb: yup.string().required('Bairro é obrigatório'),
-  quarter: yup.string(),
-  number: yup.string(),
-  complement: yup.string(),
-  reference: yup.string().min(20, 'Mínimo 20 caracteres'),
-  modality: yup.string().required('Modalidade é obrigatória'),
-  equipamentRequired: yup.boolean(),
-  hasCoverage: yup.boolean(),
-  alwaysOpen: yup.boolean(),
-  openingTime: yup.string().when('alwaysOpen', {
-    is: false,
-    then: (schema) => schema.required('Horário de abertura é obrigatório'),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  closingTime: yup.string().when('alwaysOpen', {
-    is: false,
-    then: (schema) => schema.required('Horário de fechamento é obrigatório'),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  isPaid: yup.boolean(),
-  entryAmount: yup.string().when('isPaid', {
-    is: true,
-    then: (schema) => schema.required('Valor de entrada obrigatório'),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-});
-
-const defaultValues = {
-  name: '',
-  description: '',
-  road: '',
-  suburb: '',
-  quarter: '',
-  number: '',
-  complement: '',
-  reference: '',
-  modality: '',
-  equipamentRequired: false,
-  hasCoverage: false,
-  alwaysOpen: true,
-  openingTime: '',
-  closingTime: '',
-  isPaid: false,
-  entryAmount: '',
-  images: 0,
-};
+import { ICreateSpot } from '@/pages/_layouts/NewSpotLayout';
+import { useNavigate } from 'react-router';
 
 export const useNewSpotDetails = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const mapRef = useRef<MapRef>(null);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const { register, setValue, handleSubmit, formState, watch, getValues } =
+    useFormContext<ICreateSpot>();
 
   const {
     mutate: createSpot,
@@ -91,9 +35,7 @@ export const useNewSpotDetails = () => {
     reset,
   } = useCreateSpotMutation();
 
-  const currentCoordinates = useSelector(
-    createSpotSelectors.getCreateSpotCoordinates,
-  );
+  const currentCoordinates = watch('coordinates');
   const reverseGeocoding = useSelector(
     reverseGeocodingSelectors.getReverseGeocoding,
   );
@@ -101,13 +43,6 @@ export const useNewSpotDetails = () => {
   const isLoadingReverseGeocoding = useSelector(
     reverseGeocodingSelectors.getIsLoadingReverseGeocoding,
   );
-
-  const { register, setValue, handleSubmit, formState, watch, getValues } =
-    useForm({
-      defaultValues,
-      resolver: yupResolver(validationSchema),
-      mode: 'onSubmit',
-    });
 
   const errors = formState.errors;
 
@@ -168,6 +103,7 @@ export const useNewSpotDetails = () => {
       {
         onSuccess: () => {
           toast.success('Spot criado com sucesso!', { id: toastId });
+          navigate('/home');
           reset();
         },
         onError: () => {
@@ -202,8 +138,8 @@ export const useNewSpotDetails = () => {
   }, [reverseGeocoding, setValue]);
 
   useEffect(() => {
-    setValue('images', selectedFiles.length);
-  }, [selectedFiles.length, setValue]);
+    setValue('images', selectedFiles);
+  }, [selectedFiles, setValue]);
 
   return {
     mapRef,

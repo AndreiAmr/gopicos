@@ -43,8 +43,6 @@ async function startServer() {
   app.use(
     cors({
       origin: '*',
-      // methods: ['GET', 'POST', 'OPTIONS'],
-      // allowedHeaders: ['Content-Type', 'Authorization'],
     }),
   );
 
@@ -63,16 +61,22 @@ async function startServer() {
       context: async (props) => {
         const token = props.req.headers['authorization'];
 
-        if (!token) return {};
+        if (!token) {
+          return {};
+        }
 
         const [_, tokenValue] = token.split(' ');
 
         const data = getTokenData(tokenValue);
 
-        if (!data) return {};
+        if (!data) {
+          return {};
+        }
+
+        const authModel = new AuthenticationModel(data as IAuthentication);
 
         return {
-          auth: new AuthenticationModel(data as IAuthentication),
+          auth: authModel,
         };
       },
     }),

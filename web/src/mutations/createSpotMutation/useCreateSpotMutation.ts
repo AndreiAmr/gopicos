@@ -22,6 +22,9 @@ export const fetchCreateSpot = async (params: ICreateSpot) => {
     images: files.map(() => null),
   };
 
+  const tokenCookie = await window.cookieStore.get('token');
+  const tokenValue = tokenCookie ? tokenCookie.value : null;
+
   const operations = {
     query: `
       mutation CreateSpot($input: NewSpotInput!) {
@@ -48,6 +51,7 @@ export const fetchCreateSpot = async (params: ICreateSpot) => {
     headers: {
       'x-apollo-operation-name': 'CreateSpot',
       'apollo-require-preflight': 'true',
+      Authorization: `Bearer ${tokenValue}`,
     },
   });
   return result;

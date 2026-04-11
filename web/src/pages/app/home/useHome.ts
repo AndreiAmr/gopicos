@@ -9,6 +9,7 @@ export const useHome = () => {
   const dispatch = useDispatch();
   const mapRef = useRef<MapRef>(null);
   const spots = useSelector(listSpotsSelectors.getListSpots);
+
   useMapLocation({ mapRef });
 
   useEffect(() => {

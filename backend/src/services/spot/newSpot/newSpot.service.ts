@@ -13,7 +13,7 @@ export const createSpotService = async ({
 }: INewSpotServiceProps) => {
   const spotCreated = await spotRepository.create({
     data,
-    authorId: 'a996c0af-96aa-4fc8-bb6a-dae4280904ea',
+    authorId: auth.id,
   });
 
   if (!spotCreated) {
