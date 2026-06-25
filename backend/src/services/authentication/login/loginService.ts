@@ -1,5 +1,6 @@
 import { userRepository } from '../../../database/repositories/User';
 import { LoginDTO } from './loginDTO';
+import { AppError } from '../../../utils/AppError';
 
 type LoginServiceProps = {
   email: string;
@@ -11,7 +12,11 @@ export const loginService = async (props: LoginServiceProps) => {
   console.log('🚀 ~ loginService called');
 
   if (!user) {
-    throw new Error('Usuário não encontrado');
+    throw new AppError({
+      type: 'USER_NOT_FOUND',
+      message: 'Usuário não encontrado',
+      statusCode: 404,
+    });
   }
 
   return new LoginDTO(user);

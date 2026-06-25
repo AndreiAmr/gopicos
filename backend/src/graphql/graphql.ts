@@ -14,6 +14,7 @@ import {
   AuthenticationModel,
   IAuthentication,
 } from '../models/authentication/authenticationModel';
+import { AppError } from '../utils/AppError';
 
 async function startServer() {
   const app = express();
@@ -27,12 +28,24 @@ async function startServer() {
 
   const server = new ApolloServer({
     schema,
-    formatError: (err) => {
+    formatError: (formattedError, error) => {
+      const originalError = error.originalError;
+
+      if (originalError instanceof AppError) {
+        console.log('🚀 ~ formatError ~ originalError:', originalError);
+
+        return {
+          message: originalError.message,
+          type: originalError.type,
+          statusCode: originalError.statusCode,
+        };
+      }
+
       return {
-        message: err.message,
+        message: formattedError.message,
         extensions: {
-          status: err.extensions?.code || 'INTERNAL_SERVER_ERROR',
-          statusCode: err.extensions?.statusCode || 500,
+          type: 'INTERNAL_ERROR',
+          statusCode: 500,
         },
       };
     },
