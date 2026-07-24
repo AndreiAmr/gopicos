@@ -7,6 +7,7 @@ const RootStack = createNativeStackNavigator({
   screenOptions: {
     headerShown: false,
   },
+  initialRouteName: 'Home',
   screens: {
     Login: {
       screen: LoginTemplate,
