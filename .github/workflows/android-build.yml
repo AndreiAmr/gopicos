@@ -51,7 +51,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-debug-apk
-          path: mobile/android/app/build/outputs/apk/debug/app-debug.apk # Aponta para o caminho final do APK gerado
+          path: mobile/android/app/build/outputs/apk/release/app-release.apk # Aponta para o caminho final do APK gerado
           retention-days: 7
       - name: Criar Release de Teste no GitHub
         uses: softprops/action-gh-release@v2
