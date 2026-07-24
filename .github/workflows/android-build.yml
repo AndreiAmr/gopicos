@@ -50,7 +50,7 @@ jobs:
       - name: Enviar APK para os Artifacts do GitHub
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug-apk
+          name: app-release-apk
           path: mobile/android/app/build/outputs/apk/release/app-release.apk # Aponta para o caminho final do APK gerado
           retention-days: 7
       - name: Criar Release de Teste no GitHub
@@ -62,7 +62,7 @@ jobs:
           body: "APK gerado automaticamente para testes na PR #${{ github.event.pull_request.number }}."
           draft: false
           prerelease: true # Fica marcado como versão de teste
-          files: mobile/android/app/build/outputs/apk/debug/app-debug.apk # Anexa o APK aqui
+          files: mobile/android/app/build/outputs/apk/release/app-release.apk # Anexa o APK aqui
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -72,7 +72,7 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         with:
-          args: "✅ **Build Concluído!** O novo APK da branch `${{ github.head_ref }}` está pronto! \n📲 **Clique aqui para baixar direto:** https://github.com/${{ github.repository }}/releases/download/pr-build-${{ github.event.pull_request.number }}/app-debug.apk"
+          args: "✅ **Build Concluído!** O novo APK da branch `${{ github.head_ref }}` está pronto! \n📲 **Clique aqui para baixar direto:** https://github.com/${{ github.repository }}/releases/download/pr-build-${{ github.event.pull_request.number }}/app-release.apk"
       
       - name: Notificar ERRO no Discord
         if: failure()
