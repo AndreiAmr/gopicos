@@ -26,7 +26,7 @@ jobs:
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: './mobile/package-lock.json' # Aponta para o cache de pacotes correto
 
@@ -42,10 +42,10 @@ jobs:
       - name: Permissão de execução para o Gradle
         run: chmod +x android/gradlew # Executado em ./mobile/android/gradlew
 
-      - name: Compilar APK (Debug)
+      - name: Compilar Release APK 
         run: |
           cd android
-          ./gradlew assembleDebug
+          ./gradlew assembleRelease
 
       - name: Enviar APK para os Artifacts do GitHub
         uses: actions/upload-artifact@v4
