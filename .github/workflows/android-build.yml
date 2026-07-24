@@ -23,15 +23,15 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
+      - name: Habilitar Corepack (Suporte ao Yarn v4)
+        run: corepack enable
+
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20.18.0'
           cache: 'yarn'
           cache-dependency-path: './mobile/yarn.lock' # Aponta para o cache de pacotes correto
-      
-      - name: Habilitar Corepack (Suporte ao Yarn v4)
-        run: corepack enable
 
       - name: Instalar dependências
         run: yarn install --frozen-lockfile
