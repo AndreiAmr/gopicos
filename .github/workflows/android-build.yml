@@ -53,3 +53,23 @@ jobs:
           name: app-debug-apk
           path: mobile/android/app/build/outputs/apk/debug/app-debug.apk # Aponta para o caminho final do APK gerado
           retention-days: 7
+      - name: Criar Release de Teste no GitHub
+        uses: softprops/action-gh-release@v2
+        id: create_release
+        with:
+          tag_name: pr-build-${{ github.event.pull_request.number }}
+          name: "Build de Teste - PR #${{ github.event.pull_request.number }}"
+          body: "APK gerado automaticamente para testes na PR #${{ github.event.pull_request.number }}."
+          draft: false
+          prerelease: true # Fica marcado como versão de teste
+          files: mobile/android/app/build/outputs/apk/debug/app-debug.apk # Anexa o APK aqui
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 3. Envia o link DIRETO do arquivo para o Discord
+      - name: Notificar no Discord com Link Direto
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: "✅ **Build Concluído!** O novo APK da branch `${{ github.head_ref }}` está pronto! \n📲 **Clique aqui para baixar direto:** https://github.com/${{ github.repository }}/releases/download/pr-build-${{ github.event.pull_request.number }}/app-debug.apk"
