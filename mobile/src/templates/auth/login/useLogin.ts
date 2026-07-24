@@ -32,8 +32,8 @@ export const useLogin = () => {
   const { mutate, loading } = useLoginMutation();
   const { control, handleSubmit, formState } = useForm<LoginFormData>({
     defaultValues: {
-      email: '',
-      password: '',
+      email: 'test@gmail.com',
+      password: 'amaral',
     },
     resolver: yupResolver(validationSchema),
     reValidateMode: 'onChange',
