@@ -73,3 +73,11 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         with:
           args: "✅ **Build Concluído!** O novo APK da branch `${{ github.head_ref }}` está pronto! \n📲 **Clique aqui para baixar direto:** https://github.com/${{ github.repository }}/releases/download/pr-build-${{ github.event.pull_request.number }}/app-debug.apk"
+      
+      - name: Notificar ERRO no Discord
+        if: failure()
+        uses: Ilshidur/action-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: "❌ **Deu ruim no Build!** A compilação da PR da branch `${{ github.head_ref }}` falhou. \n🔍 **Clique aqui para ver os logs do erro:** https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
