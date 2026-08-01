@@ -1,5 +1,5 @@
 import { JsonValue } from '@prisma/client/runtime/library';
-import { Spot } from '../../../prisma/generated';
+import { Spot } from '../../prisma/generated';
 
 type Props = Spot & {};
 
@@ -18,6 +18,7 @@ export class SpotModel implements Spot {
   images: string[] = [];
   markingType: string = '';
   openingHours: string | null = null;
+  createdAt: Date = new Date();
 
   constructor(props: Props) {
     Object.assign(this, props);

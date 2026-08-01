@@ -1,6 +1,6 @@
 import { IRepository } from '../..';
-import { Spot, User } from '../../../prisma/generated';
-import { prisma } from '../../../prisma/prisma';
+import { Spot } from '../../prisma/generated';
+import { prisma } from '../../prisma/prisma';
 import { NewSpotInput } from '../../controllers/spot/newSpot/newSpot.controller';
 
 type CreateSpotProps = {

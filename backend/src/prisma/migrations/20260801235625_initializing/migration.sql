@@ -21,7 +21,6 @@ CREATE TABLE "public"."Spot" (
     "hasCoverage" BOOLEAN NOT NULL,
     "coordinates" JSONB NOT NULL,
     "images" TEXT[],
-    "markingType" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

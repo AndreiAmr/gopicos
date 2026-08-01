@@ -1,13 +1,31 @@
-import path, { dirname } from 'path';
+import path from 'path';
 import { loadFilesSync } from '@graphql-tools/load-files';
 import { mergeTypeDefs } from '@graphql-tools/merge';
-import { fileURLToPath } from 'url';
+const schemaRoots = [__dirname, path.resolve(__dirname, '../../src/graphql')];
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+let types: any[] = [];
+let sharedValue: any[] = [];
 
-const types = loadFilesSync(path.join(__dirname, './modules/**/*.graphql'));
-const sharedValue = loadFilesSync(path.join(__dirname, './schema.graphql'));
+for (const root of schemaRoots) {
+  const loadedTypes = loadFilesSync(
+    path.join(root, './modules/**/*.graphql'),
+  ) as any[];
+  const loadedShared = loadFilesSync(
+    path.join(root, './schema.graphql'),
+  ) as any[];
+
+  if (loadedTypes.length > 0 && loadedShared.length > 0) {
+    types = loadedTypes;
+    sharedValue = loadedShared;
+    break;
+  }
+}
+
+if (types.length === 0 || sharedValue.length === 0) {
+  throw new Error(
+    'GraphQL schema files were not found in src/graphql or dist/graphql.',
+  );
+}
 
 const mergedTypeDefs = mergeTypeDefs([...types, ...sharedValue]);
 

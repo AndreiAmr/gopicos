@@ -7,7 +7,7 @@ import { ISpot } from '@/store/spot/spotTypes';
 import bbox from '@turf/bbox';
 import { AllGeoJSON } from '@turf/helpers';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useFormContext } from 'react-hook-form';
 import {
   LngLatBoundsLike,
   MapRef,
@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { toast } from 'sonner';
+import { ICreateSpot } from '@/pages/_layouts/NewSpotLayout';
 
 const validationSchema = yup.object().shape({
   name: yup
@@ -91,9 +92,9 @@ export const useNewSpotDetails = () => {
     reset,
   } = useCreateSpotMutation();
 
-  const currentCoordinates = useSelector(
-    createSpotSelectors.getCreateSpotCoordinates,
-  );
+  const { watch: watchContext } = useFormContext<ICreateSpot>();
+
+  const currentCoordinates = watchContext('coordinates');
   const reverseGeocoding = useSelector(
     reverseGeocodingSelectors.getReverseGeocoding,
   );
