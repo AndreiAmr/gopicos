@@ -47,19 +47,12 @@ jobs:
 
       - name: Aguardar Deploy
         run: |
-
-          echo "Deploy: $DEPLOY_ID"
-          echo API_KEY: ${{ secrets.RENDER_API_KEY }}
-          echo SERVICE_ID ${{ secrets.RENDER_QA_SERVICE_ID }}
-
           while true
           do
 
             RESPONSE=$(curl -s \
               -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
               "https://api.render.com/v1/services/${{ secrets.RENDER_QA_SERVICE_ID }}/deploys/$DEPLOY_ID")
-
-            echo "$RESPONSE"
             
             STATUS=$(echo "$RESPONSE" | jq -r '.status')
 
