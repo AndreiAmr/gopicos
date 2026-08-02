@@ -49,8 +49,8 @@ jobs:
         run: |
 
           echo "Deploy: $DEPLOY_ID"
-          echo: API_KEY: ${{ secrets.RENDER_QA_API_KEY }}
-          echo: SERVICE_ID ${{ secrets.RENDER_QA_SERVICE_ID }}
+          echo API_KEY: ${{ secrets.RENDER_QA_API_KEY }}
+          echo SERVICE_ID ${{ secrets.RENDER_QA_SERVICE_ID }}
 
           while true
           do
