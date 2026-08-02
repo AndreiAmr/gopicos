@@ -49,22 +49,8 @@ jobs:
         run: |
 
           echo "Deploy: $DEPLOY_ID"
-
-          HTTP_CODE=$(curl \
-            -s \
-            -w "%{http_code}" \
-            -o response.json \
-            -H "Authorization: Bearer ${{ secrets.RENDER_QA_API_KEY }}" \
-            "https://api.render.com/v1/services/${{ secrets.RENDER_QA_SERVICE_ID }}/deploys/$DEPLOY_ID")
-          
-          echo "HTTP_CODE=$HTTP_CODE"
-          
-          echo "Response:"
-          cat response.json
-          
-          echo "--------------------"
-          
-          jq . response.json
+          echo: API_KEY: ${{ secrets.RENDER_QA_API_KEY }}
+          echo: SERVICE_ID ${{ secrets.RENDER_QA_SERVICE_ID }}
 
           while true
           do
