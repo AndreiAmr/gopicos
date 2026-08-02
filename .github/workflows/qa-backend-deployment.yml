@@ -28,8 +28,8 @@ jobs:
 
           RESPONSE=$(curl -s \
             -X POST \
-            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
-            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}")
+            "https://api.render.com/v1/services/${{ secrets.RENDER_QA_SERVICE_ID }}/deploys" \
+            -H "Authorization: Bearer ${{ secrets.RENDER_QA_API_KEY }}")
 
           echo "$RESPONSE"
 
@@ -55,8 +55,8 @@ jobs:
           do
 
             RESPONSE=$(curl -s \
-              -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-              "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys/$DEPLOY_ID")
+              -H "Authorization: Bearer ${{ secrets.RENDER_QA_API_KEY }}" \
+              "https://api.render.com/v1/services/${{ secrets.RENDER_QA_SERVICE_ID }}/deploys/$DEPLOY_ID")
 
             STATUS=$(echo "$RESPONSE" | jq -r '.status')
 
