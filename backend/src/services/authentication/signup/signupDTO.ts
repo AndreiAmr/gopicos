@@ -1,4 +1,4 @@
-import { User } from '../../../prisma/generated';
+import { User } from '@prisma/client';
 
 export class SignupDTO implements User {
   password: string;

@@ -1,4 +1,4 @@
-import { User } from '../../prisma/generated';
+import { User } from '@prisma/client';
 import { SignupModel } from '../../models/authentication/signupModel';
 import { signUpService } from '../../services/authentication/signup/signupService';
 import bcrypt from 'bcrypt';

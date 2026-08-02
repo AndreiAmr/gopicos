@@ -8,7 +8,7 @@
     "migrate": "prisma migrate dev --schema=./src/prisma/schema.prisma",
     "generate": "prisma generate --schema=./src/prisma/schema.prisma",
     "mock": "tsx src/database/inserts/populate/index.ts",
-    "build": "npm run generate && tsc",
+    "build": "yarn generate && tsc",
     "prisma:studio": "prisma studio --schema ./src/prisma/schema.prisma",
     "setup": "npm run migrate && yarn mock"
   },

@@ -1,5 +1,5 @@
 import { IRepository } from '../..';
-import { Spot } from '../../prisma/generated';
+import { Spot } from '@prisma/client';
 import { prisma } from '../../prisma/prisma';
 import { NewSpotInput } from '../../controllers/spot/newSpot/newSpot.controller';
 

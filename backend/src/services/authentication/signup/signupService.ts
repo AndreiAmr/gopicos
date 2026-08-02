@@ -1,4 +1,4 @@
-import { User } from '../../../prisma/generated';
+import { User } from '@prisma/client';
 import { userRepository } from '../../../database/repositories/User';
 import { SignupDTO } from './signupDTO';
 

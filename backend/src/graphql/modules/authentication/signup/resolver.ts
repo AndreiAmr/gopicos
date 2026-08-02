@@ -1,4 +1,4 @@
-import { User } from '../../../../prisma/generated';
+import { User } from '@prisma/client';
 import { signupController } from '../../../../controllers/authentication/signup';
 
 export const signupResolvers = {
