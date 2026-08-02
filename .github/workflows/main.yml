@@ -1,0 +1,128 @@
+name: Deploy Backend (Development)
+
+on:
+  push:
+    branches:
+      - development
+    paths:
+      - "backend/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      ##################################################################
+      # CRIA O DEPLOY
+      ##################################################################
+
+      - name: Criar Deploy no Render
+        id: deploy
+
+        run: |
+
+          RESPONSE=$(curl -s \
+            -X POST \
+            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}")
+
+          echo "$RESPONSE"
+
+          DEPLOY_ID=$(echo "$RESPONSE" | jq -r '.id')
+
+          if [ "$DEPLOY_ID" = "null" ]; then
+            echo "Erro ao criar deploy"
+            exit 1
+          fi
+
+          echo "DEPLOY_ID=$DEPLOY_ID" >> $GITHUB_ENV
+
+      ##################################################################
+      # ESPERA O DEPLOY TERMINAR
+      ##################################################################
+
+      - name: Aguardar Deploy
+        run: |
+
+          echo "Deploy: $DEPLOY_ID"
+
+          while true
+          do
+
+            RESPONSE=$(curl -s \
+              -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+              "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys/$DEPLOY_ID")
+
+            STATUS=$(echo "$RESPONSE" | jq -r '.status')
+
+            echo "Status: $STATUS"
+
+            if [ "$STATUS" = "live" ]; then
+              echo "Deploy concluído."
+              exit 0
+            fi
+
+            if [ "$STATUS" = "build_failed" ]; then
+              echo "Deploy falhou."
+              exit 1
+            fi
+
+            sleep 20
+
+          done
+
+      ##################################################################
+      # DISCORD
+      ##################################################################
+
+      - name: Discord Sucesso
+        if: success()
+
+        uses: Ilshidur/action-discord@master
+
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+
+        with:
+          args: |
+            ✅ **Deploy concluído com sucesso!**
+
+            🚀 Backend atualizado na Render.
+
+            🌿 Branch: `${{ github.ref_name }}`
+            👤 Autor: `${{ github.actor }}`
+
+            📝 Commit:
+            `${{ github.event.head_commit.message }}`
+
+            🌐 API:
+            https://SEU-BACKEND.onrender.com
+
+      - name: Discord Erro
+        if: failure()
+
+        uses: Ilshidur/action-discord@master
+
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+
+        with:
+          args: |
+            ❌ **Deploy do backend falhou!**
+
+            🌿 Branch:
+            `${{ github.ref_name }}`
+
+            👤 Autor:
+            `${{ github.actor }}`
+
+            📝 Commit:
+            `${{ github.event.head_commit.message }}`
+
+            🔍 Logs:
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
