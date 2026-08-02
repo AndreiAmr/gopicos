@@ -7,9 +7,9 @@ cloudinary.v2.config();
 
 class CloudinaryModel {
   async uploadImage(
-    file: Promise<FileUpload>,
+    file: Promise<FileUpload> | any,
     authorId: string,
-    spotId: string
+    spotId: string,
   ): Promise<string> {
     const { createReadStream, filename } = await file.promise;
 
@@ -26,7 +26,7 @@ class CloudinaryModel {
         (error, result?: UploadApiResponse) => {
           if (error) return reject(error);
           resolve(result!.secure_url);
-        }
+        },
       );
 
       await createReadStream().pipe(uploadStream);

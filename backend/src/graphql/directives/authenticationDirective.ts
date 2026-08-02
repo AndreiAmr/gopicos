@@ -15,7 +15,7 @@ export type ContextType = {
 export function authDirectiveTransformer(schema: GraphQLSchema): GraphQLSchema {
   return mapSchema(schema, {
     [MapperKind.OBJECT_FIELD]: (
-      fieldConfig: GraphQLFieldConfig<any, ContextType>
+      fieldConfig: GraphQLFieldConfig<any, ContextType>,
     ): GraphQLFieldConfig<any, ContextType> => {
       const directives = getDirective(schema, fieldConfig, 'Authenticated');
 
@@ -24,13 +24,17 @@ export function authDirectiveTransformer(schema: GraphQLSchema): GraphQLSchema {
           fieldConfig.resolve ?? defaultFieldResolver;
 
         fieldConfig.resolve = async (parent, args, context, info) => {
+          console.log(
+            // '🚀 ~ authDirectiveTransformer ~ context.auth:',
+            context.auth,
+          );
           if (!context.auth) {
             throw new ApolloError(
               'Usuário não autenticado',
               'UNAUTHENTICATED',
               {
                 statusCode: 401,
-              }
+              },
             );
           }
           return originalResolve(parent, args, context, info);

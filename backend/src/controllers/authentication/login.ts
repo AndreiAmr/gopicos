@@ -23,6 +23,7 @@ export const loginController = async (prop: LoginControllerProps) => {
     const user = await loginService(prop);
 
     const passwordsMatch = await bcrypt.compare(prop.password, user.password);
+    console.log('🚀 ~ loginController ~ passwordsMatch:', passwordsMatch);
 
     if (!passwordsMatch) {
       throw new AppError({

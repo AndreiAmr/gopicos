@@ -1,6 +1,6 @@
-import { User } from '../../../../prisma/generated';
+import { User } from '../../../prisma/generated';
 import { userRepository } from '../../../database/repositories/User';
-import { SignupDTO } from './signupDto';
+import { SignupDTO } from './signupDTO';
 
 export const signUpService = async (prop: User): Promise<User> => {
   const userCreated = await userRepository.create(prop);

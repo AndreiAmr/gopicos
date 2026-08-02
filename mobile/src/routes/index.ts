@@ -1,18 +1,20 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { LoginTemplate } from '../templates/auth/login';
 import { createStaticNavigation } from '@react-navigation/native';
-import { HomeTemplate } from '../templates/app/home';
+
+import { HomeStack } from './HomeStack';
 
 const RootStack = createNativeStackNavigator({
   screenOptions: {
     headerShown: false,
   },
+  // initialRouteName: 'Home',
   screens: {
     Login: {
       screen: LoginTemplate,
     },
     Home: {
-      screen: HomeTemplate,
+      screen: HomeStack,
     },
   },
 });

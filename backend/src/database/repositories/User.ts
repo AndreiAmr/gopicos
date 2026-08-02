@@ -1,6 +1,6 @@
 import { IRepository } from '../..';
-import { User } from '../../../prisma/generated';
-import { prisma } from '../../../prisma/prisma';
+import { User } from '../../prisma/generated';
+import { prisma } from '../../prisma/prisma';
 
 type WithIdProp = {
   id: string;
