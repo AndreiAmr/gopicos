@@ -4,7 +4,7 @@ import { ELoginErrors } from '../hooks/mutation/login/useLoginMutation';
 import { API_URL } from '@env';
 
 const defaultHost = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
-const defaultUri = `http://${defaultHost}:4000/graphql`;
+const defaultUri = `http://${defaultHost}:4000`;
 const graphqlUri = API_URL || defaultUri;
 
 export type ApiError = {
@@ -26,7 +26,7 @@ export const normalizeApolloError = (error: unknown): ApiError | null => {
 };
 
 const httpLink = new HttpLink({
-  uri: graphqlUri,
+  uri: `${graphqlUri}/graphql`,
   // headers: {
   //   Authorization: token ? `Bearer ${token}` : '',
   // },
