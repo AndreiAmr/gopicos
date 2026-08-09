@@ -1,8 +1,11 @@
 import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client';
 import { Platform } from 'react-native';
 import { ELoginErrors } from '../hooks/mutation/login/useLoginMutation';
+import { API_URL } from '@env';
 
 const defaultHost = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
+const defaultUri = `http://${defaultHost}:4000/graphql`;
+const graphqlUri = API_URL || defaultUri;
 
 export type ApiError = {
   type: ELoginErrors | string;
@@ -23,7 +26,7 @@ export const normalizeApolloError = (error: unknown): ApiError | null => {
 };
 
 const httpLink = new HttpLink({
-  uri: `http://${defaultHost}:4000/graphql`,
+  uri: graphqlUri,
   // headers: {
   //   Authorization: token ? `Bearer ${token}` : '',
   // },
