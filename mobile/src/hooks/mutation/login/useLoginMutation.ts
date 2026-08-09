@@ -10,6 +10,7 @@ export const useLoginMutation = () => {
   const [mutate, { data, loading, error }] = useMutation(loginMutation, {
     fetchPolicy: 'no-cache',
   });
+  console.log('🚀 ~ useLoginMutation ~ data:', data);
 
   const mutationError = normalizeApolloError(error);
 

@@ -8,8 +8,8 @@ type LoginServiceProps = {
 };
 
 export const loginService = async (props: LoginServiceProps) => {
+  console.log('🚀 ~ loginService ~ props:', props);
   const user = await userRepository.find(props);
-  console.log('🚀 ~ loginService called');
 
   if (!user) {
     throw new AppError({
