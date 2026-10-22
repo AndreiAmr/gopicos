@@ -25,6 +25,7 @@ export const createApolloServer = () =>
           extensions: {
             type: originalError.type,
             statusCode: originalError.statusCode,
+            ...(originalError.field && { field: originalError.field }),
           },
         };
       }

@@ -1,9 +1,38 @@
-import { User } from '../../../prisma/generated';
+import { Prisma, User } from '../../../prisma/generated';
 import { userRepository } from '../../../database/repositories/User';
+import { AppError } from '../../../utils/AppError';
 import { SignupDTO } from './signupDTO';
 
-export const signUpService = async (prop: User): Promise<User> => {
-  const userCreated = await userRepository.create(prop);
+export type SignupServiceProps = Pick<User, 'name' | 'email' | 'password'>;
 
-  return new SignupDTO(userCreated);
+const emailAlreadyExists = () =>
+  new AppError({
+    type: 'EMAIL_ALREADY_EXISTS',
+    message: 'Este e-mail já tem cadastro.',
+    statusCode: 409,
+    field: 'email',
+  });
+
+export const signUpService = async (
+  prop: SignupServiceProps,
+): Promise<SignupDTO> => {
+  if (await userRepository.find({ email: prop.email })) {
+    throw emailAlreadyExists();
+  }
+
+  try {
+    const userCreated = await userRepository.create(prop as User);
+
+    return new SignupDTO(userCreated);
+  } catch (err) {
+    // corrida entre dois cadastros simultâneos: a constraint única do banco decide
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === 'P2002'
+    ) {
+      throw emailAlreadyExists();
+    }
+
+    throw err;
+  }
 };
