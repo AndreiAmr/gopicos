@@ -47,6 +47,18 @@ export class UserRepository implements IUserRepository {
     return prisma.user.findUnique({ where: { id } });
   }
 
+  /** Quantidade de picos e de avaliações do usuário (D35). */
+  async countActivity(
+    id: string,
+  ): Promise<{ spotsCount: number; reviewsCount: number }> {
+    const [spotsCount, reviewsCount] = await Promise.all([
+      prisma.spot.count({ where: { authorId: id } }),
+      prisma.spotReview.count({ where: { authorId: id } }),
+    ]);
+
+    return { spotsCount, reviewsCount };
+  }
+
   /** Usuário existe e não está desativado (deactivatedAt nulo). */
   async isActive(id: string): Promise<boolean> {
     const user = await prisma.user.findUnique({

@@ -1,0 +1,9 @@
+input UpdateProfileInput {
+  firstName: String!
+  lastName: String!
+}
+
+extend type Mutation {
+  # A identidade vem do token; o input não aceita id.
+  updateProfile(props: UpdateProfileInput!): Profile @Authenticated
+}

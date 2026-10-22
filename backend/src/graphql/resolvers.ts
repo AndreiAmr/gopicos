@@ -6,6 +6,7 @@ import { fowardGeocodingResolvers } from './modules/geocoding/foward/resolver';
 import { reverseGeocodingResolvers } from './modules/geocoding/reverse/resolver';
 
 import { changePasswordResolvers } from './modules/user/changePassword/resolver';
+import { updateProfileResolvers } from './modules/user/updateProfile/resolver';
 import { profileResolvers } from './modules/user/profile/resolver';
 import { spotResolvers } from './modules/spot/resolver';
 import { spotDetailsResolver } from './modules/spot/spotDetails/resolver';
@@ -25,6 +26,7 @@ export const resolvers = {
     ...resetPasswordResolvers.Mutation,
     ...spotResolvers.Mutation,
     ...changePasswordResolvers.Mutation,
+    ...updateProfileResolvers.Mutation,
   },
   SpotAuthor: spotDetailsResolver.SpotAuthor,
 };
