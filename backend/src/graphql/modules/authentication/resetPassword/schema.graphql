@@ -1,0 +1,9 @@
+input ResetPasswordProp {
+  email: String!
+  code: String!
+  newPassword: String!
+}
+
+extend type Mutation {
+  resetPassword(props: ResetPasswordProp!): Response
+}
