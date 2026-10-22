@@ -6,6 +6,7 @@ export class LoginDTO implements User {
   name: string;
   password: string;
   deactivatedAt: Date | null;
+  createdAt: Date;
 
   constructor(props: User) {
     this.email = props.email;
@@ -13,5 +14,6 @@ export class LoginDTO implements User {
     this.name = props.name;
     this.password = props.password;
     this.deactivatedAt = props.deactivatedAt;
+    this.createdAt = props.createdAt;
   }
 }

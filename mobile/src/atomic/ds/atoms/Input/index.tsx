@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, Ref, useState } from 'react';
 import { ActivityIndicator, TextInput, TextInputProps } from 'react-native';
 import { AlertCircle } from 'lucide-react-native';
 import { View, useTheme } from 'tamagui';
@@ -13,6 +13,8 @@ import {
 import { Text } from '../Text';
 
 type InputProps = Omit<TextInputProps, 'style' | 'editable'> & {
+  /** Ref do TextInput nativo (React 19: ref como prop). */
+  ref?: Ref<TextInput>;
   /** Rótulo sempre visível acima do campo (nunca só placeholder). */
   label: string;
   /** Mensagem de erro; ativa borda `error` + ícone + texto. */
