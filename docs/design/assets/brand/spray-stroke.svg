@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="200" height="22" viewBox="0 0 200 22" fill="none" aria-hidden="true" focusable="false">
-  <!-- Traço de spray decorativo. Cor via CSS (color: var(--gp-primary)); proporção 200:22 -->
-  <path d="M6 12C40 3 80 18 120 10S180 7 194 11" stroke="currentColor" stroke-width="11" stroke-linecap="round"/>
-  <path d="M12 18C60 14 130 20 188 16" stroke="currentColor" stroke-opacity=".55" stroke-width="3" stroke-linecap="round"/>
+  <!-- Traço de spray decorativo. Cor padrão laranja (#F97316) via fallback; sobrescreva com a variável CSS --gp-primary; proporção 200:22 -->
+  <path d="M6 12C40 3 80 18 120 10S180 7 194 11" stroke="var(--gp-primary, #F97316)" stroke-width="11" stroke-linecap="round"/>
+  <path d="M12 18C60 14 130 20 188 16" stroke="var(--gp-primary, #F97316)" stroke-opacity=".55" stroke-width="3" stroke-linecap="round"/>
 </svg>

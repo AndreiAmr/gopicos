@@ -243,7 +243,7 @@ export const tokens = createTokens({
   color: { /* mesmos valores da seção 3, nomes camelCase */ },
   space:  { 0: 0, 1: 4, 2: 8, 3: 12, 4: 16, 5: 20, 6: 24, 8: 32, 10: 40, 12: 48, 16: 64, true: 16 },
   size:   { /* igual a space + touch: 48 */ touch: 48 },
-  radius: { sm: 6, md: 10, lg: 16, xl: 24, full: 999, true: 10 },
+  radius: { sm: 4, md: 6, lg: 12, xl: 20, full: 999, true: 6 },
   zIndex: { map: 0, mapControls: 10, header: 20, sheet: 40, toast: 60 },
 });
 
@@ -370,7 +370,7 @@ Concreto limpo (neutros frios) + laranja vivo + amarelo de fita/sticker; título
 Todos os pares de texto da camada de marca passam AA: `ink` sobre `brand-yellow` 11,57:1; `ink` sobre `primary` claro 6,32:1; `ink` sobre `primary-soft` 15,46:1.
 
 ### 13.4 Assets (SVG leves, decorativos, `aria-hidden`)
-Todos em `docs/design/assets/`: `logo-gopicos.svg` (marca, provisório do modelo do dono), `brand/spray-stroke.svg` (cor via `currentColor`), `brand/tape.svg`, `brand/halftone.svg` (cor via `currentColor`). Cada um com menos de 2 KB. No mobile, usar `react-native-svg` (já necessário para ícones) com `color` vindo do token; **nada de PNG/JPEG de textura**. Dispensar `accessibilityLabel`: `accessibilityElementsHidden` / `importantForAccessibility="no-hide-descendants"`.
+Todos em `docs/design/assets/`: `logo-gopicos.svg` (marca, provisório do modelo do dono), `brand/spray-stroke.svg` (cor via `var(--gp-primary, #F97316)`, laranja como padrão), `brand/tape.svg`, `brand/halftone.svg` (cor via `currentColor`). Os de `brand/` têm menos de 2 KB cada; o logo tem ~4,2 KB (provisório). No mobile, usar `react-native-svg` (já necessário para ícones) com `color` vindo do token; **nada de PNG/JPEG de textura**. Dispensar `accessibilityLabel`: `accessibilityElementsHidden` / `importantForAccessibility="no-hide-descendants"`.
 
 ### 13.5 Componentes de marca
 - **Wordmark**: logo + "GoPicos" em `wordmark` + spray `primary` abaixo (largura ~4x a altura do texto).
@@ -385,7 +385,7 @@ Usar: wordmark e título de tela de entrada; cantos e cabeçalhos de telas de en
 Densidade: no máximo uma fita, um meio-tom e um spray por tela; elementos decorativos ficam **fora da área do formulário** (não podem cobrir campos nem aumentar a rolagem).
 
 ### 13.7 Desempenho e acessibilidade
-- Fonte display única + SVGs (soma de assets de marca < 10 KB). Sem textura em imagem.
+- Fonte display única + SVGs (soma de assets de marca < 10 KB, logo incluído). Sem textura em imagem.
 - Decoração fora da ordem de foco; `prefers-reduced-motion` irrelevante (estática).
 - Escala de fonte do sistema: títulos em display aceitam até 1,3x sem quebrar o layout (quebram em duas linhas, spray acompanha a largura).
 - Contraste AA em tudo que é texto e controle, nos dois temas.
