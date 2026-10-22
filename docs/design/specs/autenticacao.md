@@ -65,11 +65,11 @@ Necessários que o DS ainda não detalha (devem entrar em GP-002/003; spec abaix
 | `PasswordInput` | `Input` com botão à direita (alvo 48x48) que alterna mostrar/ocultar. Ícone olho / olho cortado. `aria-label`/`accessibilityLabel`: "Mostrar senha" / "Ocultar senha"; `aria-pressed`/`accessibilityState.checked` reflete o estado. Começa oculta. |
 | `AlertBanner` | Bloco inline que não some sozinho. **Borda total de 1,5 px** na cor da variante (`error`, `success` ou `info`) **mais uma faixa de acento de 4 px à esquerda**, na mesma cor (a faixa e o ícone reforçam a cor sem depender só dela). Fundo `sunken`, raio `md`, padding `space.3` (12). **Ícone 20x20** (alerta, check, info) alinhado ao topo da primeira linha, `space.2` de distância do texto, na cor da variante. **Tipografia:** `body-sm` (14/20) em `text` (contraste de `text`/`sunken` já verificado no DS). **Ação opcional** ("Tentar novamente", "Reenviar código"): `TextLink` em `label` (14/20, 600), alvo mínimo 48 de altura. Layout: ícone + texto em linha; a ação fica **à direita** apenas quando cabe sem quebrar o texto em mais de 2 linhas; caso contrário, e sempre com fonte em 130% ou largura menor que 360, **a ação quebra para uma linha própria, abaixo do texto, alinhada à esquerda do texto** (ao lado do ícone, não sob ele). Nunca truncar o texto. `role="alert"` para `error`, `role="status"` para `success`/`info`. |
 | `TextLink` | Texto em `primary-text`, peso 600, **sempre sublinhado** (distingue de texto comum sem depender de cor). Alvo mínimo 48 de altura no mobile (`hitSlop`); na web, altura mínima de 24 px com padding vertical para chegar a 44 em linhas isoladas. **Estados:** default `primary-text`; hover (web) `primary-hover`; **pressed** (mobile e web) `primary-hover` + opacidade 0.8; **focus** (teclado/leitor) anel `focus` de 2 px com `offset` 2 px e raio `sm`, nunca removido; desativado (durante envio ou espera) `text-subtle`, sem sublinhado, `aria-disabled`. **Dentro de mensagem de erro** (ex.: "Este e-mail já tem cadastro. Entrar"): o texto do erro continua em `error` e o link fica em `primary-text` sublinhado, na mesma linha; se não couber, o link quebra para a linha seguinte junto com a mensagem, mantendo a ordem de leitura. O link faz parte do mesmo parágrafo do erro, então o leitor de tela lê "Este e-mail já tem cadastro. Entrar" e o link é alcançável por tab logo depois do campo. |
-| `AuthLayout` | Casca das 4 telas: wordmark + título + conteúdo. Uma implementação por plataforma (ver seções 3 e 4). |
+| `AuthLayout` | Casca das 6 telas (Login, Cadastro, Esqueci minha senha, Redefinir senha, Termos e Privacidade): wordmark + título + conteúdo. Uma implementação por plataforma (ver seções 3 e 4). |
 | `Checkbox` | Caixa 24x24 visual dentro de alvo 48x48; raio `sm`; borda `border` 2 px; marcado = fundo `primary` e check em `on-primary`; foco = anel `focus`; erro = borda `error` + mensagem; desativado = opacidade 0.4. Rótulo ao lado em `body`, clicável (alterna). Usado no aceite dos termos. |
 | `Wordmark` (placeholder) | Texto "GoPicos" em `display` 700: "Go" em `text`, "Picos" em `primary-text`. Contraste de `primary-text` sobre `bg`: 6,80 claro / 9,59 escuro (AA). Quando houver logo definitivo, troca-se só este componente. `accessibilityRole="header"` não se aplica; é decorativo-informativo com `aria-label="GoPicos"`. |
 
-## 3. Padrões comuns (valem para as quatro telas)
+## 3. Padrões comuns (valem para as seis telas)
 
 ### 3.1 Formulário e validação
 - Campos: rótulo `label` acima (sempre visível, nunca só placeholder), input, mensagem de apoio/erro abaixo (`body-sm`). Espaço entre campos `space.4`.
@@ -110,7 +110,7 @@ O MVP não tem limite de tentativas de login no backend, então **não há mensa
 1. `Wordmark`
 2. Título `h1`: "Entrar"
 3. Subtítulo `body` em `text-muted`: "Bem-vindo de volta. Encontre e avalie picos de skate."
-4. (Condicional) `AlertBanner` de contexto: sessão expirada, cadastro concluído, senha alterada, conta reativada (ver estados)
+4. (Condicional) `AlertBanner` de contexto: sessão expirada, cadastro concluído, senha alterada (ver estados; a conta reativada **não** é banner, é toast na Home)
 5. Campo **E-mail**
 6. Campo **Senha** (`PasswordInput`) com `TextLink` "Esqueci minha senha" alinhado à direita, **abaixo** do campo (fica no caminho do polegar e não disputa linha com o rótulo)
 7. (Condicional) `AlertBanner` de erro de rede/servidor
@@ -250,7 +250,7 @@ Observação: no Login, e-mail e senha são validados **só quanto a "vazio" e f
 | Padrão | Foco no e-mail na web. |
 | Erro de campo | Vazio: "Informe seu e-mail."; malformado: "Informe um e-mail válido." |
 | Enviando | Botão `loading`, campo somente leitura, anúncio "Enviando código". |
-| **Sucesso (sempre igual)** | Toast `info`/`success` de 4 s: **"Se o e-mail estiver cadastrado, enviamos um código."** e navega para C2. A mensagem e a navegação são **idênticas** quer a conta exista ou não, e o tempo de resposta percebido também (o backend deve responder igual; a tela não tem nenhum outro ramo). Toast com `aria-live="polite"`; como a tela muda, o mesmo texto aparece de forma fixa em C2 (ver 7.1) para o leitor de tela e para quem perdeu o toast. |
+| **Sucesso (sempre igual)** | Grava o horário do envio (ver "Contagem do reenvio" na tela C2), e então toast `info`/`success` de 4 s: **"Se o e-mail estiver cadastrado, enviamos um código."** e navega para C2. A mensagem e a navegação são **idênticas** quer a conta exista ou não, e o tempo de resposta percebido também (o backend deve responder igual; a tela não tem nenhum outro ramo). Toast com `aria-live="polite"`; como a tela muda, o mesmo texto aparece de forma fixa em C2 (ver 7.1) para o leitor de tela e para quem perdeu o toast. |
 | Erro de rede | Banner 3.2 com "Tentar novamente". |
 
 ### 6.3 Layout
@@ -281,7 +281,7 @@ Observação: no Login, e-mail e senha são validados **só quanto a "vazio" e f
 6. Campo **Confirmar nova senha** (`PasswordInput`)
 7. (Condicional) `AlertBanner` de rede/servidor
 8. Botão primário "Redefinir senha"
-9. Linha de reenvio: "Não chegou?" + `TextLink` "Reenviar código" (ou contagem, ver abaixo)
+9. Linha de reenvio: "Não chegou?" + `TextLink` "Reenviar código". **Ao abrir C2 a contagem já está rodando**, então a linha abre como "Reenviar código em 30s" (texto desativado) e vira link ao chegar a zero.
 
 ### 7.2 Campos
 | Campo | Rótulo | Atributos | Validação |
@@ -298,9 +298,10 @@ Quando o código chega pelo SMS/e-mail e o sistema oferece o preenchimento autom
 | Padrão | Foco no Código na web; no mobile, abre o teclado numérico no Código (aqui faz sentido: é a única ação possível e a pessoa acabou de pedir o código). |
 | Erros de campo | Conforme 3.1. |
 | Enviando | Botão `loading` ("Redefinindo"), campos somente leitura, "Reenviar código" desativado. |
-| **Código inválido, expirado ou já usado** (`INVALID_RESET_CODE`) | Erro no campo Código: **"Código inválido ou expirado."** e, na linha de reenvio, `TextLink` "Reenviar código" em destaque (a linha passa a ser `body-strong`). O servidor não diz se foi inválido ou expirado (não deve), por isso a mensagem cobre os dois. Nova senha e confirmação preservadas. O campo Código fica com foco e texto selecionado. |
-| **5 tentativas erradas** | O cliente conta as falhas `INVALID_RESET_CODE` da sessão da tela. Na 5a, o campo Código e o botão ficam desabilitados e aparece `AlertBanner` error: **"Muitas tentativas incorretas. Peça um novo código."** com ação "Reenviar código". Como o servidor invalida o código nesse ponto, qualquer dígito digitado já não adiantaria. Se a pessoa sair e voltar, o contador do servidor continua valendo (o cliente mostra o erro padrão de código inválido e a opção de reenviar). Não exibimos "restam N tentativas" (não é exigido e ajuda a atacante). **Foco:** como o campo Código e o botão ficam desabilitados, o foco vai para o `AlertBanner` (que é `role="alert"`, então o leitor anuncia o texto) e fica na ação "Reenviar código" dentro dele, o único controle útil naquele momento. Depois do reenvio, o foco volta ao campo Código já reabilitado e limpo. |
-| **Reenviar código** | Toque em "Reenviar código" chama o mesmo pedido de C1, mostra toast **"Se o e-mail estiver cadastrado, enviamos um novo código."**, limpa o campo Código e o contador de tentativas, e inicia **espera de 30 s** em que o link vira texto desativado: "Reenviar código em 30s" (contagem regressiva a cada segundo, mas o leitor de tela só é avisado no início e no fim, para não ler todo segundo). Códigos anteriores deixam de valer (regra do backend), o que o texto da toast informa de forma implícita ("novo código"). |
+| **Código inválido, expirado ou já usado** (`INVALID_RESET_CODE`) | Erro no campo Código: **"Código inválido ou expirado."** e, na linha de reenvio, `TextLink` "Reenviar código" em destaque (a linha passa a ser `body-strong`); **o destaque respeita a contagem**: se ainda houver espera, a linha continua desativada com o tempo restante ("Reenviar código em {n}s") e só ganha o destaque quando o link é liberado. O servidor não diz se foi inválido ou expirado (não deve), por isso a mensagem cobre os dois. Nova senha e confirmação preservadas. O campo Código fica com foco e texto selecionado. |
+| **5 tentativas erradas** | O cliente conta as falhas `INVALID_RESET_CODE` da sessão da tela. Na 5a, o campo Código e o botão ficam desabilitados e aparece `AlertBanner` error: **"Muitas tentativas incorretas. Peça um novo código."** com a ação "Reenviar código", **que também respeita a contagem**: durante a espera aparece desativada com o tempo restante ("Reenviar código em {n}s") e é liberada ao zerar. Como o servidor invalida o código nesse ponto, qualquer dígito digitado já não adiantaria. Se a pessoa sair e voltar, o contador do servidor continua valendo (o cliente mostra o erro padrão de código inválido e a opção de reenviar). Não exibimos "restam N tentativas" (não é exigido e ajuda a atacante). **Foco:** como o campo Código e o botão ficam desabilitados, o foco vai para o `AlertBanner` (que é `role="alert"`, então o leitor anuncia o texto) e, se a ação estiver liberada, fica nela (o único controle útil naquele momento); se a contagem ainda estiver rodando, o foco fica no próprio banner e a ação é liberada e anunciada quando zerar. Depois do reenvio, o foco volta ao campo Código já reabilitado e limpo. |
+| **Contagem do reenvio (30 s)** | Começa em **todo envio de código**: ao sair de C1 para C2 e a cada reenvio. Por isso C2 abre já com "Reenviar código em 30s". Durante a contagem toda ação de reenviar (a linha de reenvio, o destaque do erro de código inválido e a ação do banner da 5a tentativa) aparece **desativada com o tempo restante**. O **horário do último envio fica guardado** (mobile: armazenamento local do app; web: `sessionStorage`/estado persistido), e o restante é calculado como 30 s menos o tempo decorrido; assim a contagem sobrevive a sair e voltar da tela, a recarregar a página e a fechar e reabrir o app. Se já passaram 30 s, abre liberado. O contador visível atualiza a cada segundo, mas o leitor de tela só é avisado no início e quando libera ("Já é possível reenviar o código"). |
+| **Reenviar código** | Disponível só com a contagem zerada. Toque chama o mesmo pedido de C1, mostra toast **"Se o e-mail estiver cadastrado, enviamos um novo código."**, limpa o campo Código e o contador de tentativas, **grava o novo horário de envio** e reinicia a contagem de 30 s (link vira texto desativado "Reenviar código em 30s"). Códigos anteriores deixam de valer (regra do backend), o que o texto do toast informa de forma implícita ("novo código"). |
 | **Erro de rede** | Banner 3.2 com "Tentar novamente". |
 | **Sucesso** | Navega ao Login (A) com `replace`, e-mail preenchido, foco na senha, `AlertBanner` success **"Senha alterada. Entre com a nova senha."** Não fazemos login automático: a issue pede voltar ao Login, e entrar com a senha nova confirma que ela foi anotada/memorizada. |
 | Senha igual à antiga | Sem tratamento (o backend não distingue). |
@@ -317,7 +318,7 @@ Quando o código chega pelo SMS/e-mail e o sistema oferece o preenchimento autom
 | Apoio | "Se o e-mail estiver cadastrado, enviamos um código de 6 dígitos para {e-mail}. Ele vale por 15 minutos." |
 | Rótulos | "Código de 6 dígitos", "Nova senha", "Confirmar nova senha" |
 | Botão | "Redefinir senha" |
-| Reenvio | "Não chegou?" + "Reenviar código" / "Reenviar código em {n}s" |
+| Reenvio | "Não chegou?" + "Reenviar código" (liberado) / "Reenviar código em {n}s" (em contagem, a tela abre assim) |
 | Erro código | "Código inválido ou expirado." |
 | Erro tentativas | "Muitas tentativas incorretas. Peça um novo código." |
 | Toast reenvio | "Se o e-mail estiver cadastrado, enviamos um novo código." |
@@ -351,7 +352,7 @@ Quando o código chega pelo SMS/e-mail e o sistema oferece o preenchimento autom
 | Casca | Tela cheia em `bg`, sem card, conteúdo alinhado à esquerda, rolagem | Card `surface` centralizado (max 420) a partir de `sm`; abaixo disso igual ao mobile |
 | Teclado | `KeyboardAvoidingView`, `returnKeyType`, `keyboardType`, teclado não abre sozinho (exceto no Código) | `<form>`, Enter envia, `autofocus` no primeiro campo, `inputMode` |
 | Safe-area | `useSafeAreaInsets` em cima e embaixo | não se aplica (usar `env(safe-area-inset-*)` apenas se a página for usada como PWA, fora do MVP) |
-| Sessão | Token no Keychain; `reset` do navigator para a Home | Token persistido (decisão técnica do Dev; sugerimos armazenamento que sobreviva ao fechamento da aba); `navigate('/home', { replace: true })` |
+| Sessão | Token no Keychain; `reset` do navigator para a Home | Token persistido (decisão técnica do Dev; sugerimos armazenamento que sobreviva ao fechamento da aba); `navigate(rotaPretendida ?? '/home', { replace: true })` (Home como fallback) |
 | Termos e privacidade | Tela nativa empilhada; ao voltar, o cadastro está intacto | Nova aba em `/termos` e `/privacidade`; o formulário continua na aba original |
 | Voltar | Seta no cabeçalho + gesto/botão do sistema | `TextLink` "Voltar" no card + botão voltar do navegador |
 | Voltar ao Login após sucesso | `replace`, sem voltar ao formulário de reset | `replace`, idem |
