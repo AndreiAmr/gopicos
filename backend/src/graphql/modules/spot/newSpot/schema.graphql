@@ -17,5 +17,5 @@ input NewSpotInput {
 }
 
 extend type Mutation {
-  createSpot(input: NewSpotInput!): Spot!
+  createSpot(input: NewSpotInput!): Spot! @Authenticated
 }

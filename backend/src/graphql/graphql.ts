@@ -5,6 +5,7 @@ import { resolvers } from './resolvers';
 import { makeExecutableSchema } from 'graphql-tools';
 import { authDirectiveTransformer } from './directives/authenticationDirective';
 import { buildContext } from './context';
+import { isUserActive } from './isUserActive';
 import express from 'express';
 import bodyParser from 'body-parser';
 import { expressMiddleware } from '@as-integrations/express4';
@@ -81,7 +82,10 @@ async function startServer() {
     '/graphql',
     expressMiddleware(server, {
       context: async (props) =>
-        buildContext(props.req.headers['authorization']),
+        buildContext(
+          props.req.headers['authorization'],
+          isUserActive,
+        ),
     }),
   );
 
