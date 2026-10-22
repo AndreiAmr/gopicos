@@ -5,6 +5,7 @@ import { signupResolvers } from './modules/authentication/signup/resolver';
 import { fowardGeocodingResolvers } from './modules/geocoding/foward/resolver';
 import { reverseGeocodingResolvers } from './modules/geocoding/reverse/resolver';
 
+import { changePasswordResolvers } from './modules/user/changePassword/resolver';
 import { updateProfileResolvers } from './modules/user/updateProfile/resolver';
 import { profileResolvers } from './modules/user/profile/resolver';
 import { spotResolvers } from './modules/spot/resolver';
@@ -24,6 +25,7 @@ export const resolvers = {
     ...requestPasswordResetResolvers.Mutation,
     ...resetPasswordResolvers.Mutation,
     ...spotResolvers.Mutation,
+    ...changePasswordResolvers.Mutation,
     ...updateProfileResolvers.Mutation,
   },
   SpotAuthor: spotDetailsResolver.SpotAuthor,
