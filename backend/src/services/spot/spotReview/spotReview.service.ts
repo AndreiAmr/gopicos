@@ -1,8 +1,8 @@
 import { spotReviewRepository } from '../../../database/repositories/SpotReview';
 
 type SpotReviewServiceProps = {
-  title: string;
-  description: string;
+  rating: number;
+  description?: string | null;
   authorId: string;
   spotId: string;
 };

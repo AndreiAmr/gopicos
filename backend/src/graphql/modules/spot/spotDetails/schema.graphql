@@ -6,7 +6,7 @@ type Author {
 
 type Review {
   id: String
-  title: String
+  rating: Int
   description: String
   authorId: String
   spotId: String

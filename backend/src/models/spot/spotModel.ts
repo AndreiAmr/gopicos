@@ -1,5 +1,4 @@
-import { JsonValue } from '@prisma/client/runtime/library';
-import { Spot } from '../../prisma/generated';
+import { Modality, Prisma, Spot } from '../../prisma/generated';
 
 type Props = Spot & {};
 
@@ -8,13 +7,13 @@ export class SpotModel implements Spot {
   name: string = '';
   description: string = '';
   authorId: string = '';
-  modality: string = '';
+  modality: Modality = 'mixed';
   equipmentRequired: boolean = false;
   isPaid: boolean = false;
   alwaysOpen: boolean = false;
   entryAmount: string | null = null;
   hasCoverage: boolean = false;
-  coordinates: JsonValue = [];
+  coordinates: Prisma.JsonValue = [];
   images: string[] = [];
   markingType: string = '';
   openingHours: string | null = null;

@@ -1,8 +1,8 @@
 import { spotReviewService } from '../../../services/spot/spotReview/spotReview.service';
 
 type SpotReviewControllerProps = {
-  title: string;
-  description: string;
+  rating: number;
+  description?: string | null;
   authorId: string;
   spotId: string;
 };
