@@ -3,7 +3,7 @@
 Issues: #66 (GP-074 ver e editar perfil, mobile), #67 (GP-075 ver e editar perfil, web), #68 (GP-076 alterar senha, mobile e web), #69 (GP-077 excluir conta, mobile), #70 (GP-078 excluir conta, web), #71 (GP-079 meus picos e minhas avaliações), #72 (GP-080 foto de perfil / avatar).
 Nomenclatura: as decisões de UX desta spec são **UX-P1 a UX-P23** (seção 13) e as pendências para o dono são **D30 em diante** (seção 15), para não colidir com UX-1..28 da spec de autenticação, nem com as D1..D17 do backlog nem com as decisões da spec de picos.
 Base: `docs/design/design-system.md` **versão 2.0** e o padrão da spec `docs/design/specs/autenticacao.md` (formulário, validação, erros de rede, acessibilidade). Esta spec **não define cor, fonte, espaço ou raio novos**: só usa tokens do DS.
-Dependência de outra spec: "Meus picos" usa o card compacto `SpotListItem` **definido em `docs/design/specs/picos.md` (PR #112)**; esta spec só diz *como* ele entra no perfil. Rotas e nomes seguem a mesma spec (`/` é o Login, a Home é `/home`, novo pico é `/spot/new-spot`).
+Dependência de outra spec: "Meus picos" usa o `SpotCard` (variante compacta) **definido em `docs/design/specs/picos.md` (PR #112)**; esta spec só diz *como* ele entra no perfil. Rotas e nomes seguem a mesma spec (`/` é o Login, a Home é `/home`, novo pico é `/spot/new-spot`).
 Figma e protótipo: ver seção 16.
 
 Regras de negócio que moldam as telas (backlog do PO: GP-070 a GP-080, D4, D7, D14):
@@ -58,7 +58,7 @@ Necessários que o DS ainda não detalha (entram em GP-002/003 junto com os de a
 | `SettingsRow` / `SettingsGroup` | Linha de lista de ajustes: ícone 24 à esquerda (em `text-muted`), rótulo `body-strong`, valor/descrição opcional (`body-sm`, `text-muted`), `chevron` à direita; altura mín. 56; grupo = `surface`, raio `lg`, bordas `divider` entre linhas; papel `button`/`link`. Variante **destrutiva**: ícone e rótulo em `error`. Uma linha por navegação; nunca duas ações na mesma linha. |
 | `DangerZone` (web) | Card com borda `error` 1,5 px, título "Excluir conta" (`h3` em `error`), texto curto e botão `destructive` ou `secondary` com texto `error`. Só web `md+`. No mobile é a `SettingsRow` destrutiva. |
 | `ConfirmDialog` | Dialog (web) / alerta nativo ou sheet (mobile) do DS com título, texto, botão secundário "Cancelar" (foco inicial, **sempre à esquerda/primeiro**) e o botão de confirmação à direita. Para ações destrutivas o botão é `destructive`. Fecha com Esc, gesto e "Cancelar". |
-| `ListItem` de pico e de avaliação | **Pico:** o card compacto de lista **`SpotListItem`, definido na spec de picos (`docs/design/specs/picos.md`, PR #112)**; esta spec não o redefine nem tem alternativa: o conteúdo, os dados e o tamanho valem os de lá. Só entram dados que os contratos expõem (nome, modalidade, nota média e contagem, foto); **não há endereço/local no card**. **Avaliação (novo, `ReviewListItem`):** nome do pico (`h3`, é o link), `StarRating` leitura, data (`caption`), comentário (`body`, até 3 linhas com reticências, o mesmo limite do `ReviewItem` do detalhe em picos.md, que deve ser igual; ver UX-P23), alvo inteiro leva ao pico. |
+| `ListItem` de pico e de avaliação | **Pico:** o **`SpotCard` (variante compacta)**, definido na spec de picos (`docs/design/specs/picos.md`, PR #112); esta spec não o redefine nem tem alternativa: conteúdo, dados e tamanho valem os de lá. O card **não mostra endereço/local** (nenhum contrato o expõe). **Avaliação (novo, `ReviewListItem`):** nome do pico (`h3`, é o link), `StarRating` leitura, data (`caption`), comentário (`body`, até 3 linhas com reticências, o mesmo limite do `ReviewItem` do detalhe em picos.md, que deve ser igual; ver UX-P23), alvo inteiro leva ao pico. |
 | `EmptyState` | Do DS (ilustração simples + texto + ação). Aqui com a **camada de marca**: usado nos vazios de P5/P6 (DS 13.6 permite vazio): ilustração de pino/skate, uma linha `h3`, uma de apoio e botão. |
 | `SectionHeader` | `label` em `text-muted` acima de um grupo (ex.: "Conta", "Atividade"). `h2` semântico (web) / `accessibilityRole="header"`. |
 
@@ -271,7 +271,7 @@ Não pedimos digitar "EXCLUIR" (UX-P12): a senha já é o atrito e a prova de id
 - **Sem paginação no MVP** (D31); se o backend limitar, "Carregar mais" ao fim da lista.
 
 ### 8.2 P5 - Meus picos
-- Item: `SpotListItem` da spec de picos (nome, modalidade, `StarRating` + média + contagem, foto; **sem local/endereço**, nenhum contrato o expõe). **Sem** ações de editar/excluir na lista: elas ficam no detalhe do pico (D13: só o autor), para não duplicar fluxos; o card inteiro é o alvo e abre o detalhe. Pico recém-criado sem avaliações: "Sem avaliações ainda" no lugar das estrelas.
+- Item: `SpotCard` (variante compacta) da spec de picos, sem local/endereço (nenhum contrato o expõe). **Sem** ações de editar/excluir na lista: elas ficam no detalhe do pico (D13: só o autor), para não duplicar fluxos; o card inteiro é o alvo e abre o detalhe. Pico recém-criado sem avaliações: "Sem avaliações ainda" no lugar das estrelas.
 - Estados:
   | Estado | Comportamento |
   |---|---|
@@ -369,7 +369,7 @@ Iguais: nomes de componentes, microcopy, regras de validação, estados e tokens
 
 **UX-P13. Contagens ausentes são omitidas, nunca "0" falso.** Um "0 picos" durante o carregamento ou numa falha leva a pensar que os picos sumiram. Skeleton enquanto carrega, "-" se falhou.
 
-**UX-P14. "Meus picos" usa o `SpotListItem` definido na spec de picos.** Consistência: o mesmo card, os mesmos dados e o mesmo toque em todo lugar onde há lista de picos. A definição (conteúdo, tamanho, estados) mora só em picos.md (PR #112); aqui não há variante própria nem plano B. O card não mostra endereço porque o pico só tem polígono nos contratos (geocodificar item a item teria custo e limite de API).
+**UX-P14. "Meus picos" usa o `SpotCard` (variante compacta) definido na spec de picos.** Consistência: o mesmo card, os mesmos dados e o mesmo toque em todo lugar onde há lista de picos. A definição (conteúdo, tamanho, estados) mora só em picos.md (PR #112); aqui não há variante própria nem plano B. O card não mostra endereço porque o pico só tem polígono nos contratos (geocodificar item a item teria custo e limite de API).
 
 **UX-P15. "Sair" com confirmação.** Toque acidental em "Sair" obriga a digitar e-mail e senha de novo (pior no celular, sem gerenciador de senha ativado). A confirmação custa um toque. Fica acima de "Excluir conta" e separada dela por espaço, porque são ações de peso muito diferente.
 
