@@ -36,7 +36,8 @@ async function startServer() {
 
   app.use(
     graphqlUploadExpress({
-      maxFileSize: 10000000,
+      // 5 MB por foto (D9); acima disso o service devolve VALIDATION_ERROR.
+      maxFileSize: 5 * 1024 * 1024,
       maxFiles: 10,
     }),
   );
