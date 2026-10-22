@@ -1,4 +1,4 @@
-import { useTestDatabase } from '../../../../test/db';
+import { prisma, useTestDatabase } from '../../../../test/db';
 import {
   createSpot,
   createSpotReview,
@@ -11,7 +11,7 @@ import {
 } from '../../../../test/graphql';
 
 const GET_SPOT = `query ($id: String!) { getSpotById(id: $id) {
-  id name coordinates ratingAverage reviewsCount isOwner author { id name firstName lastName }
+  id name coordinates ratingAverage reviewsCount isOwner author { id displayName }
 } }`;
 
 describe('getSpotById (integração)', () => {
@@ -31,7 +31,7 @@ describe('getSpotById (integração)', () => {
     expect(res.data.getSpotById).toMatchObject({
       id: spot.id,
       name: 'Pico Teste',
-      author: { id: author.id, name: 'Auto Silva', firstName: 'Auto', lastName: 'Silva' },
+      author: { id: author.id, displayName: 'Auto S.' },
       ratingAverage: 4.5,
       reviewsCount: 2,
       isOwner: true,
@@ -60,6 +60,22 @@ describe('getSpotById (integração)', () => {
 
     expect(res.data.getSpotById.ratingAverage).toBeNull();
     expect(res.data.getSpotById.reviewsCount).toBe(0);
+  });
+
+  it('autor com conta desativada aparece como "Usuário Desativado"', async () => {
+    const author = await createUser({ firstName: 'Tony', lastName: 'Hawk' });
+    const spot = await createSpot({ authorId: author.id });
+    await prisma.user.update({
+      where: { id: author.id },
+      data: { deactivatedAt: new Date() },
+    });
+    const viewer = await createUser();
+
+    const res = await executeAuthenticated(tokenFor(viewer), GET_SPOT, {
+      id: spot.id,
+    });
+
+    expect(res.data.getSpotById.author.displayName).toBe('Usuário Desativado');
   });
 
   it('id inexistente retorna NOT_FOUND', async () => {
