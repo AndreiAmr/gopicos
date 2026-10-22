@@ -58,6 +58,28 @@ describe('ResendEmailTransport', () => {
   });
 });
 
+describe('ResendEmailTransport: rede e timeout', () => {
+  const message: EmailMessage = { to: 'a@b.com', subject: 's', text: 't', html: '<p>h</p>' };
+
+  it('aborta após o timeout com erro uniforme, sem a API key', async () => {
+    const fetchImpl = jest.fn((_url: string, init: { signal?: AbortSignal }) =>
+      new Promise<{ ok: boolean; status: number }>((_resolve, reject) => {
+        init.signal?.addEventListener('abort', () => reject(new Error('aborted com segredo-key')));
+      }),
+    );
+    const transport = new ResendEmailTransport({ apiKey: 'segredo-key', from: 'f', fetchImpl, timeoutMs: 20 });
+    const error = await transport.send(message).catch((e) => e);
+    expect(error.message).toBe('Falha ao enviar e-mail pelo Resend');
+    expect(error.message).not.toContain('segredo-key');
+  });
+
+  it('converte erro de rede em mensagem uniforme', async () => {
+    const fetchImpl = jest.fn().mockRejectedValue(new TypeError('fetch failed'));
+    const error = await new ResendEmailTransport({ apiKey: 'k', from: 'f', fetchImpl }).send(message).catch((e) => e);
+    expect(error.message).toBe('Falha ao enviar e-mail pelo Resend');
+  });
+});
+
 describe('transporte simulado e seleção por ambiente', () => {
   it('sem RESEND_API_KEY usa o transporte simulado', () => {
     expect(createEmailTransportFromEnv({}).name).toBe('console');

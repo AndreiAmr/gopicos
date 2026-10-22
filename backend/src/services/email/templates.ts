@@ -33,7 +33,7 @@ export function buildPasswordResetCodeEmail(params: PasswordResetCodeParams): Em
     <p>Recebemos um pedido para redefinir a senha da sua conta no GoPicos.</p>
     <p>Seu código de recuperação é:</p>
     <p style="font-size: 32px; font-weight: bold; letter-spacing: 6px;">${escapeHtml(params.code)}</p>
-    <p>Ele é válido por ${minutes} minutos.</p>
+    <p>Ele é válido por ${escapeHtml(String(minutes))} minutos.</p>
     <p>Se você não fez esse pedido, ignore este e-mail: sua senha continua a mesma.</p>
     <p>Equipe GoPicos</p>
   </body>
