@@ -49,3 +49,19 @@ describe('minha operação', () => {
 ```
 
 Exemplo completo: `src/graphql/modules/authentication/login/login.integration.test.ts`.
+
+## E-mail transacional
+
+Serviço em `src/services/email` (interface `EmailTransport`, trocável). Provedor atual: [Resend](https://resend.com) via API HTTPS (sem dependência extra; funciona no Render, que bloqueia SMTP no plano gratuito).
+
+```ts
+import { getEmailService } from '../services/email';
+await getEmailService().sendPasswordResetCode({ to, name, code }); // código de 6 dígitos, válido por 15 min
+```
+
+| Variável | Obrigatória | Descrição |
+|---|---|---|
+| `RESEND_API_KEY` | não | Chave da API do Resend. **Sem ela o envio é simulado**: registra no log o assunto e o destinatário mascarado, nunca o código, e não quebra o fluxo. |
+| `EMAIL_FROM` | não (recomendada em produção) | Remetente, ex.: `GoPicos <no-reply@seudominio.com>`. O domínio precisa estar verificado no Resend. Padrão: `GoPicos <no-reply@gopicos.com>`. |
+
+Veja `.env.example`. Em testes, injete um transporte falso com `createEmailService(transport)`.
