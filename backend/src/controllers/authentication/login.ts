@@ -23,7 +23,6 @@ export const loginController = async (prop: LoginControllerProps) => {
     const user = await loginService(prop);
 
     const passwordsMatch = await bcrypt.compare(prop.password, user.password);
-    console.log('🚀 ~ loginController ~ passwordsMatch:', passwordsMatch);
 
     if (!passwordsMatch) {
       throw new AppError({
@@ -47,20 +46,8 @@ export const loginController = async (prop: LoginControllerProps) => {
       id: user.id,
     };
 
-    console.log('🚀 ~ loginController ~ mixpanel disparado com sucesso!');
-
-    const loginDataWithDelay = await new Promise<typeof loginData>(
-      (resolve) => {
-        setTimeout(() => {
-          resolve(loginData);
-        }, 3000);
-      },
-    );
-
-    return loginDataWithDelay;
+    return loginData;
   } catch (err) {
-    console.log(err);
-
     if (err instanceof Error) {
       throw err;
     }
