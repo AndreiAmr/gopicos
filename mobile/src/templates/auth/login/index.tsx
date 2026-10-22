@@ -1,93 +1,201 @@
-import React from 'react';
-import Logo from '../../../assets/images/logo.png';
-import { Input } from '../../../atomic/atoms/Input';
-import { Text } from '../../../atomic/atoms/Text';
-import { ActivityIndicator, Image } from 'react-native';
-import * as S from './styles';
-import { theme } from '../../../constants/theme';
-import { useLogin } from './useLogin';
-import { BottomSheetModal } from '../../../atomic/molecules/BottomSheetModal';
+import { useEffect, useState } from 'react';
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from 'react-native';
 import { Controller } from 'react-hook-form';
+import { View } from 'tamagui';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  AlertBanner,
+  Button,
+  Halftone,
+  Input,
+  PasswordInput,
+  Tape,
+  Text,
+  TextLink,
+  Wordmark,
+} from '../../../atomic/ds';
+import { space } from '../../../config/tamagui/tokens';
+import { loginStrings } from './logic';
+import { useLogin } from './useLogin';
+
+const useKeyboardVisible = () => {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const show = Keyboard.addListener('keyboardDidShow', () =>
+      setVisible(true),
+    );
+    const hide = Keyboard.addListener('keyboardDidHide', () =>
+      setVisible(false),
+    );
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, []);
+
+  return visible;
+};
 
 export const LoginTemplate = () => {
+  const insets = useSafeAreaInsets();
+  const keyboardVisible = useKeyboardVisible();
   const {
     control,
-    showPassword,
-    setShowPassword,
-    handleLogin,
     errors,
-    loading,
-    ref,
-    errorContent,
-    handleCloseModal,
+    handleLogin,
+    submitting,
+    failure,
+    failureMessage,
+    passwordRef,
+    notice,
+    goToSignup,
   } = useLogin();
 
   return (
-    <S.Container>
-      <S.LogoContainer>
-        <Image source={Logo} />
-        <Text family="bold">GoPicos</Text>
-      </S.LogoContainer>
-      <Text family="regular" mt="md" mb="md">
-        Informe seus dados de acessos
-      </Text>
-
-      <S.InputsContainer>
-        <Controller
-          control={control}
-          name="email"
-          render={({ field }) => {
-            console.log('🚀 ~ LoginTemplate ~ field:', field);
-            return (
-              <Input
-                label="Email"
-                placeholder="Digite aqui"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                error={errors.email?.message}
-                {...field}
-              />
-            );
-          }}
-        />
-        <Controller
-          control={control}
-          name="password"
-          render={({ field }) => (
-            <Input
-              {...field}
-              label="Senha"
-              secureTextEntry={!showPassword}
-              placeholder="Digite aqui"
-              rightIcon={showPassword ? 'eyeSlash' : 'eye'}
-              onRightIconPress={() => setShowPassword(!showPassword)}
-              error={errors.password?.message}
-            />
-          )}
-        />
-      </S.InputsContainer>
-      <Text textDecorationLine="underline" mb="lg">
-        Esqueci minha senha
-      </Text>
-      <S.Button onPress={handleLogin}>
-        {loading ? <ActivityIndicator /> : <S.ButtonText>Entrar</S.ButtonText>}
-      </S.Button>
-      <Text
-        textDecorationLine="underline"
-        mb="lg"
-        textAlign="center"
-        mt="md"
-        color={theme.colors.blue.medium}
+    <View flex={1} backgroundColor="$bg">
+      {keyboardVisible ? null : (
+        <>
+          <Tape />
+          <Halftone />
+        </>
+      )}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        Criar minha conta
-      </Text>
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: 'center',
+            paddingHorizontal: space[8],
+            paddingTop: insets.top + space[6],
+            paddingBottom: insets.bottom + space[6],
+          }}
+        >
+          <Text accessibilityRole="header" position="absolute" opacity={0}>
+            {loginStrings.title}
+          </Text>
 
-      <BottomSheetModal
-        ref={ref}
-        title={errorContent?.title ?? ''}
-        description={errorContent?.message ?? ''}
-        onClose={handleCloseModal}
-      />
-    </S.Container>
+          <Wordmark />
+          <Text variant="bodySm" tone="muted" marginTop={space[2]}>
+            {loginStrings.tagline}
+          </Text>
+
+          <View marginTop={space[8]} gap={space[4]}>
+            {notice ? (
+              <AlertBanner
+                type={notice === 'sessionExpired' ? 'info' : 'success'}
+                message={loginStrings.notices[notice]}
+              />
+            ) : null}
+
+            <Controller
+              control={control}
+              name="email"
+              render={({ field }) => (
+                <Input
+                  ref={field.ref}
+                  label={loginStrings.emailLabel}
+                  placeholder={loginStrings.emailPlaceholder}
+                  value={field.value}
+                  onChangeText={field.onChange}
+                  onBlur={field.onBlur}
+                  error={errors.email?.message}
+                  loading={false}
+                  disabled={submitting}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  autoComplete="email"
+                  textContentType="username"
+                  returnKeyType="next"
+                  onSubmitEditing={() => passwordRef.current?.focus()}
+                  testID="login-email"
+                />
+              )}
+            />
+
+            <View gap={space[2]}>
+              <Controller
+                control={control}
+                name="password"
+                render={({ field }) => (
+                  <PasswordInput
+                    ref={passwordRef}
+                    label={loginStrings.passwordLabel}
+                    value={field.value}
+                    onChangeText={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.password?.message}
+                    disabled={submitting}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    autoComplete="current-password"
+                    textContentType="password"
+                    returnKeyType="go"
+                    onSubmitEditing={handleLogin}
+                    testID="login-password"
+                  />
+                )}
+              />
+              <View alignItems="flex-end">
+                <TextLink
+                  quiet
+                  label={loginStrings.forgotPassword}
+                  disabled={submitting}
+                />
+              </View>
+            </View>
+
+            {failure ? (
+              <AlertBanner
+                type="error"
+                message={failureMessage ?? ''}
+                actionLabel={
+                  failure === 'credentials' ? undefined : loginStrings.retry
+                }
+                onActionPress={handleLogin}
+                testID="login-failure"
+              />
+            ) : null}
+
+            <Button
+              label={loginStrings.submit}
+              accessibilityLabel={
+                submitting ? loginStrings.signingIn : loginStrings.submit
+              }
+              onPress={handleLogin}
+              loading={submitting}
+              fullWidth
+              testID="login-submit"
+            />
+          </View>
+
+          <View
+            marginTop={space[6]}
+            paddingTop={space[4]}
+            borderTopWidth={1}
+            borderTopColor="$divider"
+            alignItems="center"
+          >
+            <Text variant="bodySm" tone="muted">
+              {loginStrings.noAccount}
+            </Text>
+            <TextLink
+              label={loginStrings.signUp}
+              disabled={submitting}
+              onPress={goToSignup}
+            />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 };
