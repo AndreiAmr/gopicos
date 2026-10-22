@@ -2,6 +2,7 @@ import { apolloClient } from '@/config/apollo-client';
 
 import {
   changePasswordMutation,
+  deleteAccountMutation,
   meQuery,
   updateProfileMutation,
 } from './userProfileQueries';
@@ -44,7 +45,15 @@ const changePassword = async (props: IChangePasswordInput): Promise<void> => {
   });
 };
 
+const deleteAccount = async (password: string): Promise<void> => {
+  await apolloClient.mutate({
+    mutation: deleteAccountMutation,
+    variables: { props: { password } },
+  });
+};
+
 export const userProfileRepository = {
+  deleteAccount,
   changePassword,
   getMe,
   updateProfile,

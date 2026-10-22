@@ -1,4 +1,5 @@
 import { LockIcon } from 'lucide-react';
+import { useOutletContext } from 'react-router';
 
 import { AlertBanner } from '@/atomic/molecules/alertBanner';
 import { EmptyState } from '@/atomic/molecules/emptyState';
@@ -6,13 +7,16 @@ import { Button } from '@/atomic/atoms/button';
 import { Input } from '@/atomic/atoms/input';
 import { Skeleton } from '@/atomic/atoms/skeleton';
 
+import type { ProfileOutletContext } from '@/pages/_layouts/ProfileLayout';
+
 import { ProfileAvatar } from './ProfileAvatar';
-import { PROFILE_STRINGS, fullName, memberSince } from './profileLogic';
+import { DELETE_STRINGS, PROFILE_STRINGS, fullName, memberSince } from './profileLogic';
 import { useMyData } from './useMyData';
 
 /** "Meus dados": cabeçalho do perfil + formulário de edição (P1 + P2). */
 export const MyDataPage = () => {
   const s = useMyData();
+  const { openDeleteAccount } = useOutletContext<ProfileOutletContext>();
 
   if (s.isLoading) {
     return (
@@ -134,6 +138,19 @@ export const MyDataPage = () => {
           {s.isSaving ? 'Salvando' : ''}
         </span>
       </form>
+
+      <section
+        aria-labelledby="danger-zone-title"
+        className="flex max-w-[400px] flex-col gap-3 rounded-lg border-[1.5px] border-gp-error p-4"
+      >
+        <h2 id="danger-zone-title" className="text-h3 text-gp-error">
+          {DELETE_STRINGS.title}
+        </h2>
+        <p className="text-body text-gp-text">{DELETE_STRINGS.dangerText}</p>
+        <Button type="button" variant="destructive" className="self-start" onClick={openDeleteAccount}>
+          {DELETE_STRINGS.submit}
+        </Button>
+      </section>
     </div>
   );
 };

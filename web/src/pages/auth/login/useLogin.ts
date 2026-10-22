@@ -14,8 +14,12 @@ export const useLogin = () => {
     from?: string;
     email?: string;
     accountCreated?: boolean;
+    sessionExpired?: boolean;
+    accountDeleted?: boolean;
   } | null;
   const accountCreated = Boolean(navState?.accountCreated);
+  const sessionExpired = Boolean(navState?.sessionExpired);
+  const accountDeleted = Boolean(navState?.accountDeleted);
 
   const [email, setEmail] = useState<string>(navState?.email ?? '');
   const [password, setPassword] = useState<string>('');
@@ -84,6 +88,8 @@ export const useLogin = () => {
     isLoading,
     error,
     accountCreated,
+    sessionExpired,
+    accountDeleted,
     email,
     password,
     showPassword,
