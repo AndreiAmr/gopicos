@@ -1,6 +1,7 @@
 import { IRepository } from '../..';
 import { User } from '../../prisma/generated';
 import { prisma } from '../../prisma/prisma';
+import { normalizeEmail } from '../../utils/email';
 
 type WithIdProp = {
   id: string;
@@ -35,7 +36,7 @@ export class UserRepository implements IUserRepository {
   async find(prop: WithEmailProp): Promise<User | null> {
     const user = await prisma.user.findUnique({
       where: {
-        email: prop.email,
+        email: normalizeEmail(prop.email),
       },
     });
 

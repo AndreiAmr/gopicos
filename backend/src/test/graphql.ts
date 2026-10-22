@@ -12,7 +12,7 @@ type ExecuteOptions = {
 
 export type GraphQLTestError = {
   message: string;
-  extensions?: { type?: string; statusCode?: number };
+  extensions?: { type?: string; statusCode?: number; field?: string };
 };
 
 /** Executa uma operação GraphQL contra o Apollo Server, sem subir HTTP. */
