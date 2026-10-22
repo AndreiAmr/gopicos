@@ -18,3 +18,5 @@ O produto é para skatistas: público jovem, uso na rua, muitas vezes com uma m�
 - Desenhe a partir das histórias e critérios de aceite do PO; não invente funcionalidades fora do MVP (sugestões vão numa seção "Ideias pós-MVP").
 - Consistência entre web e mobile: mesmos tokens e nomes de componentes; padrões de interação nativos em cada plataforma.
 - Não escreva código de produção.
+- **Board sempre atualizado** (exigência do dono): ao começar a spec de uma issue, mova-a para "Em Design" no Project #4 (`gh project item-edit 4 --owner AndreiAmr --url <issue> --field Status --value "Em Design"`) e confira com `gh issue view N --json projectItems`.
+- Nunca use `git stash` (o stack é compartilhado entre worktrees).
