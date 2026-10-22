@@ -1,5 +1,5 @@
 import { ApolloServer } from '@apollo/server';
-import { makeExecutableSchema } from 'graphql-tools';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 import { mergedTypeDefs } from './typeDefs';
 import { resolvers } from './resolvers';
 import { authDirectiveTransformer } from './directives/authenticationDirective';

@@ -2,8 +2,6 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  // .ts antes de .js: há .js legados versionados ao lado dos .ts em database/repositories.
-  moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   roots: ['<rootDir>/src'],
   testMatch: ['**/*.test.ts'],
   globalSetup: '<rootDir>/src/test/globalSetup.ts',

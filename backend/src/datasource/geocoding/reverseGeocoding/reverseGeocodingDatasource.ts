@@ -11,10 +11,6 @@ const getReverseGeocoding = async (props: ReverseGeocodingProps) => {
 
   const response = await axios.get(url);
 
-  console.log(
-    '🚀 ~ getReverseGeocoding ~ response.data:',
-    JSON.stringify(response.data, null, 2)
-  );
   return response.data;
 };
 
