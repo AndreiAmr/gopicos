@@ -94,6 +94,24 @@ describe('mutation signup (integração)', () => {
     expect(await prisma.user.count()).toBe(0);
   });
 
+  it('cadastros simultâneos do mesmo e-mail: 1 sucesso, o resto EMAIL_ALREADY_EXISTS', async () => {
+    const results = await Promise.all(
+      Array.from({ length: 8 }, () =>
+        executeAnonymous(SIGNUP, { props: valid }),
+      ),
+    );
+
+    const successes = results.filter((r) => !r.errors);
+    const failures = results.filter((r) => r.errors);
+
+    expect(successes).toHaveLength(1);
+    expect(failures).toHaveLength(7);
+    failures.forEach((r) => {
+      expect(r.errors?.[0].extensions?.type).toBe('EMAIL_ALREADY_EXISTS');
+    });
+    expect(await prisma.user.count()).toBe(1);
+  });
+
   it('aceita senha com exatamente 8 caracteres', async () => {
     const { errors } = await executeAnonymous(SIGNUP, {
       props: { ...valid, password: '12345678' },
