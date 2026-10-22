@@ -1,5 +1,6 @@
 import { createApolloServer } from '../graphql/server';
 import { buildContext } from '../graphql/context';
+import { isUserActive } from '../graphql/isUserActive';
 
 const server = createApolloServer();
 
@@ -21,6 +22,7 @@ export const executeOperation = async <TData = any>(
 ) => {
   const contextValue = await buildContext(
     token ? `Bearer ${token}` : undefined,
+    isUserActive,
   );
 
   const response = await server.executeOperation(
