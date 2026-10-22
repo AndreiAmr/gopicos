@@ -43,6 +43,10 @@ export class UserRepository implements IUserRepository {
     return user;
   }
 
+  async findById(id: string): Promise<User | null> {
+    return prisma.user.findUnique({ where: { id } });
+  }
+
   /** Usuário existe e não está desativado (deactivatedAt nulo). */
   async isActive(id: string): Promise<boolean> {
     const user = await prisma.user.findUnique({
