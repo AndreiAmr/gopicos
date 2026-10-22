@@ -14,10 +14,22 @@ export type SpotDetailsData = Spot & {
   reviewsCount: number;
 };
 
+export type SpotsFilter = {
+  modality?: string | null;
+  isPaid?: boolean | null;
+  hasCoverage?: boolean | null;
+  minRating?: number | null;
+};
+
+export type SpotListItem = Spot & {
+  ratingAverage: number | null;
+  reviewsCount: number;
+};
+
 type ISpotRepository = IRepository<string, CreateSpotProps, Spot, Spot> & {
   findDetails(id: string): Promise<SpotDetailsData | null>;
   insertImage(spotId: string, url: string): Promise<Spot>;
-  listAll(): Promise<Spot[]>;
+  listAll(filter?: SpotsFilter): Promise<SpotListItem[]>;
 };
 
 export class SpotRepository implements ISpotRepository {
@@ -121,10 +133,47 @@ export class SpotRepository implements ISpotRepository {
     return updateSpot;
   }
 
-  async listAll(): Promise<Spot[]> {
-    const spots = await prisma.spot.findMany();
+  async listAll(filter: SpotsFilter = {}): Promise<SpotListItem[]> {
+    const spots = await prisma.spot.findMany({
+      where: {
+        ...(filter.modality ? { modality: filter.modality as Modality } : {}),
+        ...(filter.isPaid != null ? { isPaid: filter.isPaid } : {}),
+        ...(filter.hasCoverage != null
+          ? { hasCoverage: filter.hasCoverage }
+          : {}),
+      },
+      orderBy: { createdAt: 'desc' },
+    });
 
-    return spots;
+    const stats = await prisma.spotReview.groupBy({
+      by: ['spotId'],
+      where: { spotId: { in: spots.map((spot) => spot.id) } },
+      _avg: { rating: true },
+      _count: { _all: true },
+    });
+    const statsBySpot = new Map(stats.map((item) => [item.spotId, item]));
+
+    const items = spots.map((spot) => {
+      const stat = statsBySpot.get(spot.id);
+      const avg = stat?._avg.rating ?? null;
+
+      return {
+        ...spot,
+        ratingAverage: avg == null ? null : Math.round(avg * 10) / 10,
+        reviewsCount: stat?._count._all ?? 0,
+      };
+    });
+
+    // Pico sem avaliação fica fora quando há filtro de nota mínima.
+    if (filter.minRating != null) {
+      const min = filter.minRating;
+
+      return items.filter(
+        (item) => item.ratingAverage != null && item.ratingAverage >= min,
+      );
+    }
+
+    return items;
   }
 }
 
