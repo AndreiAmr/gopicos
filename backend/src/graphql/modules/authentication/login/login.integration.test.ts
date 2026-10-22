@@ -9,6 +9,8 @@ const LOGIN = `
       id
       email
       name
+      firstName
+      lastName
     }
   }
 `;
@@ -17,7 +19,7 @@ describe('mutation login (integração)', () => {
   useTestDatabase();
 
   it('retorna token e dados do usuário com credenciais válidas', async () => {
-    const user = await createUser({ name: 'Skatista', email: 'skate@test.com' });
+    const user = await createUser({ firstName: 'Tony', lastName: 'Hawk', email: 'skate@test.com' });
 
     const { data, errors } = await executeAnonymous(LOGIN, {
       props: { email: user.email, password: user.plainPassword },
@@ -26,7 +28,9 @@ describe('mutation login (integração)', () => {
     expect(errors).toBeUndefined();
     expect(data.login.id).toBe(user.id);
     expect(data.login.email).toBe('skate@test.com');
-    expect(data.login.name).toBe('Skatista');
+    expect(data.login.name).toBe('Tony Hawk');
+    expect(data.login.firstName).toBe('Tony');
+    expect(data.login.lastName).toBe('Hawk');
     expect(typeof data.login.token).toBe('string');
   });
 

@@ -1,3 +1,4 @@
+import { fullName } from '../../utils/fullName';
 import { loginService } from '../../services/authentication/login/loginService';
 import bcrypt from 'bcrypt';
 import { generateToken } from '../../utils/jwt';
@@ -41,7 +42,9 @@ export const loginController = async (prop: LoginControllerProps) => {
 
     const loginData = {
       ...tokenData,
-      name: user.name,
+      name: fullName(user),
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       id: user.id,
     };

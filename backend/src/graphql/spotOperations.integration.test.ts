@@ -59,6 +59,26 @@ describe('proteção das operações de pico (integração)', () => {
     expect(saved.spotId).toBe(spot.id);
   });
 
+  it('getSpotById expõe o autor da avaliação com nome completo e separado', async () => {
+    const user = await createUser({ firstName: 'Tony', lastName: 'Hawk' });
+    const spot = await createSpot();
+    await prisma.spotReview.create({
+      data: { rating: 4, description: 'ok', authorId: user.id, spotId: spot.id },
+    });
+
+    const res = await executeAuthenticated(
+      tokenFor(user),
+      `query { getSpotById(id: "${spot.id}") { reviews { author { name firstName lastName } } } }`,
+    );
+
+    expect(res.errors).toBeUndefined();
+    expect(res.data.getSpotById.reviews[0].author).toEqual({
+      name: 'Tony Hawk',
+      firstName: 'Tony',
+      lastName: 'Hawk',
+    });
+  });
+
   it('createSpotReview rejeita authorId vindo no input', async () => {
     const user = await createUser();
     const spot = await createSpot();

@@ -21,7 +21,8 @@ enum Modality {
 model User {
   id            String              @unique() @default(uuid())
   email         String              @unique
-  name          String
+  firstName     String
+  lastName      String
   password      String
   // Desativação lógica: o usuário nunca é apagado fisicamente (D4).
   deactivatedAt DateTime?

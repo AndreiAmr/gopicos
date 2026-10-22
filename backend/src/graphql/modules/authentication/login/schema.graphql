@@ -8,6 +8,8 @@ type TokenData {
   exp: Int
   createdAt: Int
   name: String
+  firstName: String
+  lastName: String
   email: String
   id: String
 }

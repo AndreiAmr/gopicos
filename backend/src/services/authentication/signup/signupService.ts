@@ -3,7 +3,7 @@ import { userRepository } from '../../../database/repositories/User';
 import { AppError } from '../../../utils/AppError';
 import { SignupDTO } from './signupDTO';
 
-export type SignupServiceProps = Pick<User, 'name' | 'email' | 'password'>;
+export type SignupServiceProps = Pick<User, 'firstName' | 'lastName' | 'email' | 'password'>;
 
 const emailAlreadyExists = () =>
   new AppError({
