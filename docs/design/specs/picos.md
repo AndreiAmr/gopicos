@@ -374,7 +374,7 @@ Filtros pedidos: **modalidade**, **pago/gratuito**, **coberto**, **nota mínima*
 ## 13. Protótipos
 
 - **Figma (DS):** https://www.figma.com/design/cFlDLcx1lxM6RouTMSrJQN. Os frames de Picos **não foram desenhados no Figma**: o plano gratuito atingiu o limite de chamadas do MCP durante a criação. Quando o limite renovar ou o plano mudar, desenhar a partir do protótipo abaixo na página **Telas** (seção "Picos").
-- **Protótipo HTML estático:** `docs/design/prototipos/picos.html` (abrir no navegador). Cobre: Home (mobile claro e escuro, web claro), Detalhe (idem), Avaliações (lista com minha avaliação, formulário claro e escuro, vazio), Criar passo 1 e 2 (claro, escuro com erro de campo), Filtros (mobile claro e escuro, web), Busca (sugestões e vazio), Excluir (mobile claro e escuro, web) e os estados vazio, erro, carregando e não encontrado. Mapa e fotos são ilustrações.
+- **Protótipo HTML estático:** `docs/design/prototipos/picos.html` (abrir no navegador). Cobre: Home (mobile claro e escuro, web claro), Detalhe (idem), SpotCard compacto, Avaliações (lista com minha avaliação, formulário claro e escuro, vazio), Criar passo 1 e 2 (claro, escuro com erro de campo), Filtros (mobile claro e escuro, web), Busca (sugestões e vazio), Excluir (mobile claro e escuro, web) e os estados vazio, erro, carregando e não encontrado. Mapa e fotos são ilustrações.
 
 ---
 
