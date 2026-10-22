@@ -1,9 +1,9 @@
 # Spec de UX - Telas de perfil do usuário logado (mobile e web)
 
 Issues: #66 (GP-074 ver e editar perfil, mobile), #67 (GP-075 ver e editar perfil, web), #68 (GP-076 alterar senha, mobile e web), #69 (GP-077 excluir conta, mobile), #70 (GP-078 excluir conta, web), #71 (GP-079 meus picos e minhas avaliações), #72 (GP-080 foto de perfil / avatar).
-Nomenclatura: as decisões de UX desta spec são **UX-P1 a UX-P22** (seção 13) e as pendências para o dono são **D30 em diante** (seção 15), para não colidir com UX-1..28 da spec de autenticação, nem com as D1..D17 do backlog nem com as decisões da spec de picos.
+Nomenclatura: as decisões de UX desta spec são **UX-P1 a UX-P23** (seção 13) e as pendências para o dono são **D30 em diante** (seção 15), para não colidir com UX-1..28 da spec de autenticação, nem com as D1..D17 do backlog nem com as decisões da spec de picos.
 Base: `docs/design/design-system.md` **versão 2.0** e o padrão da spec `docs/design/specs/autenticacao.md` (formulário, validação, erros de rede, acessibilidade). Esta spec **não define cor, fonte, espaço ou raio novos**: só usa tokens do DS.
-Dependência de outra spec: "Meus picos" reaproveita o **card/lista de pico** definido em `docs/design/specs/picos.md` (em elaboração por outro UX). Aqui só dizemos *como* o card entra no perfil; se aquela spec mudar o card, esta herda a mudança. Ver 2 e 8.
+Dependência de outra spec: "Meus picos" usa o card compacto `SpotListItem` **definido em `docs/design/specs/picos.md` (PR #112)**; esta spec só diz *como* ele entra no perfil. Rotas e nomes seguem a mesma spec (`/` é o Login, a Home é `/home`, novo pico é `/spot/new-spot`).
 Figma e protótipo: ver seção 16.
 
 Regras de negócio que moldam as telas (backlog do PO: GP-070 a GP-080, D4, D7, D14):
@@ -58,7 +58,7 @@ Necessários que o DS ainda não detalha (entram em GP-002/003 junto com os de a
 | `SettingsRow` / `SettingsGroup` | Linha de lista de ajustes: ícone 24 à esquerda (em `text-muted`), rótulo `body-strong`, valor/descrição opcional (`body-sm`, `text-muted`), `chevron` à direita; altura mín. 56; grupo = `surface`, raio `lg`, bordas `divider` entre linhas; papel `button`/`link`. Variante **destrutiva**: ícone e rótulo em `error`. Uma linha por navegação; nunca duas ações na mesma linha. |
 | `DangerZone` (web) | Card com borda `error` 1,5 px, título "Excluir conta" (`h3` em `error`), texto curto e botão `destructive` ou `secondary` com texto `error`. Só web `md+`. No mobile é a `SettingsRow` destrutiva. |
 | `ConfirmDialog` | Dialog (web) / alerta nativo ou sheet (mobile) do DS com título, texto, botão secundário "Cancelar" (foco inicial, **sempre à esquerda/primeiro**) e o botão de confirmação à direita. Para ações destrutivas o botão é `destructive`. Fecha com Esc, gesto e "Cancelar". |
-| `ListItem` de pico e de avaliação | **Pico:** o `SpotCard` da spec de picos em variante **compacta de lista** (miniatura 72x72 à esquerda, nome `h3`, chip de modalidade, `StarRating` com média e contagem, local em `caption`). Se aquela spec não trouxer a variante compacta, o card padrão (16:9) é usado e esta spec passa a pedir a compacta (dependência registrada em UX-P14). **Avaliação (novo, `ReviewListItem`):** nome do pico (`h3`, é o link), `StarRating` leitura, data (`caption`), comentário (`body`, até 3 linhas com reticências), alvo inteiro leva ao pico. |
+| `ListItem` de pico e de avaliação | **Pico:** o card compacto de lista **`SpotListItem`, definido na spec de picos (`docs/design/specs/picos.md`, PR #112)**; esta spec não o redefine nem tem alternativa: o conteúdo, os dados e o tamanho valem os de lá. Só entram dados que os contratos expõem (nome, modalidade, nota média e contagem, foto); **não há endereço/local no card**. **Avaliação (novo, `ReviewListItem`):** nome do pico (`h3`, é o link), `StarRating` leitura, data (`caption`), comentário (`body`, até 3 linhas com reticências, o mesmo limite do `ReviewItem` do detalhe em picos.md, que deve ser igual; ver UX-P23), alvo inteiro leva ao pico. |
 | `EmptyState` | Do DS (ilustração simples + texto + ação). Aqui com a **camada de marca**: usado nos vazios de P5/P6 (DS 13.6 permite vazio): ilustração de pino/skate, uma linha `h3`, uma de apoio e botão. |
 | `SectionHeader` | `label` em `text-muted` acima de um grupo (ex.: "Conta", "Atividade"). `h2` semântico (web) / `accessibilityRole="header"`. |
 
@@ -129,7 +129,7 @@ Espaço: gutter 16; entre header e tiles `space.6`; entre grupos `space.6`; dent
 |---|---|---|---|
 | Nome | "Nome" | `autoComplete="given-name"`, `textContentType="givenName"`, `autoCapitalize="words"`, `maxLength` 40 | vazio ou só espaços: "Informe seu nome."; menos de 2: "O nome precisa ter ao menos 2 caracteres." |
 | Sobrenome | "Sobrenome" | `autoComplete="family-name"`, `textContentType="familyName"`, `autoCapitalize="words"`, `maxLength` 40 | "Informe seu sobrenome."; mínimo 2: "O sobrenome precisa ter ao menos 2 caracteres." |
-| E-mail | "E-mail" | `readOnly`, `aria-readonly`, **não** focável com Tab (ou focável só para leitura e cópia, ver UX-P7) | sem validação |
+| E-mail | "E-mail" | `readOnly`, `aria-readonly`, **focável** (Tab) para leitura e cópia, com `aria-describedby` apontando para o texto de apoio (UX-P7) | sem validação |
 
 Mesmas regras e mensagens do cadastro (autenticação 5.2), para a pessoa não ver duas regras diferentes para o mesmo dado. Espaços nas pontas são removidos ao salvar. Se o servidor devolver `VALIDATION_ERROR` com `field` (`firstName`/`lastName`), a mensagem do servidor aparece no campo (a do servidor vale sobre a do cliente); sem `field`, `AlertBanner` acima do botão.
 
@@ -219,7 +219,7 @@ Mobile: igual a P2 (sem TabBar, botão fixo acima do teclado, ordem Senha atual 
    - "Seus picos e avaliações continuam no GoPicos, com o autor mostrado como \"Usuário Desativado\"."
    - "As notas das suas avaliações continuam contando na média dos picos."
    - "Você pode reativar a conta quando quiser: é só entrar de novo com seu e-mail e senha."
-   Quando as contagens já estão carregadas, o 2º item vira "Seus {n} picos e {m} avaliações continuam ..." (1: "Seu 1 pico"; 0 de ambos: o item é omitido).
+   O 2º item tem **dois textos**. Com contagens carregadas: "Seus {n} picos e {m} avaliações continuam no GoPicos, com o autor mostrado como \"Usuário Desativado\"." (singular: \"Seu 1 pico\", \"1 avaliação\"; se um dos dois for 0, cita só o outro; se ambos forem 0, o item é omitido). **Sem contagens** (ainda carregando, falha ou D35 não entregue): "Seus picos e avaliações continuam no GoPicos, com o autor mostrado como \"Usuário Desativado\"." A tela nunca espera as contagens para abrir; assim #69/#70 não dependem de D35.
 4. Campo **Senha** (`PasswordInput`) com texto de apoio: "Digite sua senha para confirmar."
 5. (Condicional) `AlertBanner` de rede/servidor.
 6. Botões: **"Excluir conta"** (`destructive`) e **"Cancelar"** (`secondary`); disposição em 7.5.
@@ -242,7 +242,7 @@ Não pedimos digitar "EXCLUIR" (UX-P12): a senha já é o atrito e a prova de id
 | `UNAUTHENTICATED` | Login com aviso de sessão expirada. |
 
 ### 7.5 Layout
-- **Mobile:** conteúdo rolável; **barra inferior fixa** (acima do teclado, safe-area) com os dois botões empilhados: `destructive` "Excluir conta" em cima e "Cancelar" (`secondary`) embaixo, cada um com 48 e `space.3` entre eles. Na ordem de leitura e de foco, "Cancelar" vem primeiro. O escape é fácil pelo "Cancelar", pelo voltar do cabeçalho e pelo gesto do sistema. Variante `destructive`: fundo `error`, texto `#FFFFFF` no claro (contraste **6,68:1**) e `bg` no escuro (`#0F1113` sobre `#FF8A80`, **8,29:1**).
+- **Mobile:** conteúdo rolável; **barra inferior fixa** (acima do teclado, safe-area) com os dois botões empilhados: **"Cancelar" (`secondary`) em cima e `destructive` "Excluir conta" embaixo**, cada um com 48 e `space.3` entre eles. A ordem visual, a de leitura e a de foco coincidem (de cima para baixo), com o foco inicial dos botões em "Cancelar"; o destrutivo fica por último, no fim do caminho do polegar para a confirmação consciente. O escape é fácil pelo "Cancelar", pelo voltar do cabeçalho e pelo gesto do sistema. Variante `destructive`: fundo `error`, texto `#FFFFFF` no claro (contraste **6,68:1**) e `bg` no escuro (`#0F1113` sobre `#FF8A80`, **8,29:1**).
 - **Web:** diálogo de 480 px; botões alinhados à direita na ordem **Cancelar | Excluir conta** (convenção de diálogos; "Cancelar" é a ação padrão e recebe o foco ao tabular primeiro após o campo).
 - Entrada de P4 em P1/menu: `SettingsRow` destrutiva (mobile) e `DangerZone` (web `md+`); **nada** de excluir conta fica no caminho do polegar do hub além da última linha, para evitar toque acidental.
 
@@ -271,13 +271,13 @@ Não pedimos digitar "EXCLUIR" (UX-P12): a senha já é o atrito e a prova de id
 - **Sem paginação no MVP** (D31); se o backend limitar, "Carregar mais" ao fim da lista.
 
 ### 8.2 P5 - Meus picos
-- Item: `SpotCard` compacto da spec de picos (nome `h3`, chip de modalidade, `StarRating` + média + contagem, local). **Sem** ações de editar/excluir na lista: elas ficam no detalhe do pico (D13: só o autor), para não duplicar fluxos; o card inteiro é o alvo e abre o detalhe. Pico recém-criado sem avaliações: "Sem avaliações ainda" no lugar das estrelas.
+- Item: `SpotListItem` da spec de picos (nome, modalidade, `StarRating` + média + contagem, foto; **sem local/endereço**, nenhum contrato o expõe). **Sem** ações de editar/excluir na lista: elas ficam no detalhe do pico (D13: só o autor), para não duplicar fluxos; o card inteiro é o alvo e abre o detalhe. Pico recém-criado sem avaliações: "Sem avaliações ainda" no lugar das estrelas.
 - Estados:
   | Estado | Comportamento |
   |---|---|
   | Carregando | 3 skeletons do card compacto. |
   | Com dados | Lista; toque abre o detalhe. |
-  | **Vazio** | `EmptyState` com ilustração de marca: título **"Você ainda não cadastrou nenhum pico."**, apoio "Conhece um lugar bom para andar? Cadastre e ajude a galera." e botão primário **"Cadastrar pico"** (atalho): mobile navega à aba/tela de novo pico (`NewSpot`); web leva à rota de criação de pico definida na spec de picos. |
+  | **Vazio** | `EmptyState` com ilustração de marca: título **"Você ainda não cadastrou nenhum pico."**, apoio "Conhece um lugar bom para andar? Cadastre e ajude a galera." e botão primário **"Cadastrar pico"** (atalho): mobile navega à aba/tela de novo pico (`NewSpot`); web leva a `/spot/new-spot` (rota da spec de picos). |
   | Erro | `EmptyState` de erro com "Tentar novamente"; resto do perfil intacto. |
   | Pico removido por outro fluxo | Não acontece no MVP (só o autor remove; ao remover no detalhe, a lista atualiza ao voltar). |
 
@@ -287,7 +287,7 @@ Não pedimos digitar "EXCLUIR" (UX-P12): a senha já é o atrito e a prova de id
   | Estado | Comportamento |
   |---|---|
   | Carregando | 3 skeletons (linha de título, estrelas, 2 linhas). |
-  | **Vazio** | `EmptyState`: **"Você ainda não avaliou nenhum pico."**, apoio "Suas notas ajudam outros skatistas a achar os melhores picos." e botão **"Explorar o mapa"** (leva à aba Home / `/home`). |
+  | **Vazio** | `EmptyState`: **"Você ainda não avaliou nenhum pico."**, apoio "Suas notas ajudam outros skatistas a achar os melhores picos." e botão **"Explorar o mapa"** (mobile: aba Home; web: `/home`; a rota `/` é o Login). |
   | Erro | Igual a P5. |
 
 ### 8.4 Acessibilidade e microcopy
@@ -355,7 +355,7 @@ Iguais: nomes de componentes, microcopy, regras de validação, estados e tokens
 
 **UX-P6. "Salvar alterações" desabilitado quando nada mudou (exceção à regra de autenticação 3.1).** Na autenticação, o botão cinza sem explicação confundia ("o que falta?"). Aqui a razão é evidente: **não há o que salvar** porque nada foi alterado, e habilitar um botão que não faz nada induz a dúvida ("salvou?"). Em P3 e P4 (campos obrigatórios) mantemos a regra de sempre habilitado e deixamos o envio mostrar o que falta.
 
-**UX-P7. E-mail visível, bloqueado e explicado.** D7 torna o e-mail imutável (é o login e o destino do código de recuperação). Esconder o campo geraria "onde mudo meu e-mail?"; mostrá-lo como campo desabilitado com a razão em uma frase responde antes da pergunta. Usamos o estilo "somente leitura" (fundo `sunken` + cadeado + texto) e não um campo normal desativado com opacidade, para o contraste do e-mail continuar legível (o dado é útil: confirmar com qual conta estou logado).
+**UX-P7. E-mail visível, bloqueado e explicado.** D7 torna o e-mail imutável (é o login e o destino do código de recuperação). Esconder o campo geraria "onde mudo meu e-mail?"; mostrá-lo como campo desabilitado com a razão em uma frase responde antes da pergunta. Usamos o estilo "somente leitura" (fundo `sunken` + cadeado + texto) e não um campo normal desativado com opacidade, para o contraste do e-mail continuar legível. O campo é **focável** (Tab) com `aria-readonly` e `aria-describedby` para o texto de apoio, assim o leitor de tela encontra o campo e a explicação, e dá para selecionar e copiar. Para o contraste do e-mail continuar legível (o dado é útil: confirmar com qual conta estou logado).
 
 **UX-P8. Contagens em tiles tocáveis e linhas "Meus picos / Minhas avaliações" duplicadas.** As tiles dão um resumo visual e um atalho; as linhas são o caminho previsível para quem navega por lista e para leitores de tela (a ordem de foco entra no grupo "Atividade"). A duplicação é deliberada e barata: ambas são focáveis, e as tiles têm `accessibilityLabel` "Ver meus picos, {n}". Se o dono achar redundante, remover as tiles não afeta nenhuma outra tela.
 
@@ -369,7 +369,7 @@ Iguais: nomes de componentes, microcopy, regras de validação, estados e tokens
 
 **UX-P13. Contagens ausentes são omitidas, nunca "0" falso.** Um "0 picos" durante o carregamento ou numa falha leva a pensar que os picos sumiram. Skeleton enquanto carrega, "-" se falhou.
 
-**UX-P14. "Meus picos" reutiliza o card de pico em variante compacta.** Consistência: o mesmo card, mesmos dados e mesmo toque. A lista densa do perfil pede uma versão compacta (miniatura + dados); a spec de picos deve prever essa variante, senão se usa o card 16:9 com `maxWidth`. **Dependência registrada**: se a variante não existir quando a issue #71 for implementada, o Dev usa o card padrão e abre issue de ajuste.
+**UX-P14. "Meus picos" usa o `SpotListItem` definido na spec de picos.** Consistência: o mesmo card, os mesmos dados e o mesmo toque em todo lugar onde há lista de picos. A definição (conteúdo, tamanho, estados) mora só em picos.md (PR #112); aqui não há variante própria nem plano B. O card não mostra endereço porque o pico só tem polígono nos contratos (geocodificar item a item teria custo e limite de API).
 
 **UX-P15. "Sair" com confirmação.** Toque acidental em "Sair" obriga a digitar e-mail e senha de novo (pior no celular, sem gerenciador de senha ativado). A confirmação custa um toque. Fica acima de "Excluir conta" e separada dela por espaço, porque são ações de peso muito diferente.
 
@@ -377,7 +377,7 @@ Iguais: nomes de componentes, microcopy, regras de validação, estados e tokens
 
 **UX-P17. Sucesso de edição volta à lista no mobile e fica na página na web.** No celular o fluxo é linear (entrar, mudar, voltar), e o nome novo visível em P1 confirma o salvamento além do toast. Na web a página é o destino: ficar nela é natural, e o toast + botão desabilitado confirmam.
 
-**UX-P18. Alterar senha não encerra a sessão atual (D33).** Reautenticar logo após o usuário ter digitado a senha atual é atrito sem ganho. Ficam as dúvidas sobre outras sessões abertas, que é decisão técnica/de segurança do dono.
+**UX-P18. Alterar senha não encerra a sessão atual nem invalida nenhum token no MVP (D33).** Reautenticar logo após a pessoa ter digitado a senha atual é atrito sem ganho. O risco (token antigo em outro aparelho segue válido até expirar) foi aceito e fica documentado em D33.
 
 **UX-P19. Após excluir conta, vai ao Login com aviso e e-mail preenchido.** Dá fechamento ("deu certo") e reforça que a conta pode voltar. O e-mail preenchido facilita a reativação. O aviso é um `AlertBanner` info no Login, não toast (a tela muda e o toast poderia ser perdido; o banner ensina a regra de D4).
 
@@ -385,7 +385,9 @@ Iguais: nomes de componentes, microcopy, regras de validação, estados e tokens
 
 **UX-P21. Nenhuma ação de editar/excluir dentro das listas de "Meus picos/avaliações".** Elas já existem no detalhe (autor); duplicar criaria dois caminhos com estados e confirmações paralelos e aumentaria o risco de toque acidental numa lista rolável. A lista é só para achar e abrir.
 
-**UX-P22. Nome completo derivado de `firstName + " " + lastName`.** Usado no header do perfil, no menu da web e como autor de avaliações; nos espaços apertados (menu, cards) usa-se só o `firstName` + inicial do sobrenome ("Marina S."), para caber e para dar menos exposição do nome inteiro em contexto público. (Detalhe de exibição pública de autor pertence à spec de picos; esta apenas sugere.)
+**UX-P22. Nome completo só para o próprio usuário; "Nome S." em todo contexto público (D36, aprovada).** Header do perfil, menu da web e P2 mostram `firstName + " " + lastName`. Em qualquer contexto visto por outras pessoas (autor de pico, de avaliação, cards, listas) o formato é **"Nome S."** (primeiro nome + inicial do sobrenome com ponto, ex.: "Marina S."), para reduzir a exposição do sobrenome. Sem sobrenome: só o nome. Conta desativada: "Usuário Desativado". **Impacto técnico:** o #104 hoje devolve `author.name` completo; o formato público deve ser **montado no backend** (para o sobrenome nem sair da API) a partir de `firstName`/`lastName` (#97), e o cliente só exibe. Vale também para a spec de picos.
+
+**UX-P23. Comentário truncado em 3 linhas em toda lista.** Em "Minhas avaliações" e no `ReviewItem` do detalhe do pico o limite é o mesmo, **3 linhas** com reticências (picos.md fala em 4: ajuste pedido a ela); o texto completo fica no detalhe e no rótulo de acessibilidade.
 
 ## 14. Ideias pós-MVP
 - Envio de foto de perfil (seção 9), com recorte avançado e remoção.
@@ -399,15 +401,16 @@ Iguais: nomes de componentes, microcopy, regras de validação, estados e tokens
 - Biometria para confirmar ações sensíveis.
 
 ## 15. Pendências para o dono (decisões D30 em diante)
-1. **D30 - Foto de perfil no MVP?** Recomendação: **não**; manter iniciais no MVP (UX-P20) e a seção 9 pronta para depois. Antecipar exige backend (upload, remoção) e permissões de câmera/galeria em iOS e Android.
-2. **D31 - Paginação em Meus picos/Minhas avaliações.** Recomendação: **lista completa, sem paginação no MVP** (a base é pequena); `mySpots`/`myReviews` devolvem tudo ordenado por recência. Reavaliar com volume.
-3. **D32 - Excluir conta: confirmação extra além da senha** (digitar "EXCLUIR")? Recomendação: **não**; senha basta porque a ação é reversível (UX-P12).
-4. **D33 - Alterar senha: encerrar outras sessões / invalidar o token atual?** Recomendação: **manter a sessão atual** e (decisão técnica) invalidar tokens emitidos antes da troca se o backend suportar; sem isso, comportamento atual do JWT de 7 dias.
-5. **D34 - Aviso no Login após excluir conta** ("Conta excluída. Se quiser voltar, entre com seu e-mail e senha e ela será reativada.")? Recomendação: **sim**. Exige acrescentar esse banner à tabela de estados do Login (autenticação 4.3).
-6. **D35 - Contagens no hub (picos/avaliações) e "Membro desde".** Recomendação: **sim**; exige `me` devolver `spotsCount`, `reviewsCount` e `createdAt` (GP-070 já devolve a data de cadastro). Sem as contagens, as tiles são removidas (UX-P13).
-7. **D36 - Exibição pública do autor: nome completo ou "Marina S."** (UX-P22). Recomendação: **"Marina S."** em contextos públicos (cards, avaliações); nome completo só no próprio perfil. Decide a spec de picos em conjunto.
-8. **D37 - Limite de caracteres de nome e sobrenome: 40 cada** (cadastro) em vez dos 60 do nome único do GP-071. Recomendação: **40 cada**, para coerência com o cadastro (depende de GP-081).
+Todas aprovadas pelo dono conforme a recomendação (registradas em `docs/produto/backlog.md`). **D27 a D29 ficaram reservadas** (intervalo deixado livre entre as decisões da spec de picos, D18 a D26, e as desta spec, para a spec de picos poder crescer sem colisão); não foram usadas.
+1. **D30 - Foto de perfil no MVP?** **Não**; iniciais no MVP (UX-P20), seção 9 pronta para depois. Impacto: antecipar exige backend (upload, remoção) e permissões de câmera/galeria.
+2. **D31 - Paginação em Meus picos/Minhas avaliações.** **Lista completa, sem paginação no MVP**; `mySpots`/`myReviews` devolvem tudo por recência. Impacto: backend sem cursor; reavaliar com volume.
+3. **D32 - Excluir conta: confirmação extra além da senha.** **Não**; a senha basta porque a ação é reversível (UX-P12). Impacto: nenhum no backend; P4 tem só o campo de senha.
+4. **D33 - Alterar senha e sessões.** **No MVP a sessão atual continua válida e NENHUM token é invalidado** (nem o atual, nem os de outros dispositivos) ao trocar a senha; vale o JWT de 7 dias sem refresh (D8). Risco aceito: quem já tinha um token roubado ou em outro aparelho continua com acesso até ele expirar. "Sair de todos os dispositivos"/invalidação ficam pós-MVP. Impacto: backend de GP-072 só troca o hash.
+5. **D34 - Aviso no Login após excluir conta.** **Sim.** Impacto em `autenticacao.md`: a tabela de estados do Login (4.3) ganha a linha **"Vindo de excluir conta"** (editada neste PR): `AlertBanner` info "Conta excluída. Se quiser voltar, entre com seu e-mail e senha e ela será reativada.", e-mail preenchido e foco na senha. O Login recebe isso pelos parâmetros da navegação `replace` (mobile) / estado da navegação (web), como o aviso de conta criada (UX-15); nunca pela URL.
+6. **D35 - Contagens e "Membro desde" no hub.** **Sim.** Impacto: `me` deve devolver `spotsCount`, `reviewsCount` e `createdAt` (hoje devolve `{id, name, email, createdAt}`, #109). Sem as contagens, as tiles saem (UX-P13) e o aviso de exclusão usa o texto genérico (7.2).
+7. **D36 - Autor público.** **"Nome S." em todo contexto público** (UX-P22). Impacto: o formato é montado no backend (#104 devolve `author.name` completo hoje) e vale também em picos.md.
+8. **D37 - Nome e sobrenome: 40 caracteres cada.** **Aprovada.** Impacto: o critério do GP-071 (#63, "até 60 caracteres") **será alterado para 40 pelo orquestrador**; depende de GP-081 (#97).
 
 ## 16. Figma e protótipo
 
-O limite de chamadas do Figma MCP do plano Starter foi atingido antes de qualquer frame ser desenhado, então **não há frames de Perfil no arquivo do DS** (https://www.figma.com/design/cFlDLcx1lxM6RouTMSrJQN, página "Telas"). Para não deixar a spec sem referência visual, há um **protótipo HTML estático** (sem dependências, tokens do DS em CSS, claro e escuro) em `docs/design/prototipos/perfil.html`, com: Perfil (mobile e web), Editar dados, Alterar senha, Excluir conta, Meus picos (cheio e vazio) e Minhas avaliações. A fonte de verdade continua sendo este texto. Quando o limite do Figma for restabelecido, os frames serão desenhados ao lado das telas de autenticação e os links listados aqui.
+O limite de chamadas do Figma MCP do plano Starter foi atingido antes de qualquer frame ser desenhado, então **não há frames de Perfil no arquivo do DS** (https://www.figma.com/design/cFlDLcx1lxM6RouTMSrJQN, página "Telas"). Para não deixar a spec sem referência visual, há um **protótipo HTML estático** (sem dependências, tokens do DS em CSS, claro e escuro) em `docs/design/prototipos/perfil.html`, com: Perfil (mobile e web), Editar dados, Alterar senha, Excluir conta, Sair (P7), Meus picos (cheio e vazio) e Minhas avaliações. A fonte de verdade continua sendo este texto. Quando o limite do Figma for restabelecido, os frames serão desenhados ao lado das telas de autenticação e os links listados aqui.
