@@ -5,6 +5,7 @@ export type AppErrorType =
   | 'USER_NOT_FOUND'
   | 'UNAUTHORIZED'
   | 'UNAUTHENTICATED'
+  | 'NOT_FOUND'
   | 'INTERNAL_ERROR';
 
 type AppErrorProps = {
