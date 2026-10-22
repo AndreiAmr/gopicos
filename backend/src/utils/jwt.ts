@@ -1,11 +1,14 @@
-import { create } from 'domain';
 import jwt, { SignOptions } from 'jsonwebtoken';
-const JWT_SECRET = process.env.JWT_SECRET || '';
+// JWT de 7 dias, sem refresh token (decisão D8)
+export const TOKEN_EXPIRES_IN = '7d';
+
+const getSecret = () => process.env.JWT_SECRET || '';
 
 export const generateToken = (
   payload: object,
-  expiresIn: SignOptions['expiresIn'] = '20m'
+  expiresIn: SignOptions['expiresIn'] = TOKEN_EXPIRES_IN,
 ) => {
+  const JWT_SECRET = getSecret();
   if (!JWT_SECRET) throw new Error('JWT_SECRET must be string');
   const expiresInSeconds =
     typeof expiresIn === 'string' ? msToSeconds(expiresIn) : expiresIn;
@@ -24,7 +27,9 @@ export const generateToken = (
 
 export const getTokenData = (token: string) => {
   try {
-    return jwt.verify(token, JWT_SECRET);
+    const secret = getSecret();
+    if (!secret) return null;
+    return jwt.verify(token, secret);
   } catch {
     return null;
   }

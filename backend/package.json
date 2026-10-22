@@ -10,6 +10,7 @@
     "mock": "tsx src/database/inserts/populate/index.ts",
     "build": "yarn generate && tsc",
     "prisma:studio": "prisma studio --schema ./src/prisma/schema.prisma",
+    "test": "tsx --test \"src/**/*.test.ts\"",
     "setup": "yarn migrate && yarn mock"
   },
   "keywords": [],
