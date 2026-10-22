@@ -1,5 +1,5 @@
 import { RefreshControl, ScrollView } from 'react-native';
-import { Lock, LogOut, Pencil, Trash2 } from 'lucide-react-native';
+import { Lock, LogOut, MapPin, Pencil, Star, Trash2 } from 'lucide-react-native';
 import { View, useTheme } from 'tamagui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
@@ -11,6 +11,8 @@ import {
   Text,
 } from '../../../atomic/ds';
 import { space } from '../../../config/tamagui/tokens';
+import { activityStrings } from './activity/logic';
+import { StatTile } from './StatTile';
 import { fullName, memberSince, profileStrings } from './logic';
 import { useProfileHome } from './useProfileHome';
 
@@ -48,6 +50,8 @@ export const ProfileTemplate = () => {
     refresh,
     goToEdit,
     goToPassword,
+    goToSpots,
+    goToReviews,
     goToDelete,
     confirmLogout,
   } = useProfileHome();
@@ -110,6 +114,25 @@ export const ProfileTemplate = () => {
           </View>
         ) : null}
 
+        {profile ? (
+          <View flexDirection="row" gap={space[3]}>
+            <StatTile
+              count={profile.spotsCount}
+              label={activityStrings.spotsTile}
+              a11yLabel={`Ver meus picos, ${profile.spotsCount}`}
+              onPress={goToSpots}
+              testID="profile-spots-tile"
+            />
+            <StatTile
+              count={profile.reviewsCount}
+              label={activityStrings.reviewsTile}
+              a11yLabel={`Ver minhas avaliações, ${profile.reviewsCount}`}
+              onPress={goToReviews}
+              testID="profile-reviews-tile"
+            />
+          </View>
+        ) : null}
+
         <View>
           <SectionHeader label={profileStrings.account} />
           <SettingsGroup>
@@ -131,6 +154,25 @@ export const ProfileTemplate = () => {
               onPress={goToPassword}
               isLast
               testID="profile-password-row"
+            />
+          </SettingsGroup>
+        </View>
+
+        <View>
+          <SectionHeader label={activityStrings.activity} />
+          <SettingsGroup>
+            <SettingsRow
+              icon={MapPin}
+              label={activityStrings.mySpots}
+              onPress={goToSpots}
+              testID="profile-spots-row"
+            />
+            <SettingsRow
+              icon={Star}
+              label={activityStrings.myReviews}
+              onPress={goToReviews}
+              isLast
+              testID="profile-reviews-row"
             />
           </SettingsGroup>
         </View>

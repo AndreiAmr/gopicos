@@ -21,4 +21,6 @@ export type ProfileStackParamList = {
   ProfileEdit: undefined;
   ChangePassword: undefined;
   DeleteAccount: undefined;
+  MySpots: undefined;
+  MyReviews: undefined;
 };
