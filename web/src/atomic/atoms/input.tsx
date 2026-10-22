@@ -9,6 +9,8 @@ type InputProps = React.ComponentProps<'input'> & {
   containerStyle?: React.ComponentProps<'div'>['className'];
   isLoading?: boolean;
   error?: string;
+  /** Texto de apoio fixo abaixo do campo (ex.: "Minimo de 8 caracteres."). */
+  hint?: string;
 };
 
 function Input({
@@ -18,12 +20,17 @@ function Input({
   containerStyle,
   isLoading = false,
   error,
+  hint,
   id,
   ...props
 }: InputProps) {
   const generatedId = React.useId();
   const inputId = id ?? generatedId;
   const errorId = `${inputId}-error`;
+  const hintId = `${inputId}-hint`;
+  const describedBy =
+    [error ? errorId : null, hint && !error ? hintId : null].filter(Boolean).join(' ') ||
+    undefined;
 
   return (
     <div className={cn('flex flex-col gap-1', containerStyle)}>
@@ -45,7 +52,7 @@ function Input({
             type={type}
             data-slot="input"
             aria-invalid={error ? true : undefined}
-            aria-describedby={error ? errorId : undefined}
+            aria-describedby={describedBy}
             className={cn(
               'h-12 w-full min-w-0 rounded-md border border-input bg-gp-surface px-3 py-1 text-body text-gp-text shadow-1 transition-colors duration-150 outline-none',
               'placeholder:text-gp-text-subtle file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium',
@@ -56,6 +63,11 @@ function Input({
             )}
             {...props}
           />
+          {hint && !error && (
+            <p id={hintId} className="text-body-sm text-gp-text-muted">
+              {hint}
+            </p>
+          )}
           {error && (
             <p
               id={errorId}

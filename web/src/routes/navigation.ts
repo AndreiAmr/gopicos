@@ -1,11 +1,20 @@
 import { URL } from './url';
 
-let navigateFunction: ((path: string) => void) | null = null;
+export type NavigateOptions = {
+  replace?: boolean;
+  state?: unknown;
+};
 
-export const setNavigate = (fn: (path: string) => void) => {
+let navigateFunction:
+  | ((path: string, options?: NavigateOptions) => void)
+  | null = null;
+
+export const setNavigate = (
+  fn: (path: string, options?: NavigateOptions) => void
+) => {
   navigateFunction = fn;
 };
 
-export const navigate = (path: URL) => {
-  if (navigateFunction) navigateFunction(path);
+export const navigate = (path: URL, options?: NavigateOptions) => {
+  if (navigateFunction) navigateFunction(path, options);
 };

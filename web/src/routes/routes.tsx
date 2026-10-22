@@ -6,6 +6,7 @@ import { LoginPage } from '@/pages/auth/login';
 import { PageNotFound } from '@/pages/error/PageNotFound';
 import { createBrowserRouter } from 'react-router';
 import { spotRoutes } from './spot.routes';
+import { signUpRoutes } from './auth.routes';
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,7 @@ const router = createBrowserRouter([
     children: [{ path: '/home', element: <HomePage /> }],
   },
   ...spotRoutes,
+  ...signUpRoutes,
 ]);
 
 export { router };
