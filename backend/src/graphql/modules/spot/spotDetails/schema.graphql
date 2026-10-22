@@ -1,17 +1,6 @@
-type Author {
+type SpotAuthor {
   id: String
-  email: String
   name: String
-}
-
-type Review {
-  id: String
-  rating: Int
-  description: String
-  authorId: String
-  spotId: String
-  createdAt: String
-  author: Author
 }
 
 type SpotDetails {
@@ -28,7 +17,10 @@ type SpotDetails {
   coordinates: JSON
   openingHours: String
   markingType: String
-  reviews: [Review]
+  author: SpotAuthor
+  ratingAverage: Float
+  reviewsCount: Int
+  isOwner: Boolean
 }
 
 extend type Query {
