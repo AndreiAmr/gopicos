@@ -1,0 +1,8 @@
+input DeleteAccountInput {
+  password: String!
+}
+
+extend type Mutation {
+  # Desativa a conta (D4): nada é apagado e o token atual deixa de valer.
+  deleteAccount(props: DeleteAccountInput!): Response @Authenticated
+}
