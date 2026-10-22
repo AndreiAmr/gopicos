@@ -7,6 +7,7 @@ import {
   fontFamily,
   radius,
   size,
+  typography,
   space,
 } from '../../../../config/tamagui/tokens';
 import { Text } from '../Text';
@@ -47,7 +48,7 @@ export const Input = ({
   const inputStyle = {
     flex: 1,
     paddingVertical: space[2],
-    fontSize: 16,
+    fontSize: typography.body.fontSize,
     fontFamily: fontFamily.regular,
     color: theme.text.val,
   };
