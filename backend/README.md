@@ -49,3 +49,32 @@ describe('minha operação', () => {
 ```
 
 Exemplo completo: `src/graphql/modules/authentication/login/login.integration.test.ts`.
+
+## E-mail transacional
+
+Serviço em `src/services/email` (interface `EmailTransport`, trocável). Provedor atual: [Resend](https://resend.com) via API HTTPS (sem dependência extra; funciona no Render, que bloqueia SMTP no plano gratuito).
+
+```ts
+import { getEmailService } from '../services/email';
+await getEmailService().sendPasswordResetCode({ to, name, code }); // código de 6 dígitos, válido por 15 min
+```
+
+| Variável | Obrigatória | Descrição |
+|---|---|---|
+| `RESEND_API_KEY` | não | Chave da API do Resend. **Sem ela o envio é simulado**: registra no log o assunto e o destinatário mascarado, nunca o código, e não quebra o fluxo. |
+| `EMAIL_FROM` | não (recomendada em produção) | Remetente, ex.: `GoPicos <no-reply@seudominio.com>`. O domínio precisa estar verificado no Resend. Padrão: `GoPicos <no-reply@gopicos.com>`. |
+
+A chamada ao Resend aborta após 10 s e falhas de rede/timeout viram o erro uniforme `Falha ao enviar e-mail pelo Resend` (sem a API key). Quem chamar `sendPasswordResetCode` (ex.: GP-029) deve capturar o erro para não derrubar o fluxo nem revelar se o e-mail existe.
+
+### Passo a passo para o dono (produção/QA no Render)
+
+1. Criar a conta em [resend.com](https://resend.com) (plano gratuito).
+2. Adicionar e verificar o domínio de envio (registros DNS SPF e DKIM).
+3. Criar uma API key.
+4. No Render, definir `RESEND_API_KEY` (a chave) e `EMAIL_FROM` (ex.: `GoPicos <no-reply@seudominio.com>`).
+
+Atenção: o remetente padrão `no-reply@gopicos.com` só funciona se esse domínio estiver verificado; sem `EMAIL_FROM` válido, o Resend recusa o envio (HTTP 403/422).
+
+Para testar sem domínio: use `EMAIL_FROM="GoPicos <onboarding@resend.dev>"`; nesse modo o Resend só entrega ao e-mail do dono da conta.
+
+Veja `.env.example`. Em testes, injete um transporte falso com `createEmailService(transport)`.
