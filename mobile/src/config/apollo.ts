@@ -31,8 +31,11 @@ export const normalizeApolloError = (error: unknown): ApiError | null => {
   return parsedError.errors?.[0] ?? null;
 };
 
+/** Endpoint GraphQL (também usado pelo envio multipart de fotos). */
+export const graphqlEndpoint = `${graphqlUri}/graphql`;
+
 const httpLink = new HttpLink({
-  uri: `${graphqlUri}/graphql`,
+  uri: graphqlEndpoint,
 });
 
 const authLink = new SetContextLink(async ({ headers }) => {

@@ -21,6 +21,13 @@ export { BottomSheet } from './molecules/BottomSheet';
 export { SpotCard, SpotCardSkeleton } from './molecules/SpotCard';
 export { SpotPin } from './molecules/SpotPin';
 export { SpotPreview } from './molecules/SpotPreview';
+export {
+  CheckboxRow,
+  ChoiceChips,
+  Segmented,
+  SwitchRow,
+} from './molecules/FormControls';
+export { PhotoPicker } from './molecules/PhotoPicker';
 export { Toast, ToastProvider, useToast } from './molecules/Toast';
 export { AlertBanner } from './auth/AlertBanner';
 export { TextLink } from './auth/TextLink';
