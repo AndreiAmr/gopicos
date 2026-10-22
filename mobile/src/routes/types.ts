@@ -15,4 +15,5 @@ export type RootStackParamList = {
 export type ProfileStackParamList = {
   ProfileHome: undefined;
   ProfileEdit: undefined;
+  ChangePassword: undefined;
 };

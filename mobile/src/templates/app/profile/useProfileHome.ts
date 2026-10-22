@@ -17,6 +17,11 @@ export const useProfileHome = () => {
     [navigation],
   );
 
+  const goToPassword = useCallback(
+    () => navigation.navigate('ChangePassword'),
+    [navigation],
+  );
+
   // P7: confirmação antes de sair; o foco inicial fica em "Cancelar".
   const confirmLogout = useCallback(() => {
     Alert.alert(profileStrings.logoutTitle, profileStrings.logoutMessage, [
@@ -38,6 +43,7 @@ export const useProfileHome = () => {
     refreshing,
     refresh,
     goToEdit,
+    goToPassword,
     confirmLogout,
   };
 };

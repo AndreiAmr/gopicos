@@ -5,6 +5,7 @@ export const profileStrings = {
   editTitle: 'Editar dados',
   account: 'Conta',
   editRow: 'Editar dados',
+  passwordRow: 'Alterar senha',
   logout: 'Sair',
   logoutTitle: 'Sair do GoPicos?',
   logoutMessage: 'Você precisará entrar de novo com seu e-mail e senha.',
