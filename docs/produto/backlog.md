@@ -196,8 +196,9 @@ Quando faço login
 Então recebo a MESMA mensagem INVALID_CREDENTIALS (não revelar qual campo falhou)
 Dado uma conta desativada (GP-073) e senha correta
 Quando faço login
-Então a conta é reativada, recebo o token normalmente
+Então a conta é reativada, recebo o token normalmente e `reactivated: true` (nos demais logins, `reactivated: false`)
 E meus picos e avaliações voltam a exibir meu nome
+E o app mostra "Bem-vindo de volta! Sua conta foi reativada." (D14)
 ```
 
 **GP-022 - Login mobile completo** | M | MOB | Dep.: GP-021, merge `feature/mobile-home-map`
@@ -219,7 +220,7 @@ Cenário: sem rede
 ```gherkin
 Dado que estou na tela de Cadastro
 Quando preencho dados válidos e confirmo
-Então a conta é criada e entro autenticado (ou sou levado ao Login com aviso de sucesso)
+Então a conta é criada e sou levado ao Login com o e-mail preenchido e aviso de conta criada (D15)
 Quando o e-mail já existe
 Então vejo erro no campo e-mail
 E o botão fica desabilitado enquanto envia
@@ -256,7 +257,7 @@ Então vejo a mensagem de erro sem perder o e-mail digitado
 ```gherkin
 Dado a página /cadastro
 Quando preencho dados válidos
-Então a conta é criada e sou autenticado
+Então a conta é criada e sou levado ao login com o e-mail preenchido e aviso de conta criada (D15)
 E validações de formulário (yup) aparecem por campo antes do envio
 ```
 
@@ -290,6 +291,20 @@ Cenário: conta desativada
   Então a senha é alterada e a conta é reativada no próximo login (GP-021)
 ```
 
+**GP-099 - Termos de uso e política de privacidade** | M | BE, WEB, MOB | Dep.: GP-020, D17
+Como visitante, quero ler e aceitar os termos de uso e a política de privacidade ao me cadastrar, para saber como meus dados são usados (exigência das lojas para publicação).
+```gherkin
+Dado a tela de Cadastro
+Então vejo um aceite obrigatório com links para "Termos de uso" e "Política de privacidade"
+Quando tento cadastrar sem aceitar
+Então vejo erro no aceite e a conta não é criada
+Quando aceito e cadastro
+Então o backend grava a data do aceite e a versão dos termos no usuário
+E o backend recusa cadastro sem aceite com VALIDATION_ERROR
+E os textos ficam acessíveis sem login (web: /termos e /privacidade; mobile: tela ou link para a web)
+```
+Nota: o conteúdo jurídico dos textos é fornecido pelo dono; o time entrega estrutura e páginas com texto provisório marcado como tal. ID fora da faixa do épico (IDs estáveis).
+
 **GP-098 - Recuperar senha (mobile e web)** | M | WEB, MOB | Dep.: GP-029, GP-022, GP-026
 Link "Esqueci minha senha" no Login, tela para informar o e-mail e tela para código + nova senha + confirmação.
 ```gherkin
@@ -299,6 +314,7 @@ Quando informo código válido, nova senha e confirmação iguais
 Então vejo confirmação e volto ao Login com o e-mail preenchido
 Quando o código é inválido ou expirou
 Então vejo o erro no campo e a opção "Reenviar código"
+E "Reenviar código" só fica disponível 30 segundos após o último envio (D16)
 E loading, erro de rede e botão desabilitado durante o envio são tratados
 ```
 Nota: ID fora da faixa do épico porque os IDs são estáveis e a faixa E3 estava cheia.
@@ -685,7 +701,7 @@ Então o APK é gerado e o dono consegue instalar e executar o fluxo MVP
 
 ## Decisões do dono
 
-Decididas em 2026-10-22. D1 e D4 foram alteradas pelo dono; as demais seguem a recomendação do PO.
+Decididas em 2026-10-22. D1 e D4 foram alteradas pelo dono; D1–D13 seguem a recomendação do PO nos demais itens. D14–D17 vieram da spec de autenticação (PR #89).
 
 | # | Decisão | Decisão final |
 |---|---|---|
@@ -702,6 +718,10 @@ Decididas em 2026-10-22. D1 e D4 foram alteradas pelo dono; as demais seguem a r
 | D11 | Plataformas mobile do MVP: iOS e Android? | Ambos compilam e funcionam; validação E2E (Maestro) e critério de aceite principal no iOS; APK Android para teste do dono via `development`. |
 | D12 | Idioma do app | pt-BR no MVP, textos centralizados para i18n futuro (GP-097). |
 | D13 | Qualquer usuário pode editar fotos/dados de qualquer pico (wiki) ou só o autor? | Só o autor (regra atual do time). Colaboração aberta e moderação ficam pós-MVP. |
+| D14 | Avisar quando a conta desativada é reativada no login? | Sim: login devolve `reactivated` e o app mostra "Bem-vindo de volta! Sua conta foi reativada." |
+| D15 | Após o cadastro o usuário entra logado? | Não: volta ao Login com o e-mail preenchido e aviso de conta criada. |
+| D16 | Espera no "Reenviar código" da recuperação de senha? | Sim, 30 segundos entre envios. |
+| D17 | Termos de uso e política de privacidade no MVP? | Sim (GP-099), aceite obrigatório no cadastro. |
 
 ## Resumo de priorização
-Total: 72 histórias - Must 52, Should 14, Could 2, Won't 4 (atualizar ao alterar o backlog).
+Total: 73 histórias - Must 53, Should 14, Could 2, Won't 4 (atualizar ao alterar o backlog).
