@@ -8,8 +8,11 @@ import { normalizeApolloError } from '../../../config/apollo';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../../routes/types';
+import * as Keychain from 'react-native-keychain';
 
 import * as yup from 'yup';
+import { useDispatch } from 'react-redux';
+import { allSpotsActions } from '../../../store/spots/allSpots/allSpotsSlice';
 
 const validationSchema = yup
   .object({
@@ -21,6 +24,8 @@ const validationSchema = yup
 type LoginFormData = yup.InferType<typeof validationSchema>;
 
 export const useLogin = () => {
+  const dispatch = useDispatch();
+
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [showPassword, setShowPassword] = useState(false);
@@ -39,6 +44,7 @@ export const useLogin = () => {
     reValidateMode: 'onChange',
   });
 
+  // TODO: refatorar para utilizar sagas
   const handleLogin = useCallback<SubmitHandler<LoginFormData>>(
     props => {
       mutate({
@@ -51,13 +57,23 @@ export const useLogin = () => {
           setErrorContent(getErrorContent(parsedError?.type));
           ref.current?.present();
         },
-        onCompleted: () => {
-          setErrorContent(null);
-          ref.current?.close();
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'Home' }],
-          });
+        onCompleted: async data => {
+          try {
+            if (!data?.login?.token) return;
+
+            await Keychain.setGenericPassword('auth', data?.login?.token);
+            setErrorContent(null);
+            ref.current?.close();
+            // navigation.reset({
+            //   index: 0,
+            //   routes: [{ name: 'Home' }],
+            // });
+
+            dispatch(allSpotsActions.getAllSpotsAsync());
+          } catch (error) {
+
+            setErrorContent(getErrorContent());
+          }
         },
       });
     },

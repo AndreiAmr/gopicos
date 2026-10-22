@@ -1,8 +1,13 @@
 import { View } from 'tamagui';
 import { FilterInfo } from './FilterInfo';
 import { Filter, Mountain } from 'lucide-react-native';
+import { useSelector } from 'react-redux';
+
+import { allSpotsSelectors } from '../../../../../store/spots/allSpots/allSpotsSlice';
 
 export const Header = () => {
+  const spotsAmount = useSelector(allSpotsSelectors.getSpotsAmount);
+
   return (
     <View
       bg="$backgroundHover"
@@ -15,12 +20,11 @@ export const Header = () => {
       boxShadow="0 8px 10px -1px $shadowColor"
       alignItems="center"
       justifyContent="space-evenly"
-      // gap={12}
       paddingLeft={6}
       paddingRight={6}
     >
       <FilterInfo
-        numberHighlight={82}
+        numberHighlight={spotsAmount}
         description="picos encontrados"
         Icon={Mountain}
         variant="orange"
@@ -28,7 +32,7 @@ export const Header = () => {
       />
       <View borderWidth={0.5} height="35%" borderColor="$accent11" />
       <FilterInfo
-        numberHighlight={5}
+        numberHighlight={0}
         description="filtros aplicados"
         Icon={Filter}
         variant="green"

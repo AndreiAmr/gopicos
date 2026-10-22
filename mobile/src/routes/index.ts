@@ -3,6 +3,7 @@ import { LoginTemplate } from '../templates/auth/login';
 import { createStaticNavigation } from '@react-navigation/native';
 
 import { HomeStack } from './HomeStack';
+import { LoaderScreen } from '../templates/loader';
 
 const RootStack = createNativeStackNavigator({
   screenOptions: {
@@ -15,6 +16,9 @@ const RootStack = createNativeStackNavigator({
     },
     Home: {
       screen: HomeStack,
+    },
+    LoaderScreen: {
+      screen: LoaderScreen,
     },
   },
 });

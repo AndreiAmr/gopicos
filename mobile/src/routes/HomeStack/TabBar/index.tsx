@@ -1,73 +1,123 @@
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { MapPin } from 'lucide-react-native';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
+import {
+  LayoutChangeEvent,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button, Text, useTheme, View } from 'tamagui';
+import { useTheme } from 'tamagui';
 import { tabInfoMapper } from './helpers';
+import { CustomTabBar } from './RoundedButton';
 
 type TabBarProps = BottomTabBarProps & {};
+const TAB_BAR_BASE_HEIGHT = 126;
 
 export const TabBar = ({ state, navigation }: TabBarProps) => {
   const themes = useTheme();
   const { bottom } = useSafeAreaInsets();
+  const [tabBarWidth, setTabBarWidth] = useState(0);
+  const centerIndex = Math.floor(state.routes.length / 2);
+
+  const onLayout = useCallback((event: LayoutChangeEvent) => {
+    setTabBarWidth(event.nativeEvent.layout.width);
+  }, []);
 
   const onPress = useCallback(
-    (screen: string) => {
-      navigation.navigate(screen);
+    (routeName: string) => {
+      navigation.navigate(routeName as never);
     },
     [navigation],
   );
 
-  return (
-    <View
-      position="absolute"
-      bottom={bottom}
-      height={60}
-      alignSelf="center"
-      width="90%"
-      borderColor="black"
-      bg={themes.backgroundHover}
-      zIndex={999}
-      borderRadius="$3"
-      boxShadow="0 8px 10px -1px $shadowColor"
-      flexDirection="row"
-      gap="$2"
-      paddingRight={6}
-      paddingLeft={6}
-    >
-      {state.routes.map((route, index) => {
-        const currentTab = tabInfoMapper.get(route.name);
-        const isCurrentTab = state.index === index;
+  const tabBarHeight = TAB_BAR_BASE_HEIGHT;
 
-        return (
-          <Button
-            flex={1}
-            height="100%"
-            flexDirection="column"
-            onPress={() => onPress(route.name)}
-            backgroundColor="transparent"
-            pressStyle={{
-              backgroundColor: 'transparent',
-              borderWidth: 0,
-            }}
-          >
-            {currentTab?.Icon && (
-              <currentTab.Icon
-                size={15}
-                color={
-                  isCurrentTab ? themes.orange10.val : themes.colorHover.val
-                }
-              />
-            )}
-            <Text
-              fontSize="$2.5"
-              color={isCurrentTab ? themes.orange10 : themes.colorHover}
+  return (
+    <View style={[styles.root, { height: tabBarHeight }]} onLayout={onLayout}>
+      <CustomTabBar
+        width={tabBarWidth}
+        height={tabBarHeight}
+        centerLabel={
+          tabInfoMapper.get(state.routes[centerIndex]?.name || '')?.label ||
+          'Novo pico'
+        }
+        isCenterFocused={state.index === centerIndex}
+        onCenterPress={() => onPress(state.routes[centerIndex]?.name || '')}
+      />
+
+      <View style={[styles.tabsRow, { paddingBottom: Math.max(bottom, 12) }]}>
+        {state.routes.map((route, index) => {
+          if (index === centerIndex) {
+            return <View key={route.key} style={styles.centerSpacer} />;
+          }
+
+          const currentTab = tabInfoMapper.get(route.name);
+          const isCurrentTab = state.index === index;
+          const Icon = currentTab?.Icon;
+
+          return (
+            <Pressable
+              key={route.key}
+              onPress={() => onPress(route.name)}
+              style={styles.tabButton}
             >
-              {currentTab?.label}
-            </Text>
-          </Button>
-        );
-      })}
+              {Icon && (
+                <Icon
+                  size={19}
+                  color={
+                    isCurrentTab ? themes.orange10.val : themes.colorHover.val
+                  }
+                />
+              )}
+              <Text
+                style={[
+                  styles.tabLabel,
+                  {
+                    color: isCurrentTab
+                      ? themes.orange10.val
+                      : themes.colorHover.val,
+                  },
+                ]}
+              >
+                {currentTab?.label || route.name}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  root: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    width: '100%',
+  },
+  tabsRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    paddingHorizontal: 18,
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    minHeight: 56,
+    gap: 6,
+    marginTop: 30,
+  },
+  centerSpacer: {
+    flex: 1,
+    minHeight: 56,
+  },
+  tabLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+});

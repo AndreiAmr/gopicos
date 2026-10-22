@@ -9,7 +9,7 @@ export const HomePage = () => {
     <div className="h-full w-full overflow-hidden">
       <Map mapRef={mapRef}>
         {spots?.map((spot) => (
-          <MapPolygon spot={spot} />
+          <MapPolygon key={spot.id} spot={spot} />
         ))}
       </Map>
     </div>

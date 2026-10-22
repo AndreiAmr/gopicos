@@ -11,6 +11,11 @@ const errorMessages: Record<ELoginErrors, ErrorContentProps> = {
     message:
       'Não foi possível localizar um usuário com os dados fornecidos. Por favor, verifique seus dados e tente novamente.',
   },
+  [ELoginErrors.INVALID_CREDENTIALS]: {
+    title: 'Credenciais inválidas',
+    message:
+      'O email ou a senha fornecidos estão incorretos. Por favor, verifique seus dados e tente novamente.',
+  },
 };
 
 const defaultErrorContent: ErrorContentProps = {

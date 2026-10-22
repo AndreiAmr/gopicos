@@ -4,6 +4,7 @@ import { normalizeApolloError } from '../../../config/apollo';
 
 export enum ELoginErrors {
   USER_NOT_FOUND = 'USER_NOT_FOUND',
+  INVALID_CREDENTIALS = 'INVALID_CREDENTIALS',
 }
 
 export const useLoginMutation = () => {

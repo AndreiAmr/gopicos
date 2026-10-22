@@ -3,6 +3,30 @@ PODS:
   - hermes-engine (250829098.0.10):
     - hermes-engine/Pre-built (= 250829098.0.10)
   - hermes-engine/Pre-built (250829098.0.10)
+  - lottie-ios (4.6.0)
+  - lottie-react-native (7.5.0):
+    - hermes-engine
+    - lottie-ios (= 4.6.0)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - MapboxCommon (24.23.1):
     - Turf (= 4.0.0)
   - MapboxCoreMaps (11.23.1):
@@ -1886,6 +1910,28 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
+  - RNKeychain (10.0.0):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - rnmapbox-maps (10.3.5):
     - MapboxMaps (~> 11.23.1)
     - React
@@ -2203,6 +2249,7 @@ PODS:
 DEPENDENCIES:
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
+  - lottie-react-native (from `../node_modules/lottie-react-native`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
   - RCTRequired (from `../node_modules/react-native/Libraries/Required`)
   - RCTSwiftUI (from `../node_modules/react-native/ReactApple/RCTSwiftUI`)
@@ -2277,6 +2324,7 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - ReactNativeDependencies (from `../node_modules/react-native/third-party-podspecs/ReactNativeDependencies.podspec`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - RNKeychain (from `../node_modules/react-native-keychain`)
   - "rnmapbox-maps (from `../node_modules/@rnmapbox/maps`)"
   - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
@@ -2287,6 +2335,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - lottie-ios
     - MapboxCommon
     - MapboxCoreMaps
     - MapboxMaps
@@ -2298,6 +2347,8 @@ EXTERNAL SOURCES:
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
     :tag: hermes-v250829098.0.10
+  lottie-react-native:
+    :path: "../node_modules/lottie-react-native"
   RCTDeprecation:
     :path: "../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation"
   RCTRequired:
@@ -2444,6 +2495,8 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/ReactNativeDependencies.podspec"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
+  RNKeychain:
+    :path: "../node_modules/react-native-keychain"
   rnmapbox-maps:
     :path: "../node_modules/@rnmapbox/maps"
   RNPermissions:
@@ -2461,7 +2514,9 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   FBLazyVector: 24e62c765683b8d89006a88a2c8f5cf019f0074d
-  hermes-engine: 93a995dc289d5fac07e2a2a3939f71d422e2aa1d
+  hermes-engine: 28b8c5bf5dd64eef79c226ebe3dcc187bf9407fd
+  lottie-ios: 8f959969761e9c45d70353667d00af0e5b9cadb3
+  lottie-react-native: 15890be59c58bf4fbdac4c93fa5759c84ee79f7f
   MapboxCommon: d006256c4643860a7b3046af45d1671569b6c5ac
   MapboxCoreMaps: de1a4461d0ab5d65d907f06e8d82fdbe06bb3213
   MapboxMaps: 22340ae0e0d47b2e4761019b1d6c569ab04e088d
@@ -2538,6 +2593,7 @@ SPEC CHECKSUMS:
   ReactCommon: 7dfc3250793bf36cf221096ff59e1179e13eef7f
   ReactNativeDependencies: 59a13003e3a8bb66f59d33196f2442c0486e0908
   RNGestureHandler: 1392b76f486b77a20732a040a16789dca24702e4
+  RNKeychain: 6778b35b5bd067c322f8479526ac09b1d61f31d0
   rnmapbox-maps: 2898fe0a478c26be588ffed831e289c244738562
   RNPermissions: c598a5711a7a5ed8e800f60c8a869d0a316c2c0b
   RNReanimated: 5aa9e73d0f8d3c40d5c9bec396d6a61098db31f0
