@@ -63,7 +63,7 @@ describe('useSignup', () => {
     });
     expect(hook.result.current.step).toBe(2);
 
-    act(() => hook.result.current.goBack());
+    await act(async () => hook.result.current.goBack());
     expect(hook.result.current.step).toBe(1);
     expect(hook.result.current.getValues().firstName).toBe('Marina');
   });
@@ -90,7 +90,7 @@ describe('useSignup', () => {
     await waitFor(() =>
       expect(mockReplace).toHaveBeenCalledWith('Login', {
         email: 'marina@exemplo.com',
-        accountCreated: true,
+        notice: 'registered',
       }),
     );
   });

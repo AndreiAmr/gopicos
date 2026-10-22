@@ -1,5 +1,4 @@
 import React from 'react';
-import { Pressable } from 'react-native';
 import { View } from 'tamagui';
 import { radius, space } from '../../../config/tamagui/tokens';
 import { Text } from '../../../atomic/ds';
@@ -30,38 +29,5 @@ export const Stepper = ({ step, total }: { step: number; total: number }) => (
     >
       {`Passo ${step} de ${total}`}
     </Text>
-  </View>
-);
-
-/** Aviso de erro que exige ação (não some sozinho). */
-export const AlertBanner = ({
-  message,
-  actionLabel,
-  onAction,
-}: {
-  message: string;
-  actionLabel?: string;
-  onAction?: () => void;
-}) => (
-  <View
-    gap={space[2]}
-    padding={space[3]}
-    borderRadius={radius.md}
-    borderWidth={1}
-    borderColor="$error"
-    backgroundColor="$surface"
-    accessibilityRole="alert"
-    testID="signup-banner"
-  >
-    <Text variant="bodySm" tone="error">
-      {message}
-    </Text>
-    {actionLabel && onAction ? (
-      <Pressable onPress={onAction} accessibilityRole="button" hitSlop={8}>
-        <Text variant="bodyStrong" tone="primary">
-          {actionLabel}
-        </Text>
-      </Pressable>
-    ) : null}
   </View>
 );

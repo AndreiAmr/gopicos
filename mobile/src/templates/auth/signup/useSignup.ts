@@ -30,8 +30,6 @@ export const useSignup = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [step, setStep] = useState<SignupStep>(1);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [emailTaken, setEmailTaken] = useState(false);
   const [bannerMessage, setBannerMessage] = useState<string | null>(null);
 
@@ -60,10 +58,10 @@ export const useSignup = () => {
   } = form;
 
   const goToLogin = useCallback(
-    (accountCreated: boolean) => {
+    (withNotice: boolean, email = getValues('email')) => {
       navigation.replace('Login', {
-        email: normalizeEmail(getValues('email')),
-        accountCreated,
+        email: normalizeEmail(email),
+        ...(withNotice ? { notice: 'registered' as const } : {}),
       });
     },
     [getValues, navigation],
@@ -91,22 +89,24 @@ export const useSignup = () => {
 
   const submit = useCallback(() => {
     const { firstName, lastName, email, password } = getValues();
+    const props = {
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: normalizeEmail(email),
+      password,
+    };
     setBannerMessage(null);
     announce('Criando sua conta');
 
     mutate({
       variables: {
-        props: {
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
-          email: normalizeEmail(email),
-          password,
-        },
+        props,
       },
       onCompleted: () => {
         // Sem login automático (UX-15): volta ao Login com e-mail preenchido.
+        const createdEmail = props.email;
         form.reset();
-        goToLogin(true);
+        goToLogin(true, createdEmail);
       },
       onError: error => {
         const action = mapSignupError(error);
@@ -158,16 +158,14 @@ export const useSignup = () => {
 
   return {
     control,
+    setValue: form.setValue,
+    getValues,
     errors: formState.errors,
     step,
     subtitle: STEP_SUBTITLES[step],
     loading,
     emailTaken,
     bannerMessage,
-    showPassword,
-    toggleShowPassword: () => setShowPassword(v => !v),
-    showConfirmPassword,
-    toggleShowConfirmPassword: () => setShowConfirmPassword(v => !v),
     handleContinue,
     handleOriginalChange,
     goBack,

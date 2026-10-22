@@ -3,48 +3,30 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  StyleSheet,
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Controller } from 'react-hook-form';
-import { Eye, EyeOff } from 'lucide-react-native';
-import { View, useTheme } from 'tamagui';
+import { View } from 'tamagui';
 import { Button, Input, Text } from '../../../atomic/ds';
+import { AlertBanner } from '../../../atomic/ds/auth/AlertBanner';
+import { PasswordInput } from '../../../atomic/ds/auth/PasswordInput';
+import { TextLink } from '../../../atomic/ds/auth/TextLink';
 import { space } from '../../../config/tamagui/tokens';
-import { AlertBanner, Stepper } from './components';
+import { Stepper } from './components';
 import { TOTAL_STEPS, useSignup } from './useSignup';
 
-const ToggleVisibility = ({
-  visible,
-  onPress,
-}: {
-  visible: boolean;
-  onPress: () => void;
-}) => {
-  const theme = useTheme();
-  const Icon = visible ? EyeOff : Eye;
-
-  return (
-    <Pressable
-      onPress={onPress}
-      hitSlop={8}
-      accessibilityRole="button"
-      accessibilityLabel={visible ? 'Ocultar senha' : 'Mostrar senha'}
-      testID="toggle-password"
-    >
-      <Icon size={20} color={theme.textMuted.val} />
-    </Pressable>
-  );
-};
+const styles = StyleSheet.create({ flex: { flex: 1 } });
 
 export const SignupTemplate = () => {
   const s = useSignup();
   const { control, errors, step, loading } = s;
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={styles.flex}>
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View flex={1} backgroundColor="$bg">
@@ -154,16 +136,7 @@ export const SignupTemplate = () => {
                   )}
                 />
                 {s.emailTaken ? (
-                  <Pressable
-                    onPress={s.goToLogin}
-                    accessibilityRole="link"
-                    accessibilityLabel="Entrar"
-                    hitSlop={8}
-                  >
-                    <Text variant="bodyStrong" tone="primary">
-                      Entrar
-                    </Text>
-                  </Pressable>
+                  <TextLink label="Entrar" onPress={s.goToLogin} />
                 ) : null}
                 <Controller
                   control={control}
@@ -196,7 +169,7 @@ export const SignupTemplate = () => {
                   control={control}
                   name="password"
                   render={({ field }) => (
-                    <Input
+                    <PasswordInput
                       label="Senha"
                       hint="Mínimo de 8 caracteres."
                       value={field.value}
@@ -206,19 +179,12 @@ export const SignupTemplate = () => {
                       }}
                       onBlur={field.onBlur}
                       error={errors.password?.message}
-                      secureTextEntry={!s.showPassword}
                       autoCapitalize="none"
                       autoCorrect={false}
                       autoComplete="new-password"
                       textContentType="newPassword"
                       returnKeyType="next"
                       disabled={loading}
-                      right={
-                        <ToggleVisibility
-                          visible={s.showPassword}
-                          onPress={s.toggleShowPassword}
-                        />
-                      }
                       testID="signup-password"
                     />
                   )}
@@ -227,25 +193,18 @@ export const SignupTemplate = () => {
                   control={control}
                   name="confirmPassword"
                   render={({ field }) => (
-                    <Input
+                    <PasswordInput
                       label="Confirmar senha"
                       value={field.value}
                       onChangeText={field.onChange}
                       onBlur={field.onBlur}
                       error={errors.confirmPassword?.message}
-                      secureTextEntry={!s.showConfirmPassword}
                       autoCapitalize="none"
                       autoCorrect={false}
                       autoComplete="new-password"
                       returnKeyType="go"
                       onSubmitEditing={s.handleContinue}
                       disabled={loading}
-                      right={
-                        <ToggleVisibility
-                          visible={s.showConfirmPassword}
-                          onPress={s.toggleShowConfirmPassword}
-                        />
-                      }
                       testID="signup-confirmPassword"
                     />
                   )}
@@ -255,9 +214,10 @@ export const SignupTemplate = () => {
 
             {s.bannerMessage ? (
               <AlertBanner
+                type="error"
                 message={s.bannerMessage}
                 actionLabel="Tentar novamente"
-                onAction={s.retry}
+                onActionPress={s.retry}
               />
             ) : null}
 
@@ -266,15 +226,7 @@ export const SignupTemplate = () => {
                 <Text variant="body" tone="muted">
                   Já tem conta?
                 </Text>
-                <Pressable
-                  onPress={s.goToLogin}
-                  accessibilityRole="link"
-                  hitSlop={8}
-                >
-                  <Text variant="bodyStrong" tone="primary">
-                    Entrar
-                  </Text>
-                </Pressable>
+                <TextLink label="Entrar" onPress={s.goToLogin} />
               </View>
             ) : null}
           </ScrollView>
