@@ -701,7 +701,7 @@ Então o APK é gerado e o dono consegue instalar e executar o fluxo MVP
 
 ## Decisões do dono
 
-Decididas em 2026-10-22. D1 e D4 foram alteradas pelo dono; D1–D13 seguem a recomendação do PO nos demais itens. D14–D17 vieram da spec de autenticação (PR #89).
+Decididas em 2026-10-22. D1 e D4 foram alteradas pelo dono; D1–D13 seguem a recomendação do PO nos demais itens. D14–D17 vieram da spec de autenticação (PR #89). D18–D26 (spec de picos, PR #112) e D30–D37 (spec de perfil, PR #114) foram aprovadas pelo dono em 2026-10-22, junto com os protótipos das telas, seguindo a recomendação do UX.
 
 | # | Decisão | Decisão final |
 |---|---|---|
@@ -722,6 +722,23 @@ Decididas em 2026-10-22. D1 e D4 foram alteradas pelo dono; D1–D13 seguem a re
 | D15 | Após o cadastro o usuário entra logado? | Não: volta ao Login com o e-mail preenchido e aviso de conta criada. |
 | D16 | Espera no "Reenviar código" da recuperação de senha? | Sim, 30 segundos entre envios. |
 | D17 | Termos de uso e política de privacidade no MVP? | Sim (GP-099), aceite obrigatório no cadastro. |
+| D18 | Campo "equipamento" do pico | "Exige proteção" (e não "tem equipamento no local"). |
+| D19 | Valor da entrada paga | Texto livre. |
+| D20 | Busca no mapa | Só por lugar no MVP; busca de picos por nome fica para depois. |
+| D21 | Filtro por nota mínima | Pedir `minRating` ao backend (GP-030); se custar muito, o filtro sai do MVP. |
+| D22 | Editar o polígono depois de criado | Sim, por "Alterar local". |
+| D23 | Limites de texto do pico | Nome até 80 caracteres; descrição até 1000. |
+| D24 | Rascunho do cadastro de pico se a sessão expirar | Aceita-se perder os dados no MVP. |
+| D25 | TabBar | Só Mapa e Perfil; criar pico fica num botão flutuante (FAB). |
+| D26 | Confirmar antes de excluir a própria avaliação | Sim, confirmação curta. |
+| D30 | Foto de perfil no MVP | Não: só iniciais; envio de foto (GP-080) fica fora do MVP. |
+| D31 | Paginação em "meus picos" e "minhas avaliações" | Não no MVP: lista completa. |
+| D32 | Confirmação extra ao excluir a conta, além da senha | Não (a exclusão é reversível pela reativação). |
+| D33 | Alterar senha encerra outras sessões | Mantém a sessão atual; invalidar tokens anteriores só se o backend suportar. |
+| D34 | Aviso no Login após excluir a conta | Sim. |
+| D35 | Contagens de picos e avaliações no perfil | Sim: `me` passa a devolver `spotsCount` e `reviewsCount`. |
+| D36 | Nome do autor em contextos públicos | "Nome S." (nome e inicial do sobrenome). |
+| D37 | Limite do nome no perfil | 40 caracteres para o nome e 40 para o sobrenome (como no cadastro, GP-081). |
 
 ## Resumo de priorização
 Total: 73 histórias - Must 53, Should 14, Could 2, Won't 4 (atualizar ao alterar o backlog).
