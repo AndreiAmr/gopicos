@@ -5,15 +5,16 @@ import {
 import { createUser, tokenFor } from '../../../../test/factories';
 import { prisma, useTestDatabase } from '../../../../test/db';
 
-const ME = `query { me { id name email createdAt } }`;
-const GET_PROFILE = `query { getProfile { id name email createdAt } }`;
+const ME = `query { me { id name firstName lastName email createdAt } }`;
+const GET_PROFILE = `query { getProfile { id name firstName lastName email createdAt } }`;
 
 describe('query me / getProfile (integração)', () => {
   useTestDatabase();
 
   it('retorna id, nome, e-mail e data de cadastro do usuário logado', async () => {
     const user = await createUser({
-      name: 'Skatista',
+      firstName: 'Tony',
+      lastName: 'Hawk',
       email: 'skate@test.com',
     });
 
@@ -22,7 +23,9 @@ describe('query me / getProfile (integração)', () => {
     expect(errors).toBeUndefined();
     expect(data.me).toEqual({
       id: user.id,
-      name: 'Skatista',
+      name: 'Tony Hawk',
+      firstName: 'Tony',
+      lastName: 'Hawk',
       email: 'skate@test.com',
       createdAt: user.createdAt.toISOString(),
     });

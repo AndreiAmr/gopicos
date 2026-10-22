@@ -56,7 +56,7 @@ export const requestPasswordResetService = async (
   try {
     await getEmailService().sendPasswordResetCode({
       to: user.email,
-      name: user.name,
+      name: user.firstName,
       code,
       expiresInMinutes: DEFAULT_CODE_EXPIRATION_MINUTES,
     });
