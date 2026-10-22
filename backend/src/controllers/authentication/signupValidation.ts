@@ -1,7 +1,8 @@
 import { AppError } from '../../utils/AppError';
 
 export type SignupInput = {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
 };
@@ -15,12 +16,16 @@ const invalid = (field: string, message: string) =>
 
 /**
  * Valida o input do cadastro e lança VALIDATION_ERROR com `extensions.field`
- * no primeiro campo inválido (ordem: name, email, password).
+ * no primeiro campo inválido (ordem: firstName, lastName, email, password).
  * Para novas regras (ex.: aceite de termos, GP-099) basta adicionar um passo aqui.
  */
 export const validateSignupInput = (input: Partial<SignupInput>): void => {
-  if (!input.name?.trim()) {
-    throw invalid('name', 'Informe seu nome.');
+  if (!input.firstName?.trim()) {
+    throw invalid('firstName', 'Informe seu nome.');
+  }
+
+  if (!input.lastName?.trim()) {
+    throw invalid('lastName', 'Informe seu sobrenome.');
   }
 
   if (!input.email?.trim()) {

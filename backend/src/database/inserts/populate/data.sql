@@ -1,21 +1,22 @@
 INSERT INTO
-  "public"."User" ("id", "name", "email", "password")
+  "public"."User" ("id", "firstName", "lastName", "email", "password")
 VALUES
   (
     'a996c0af-96aa-4fc8-bb6a-dae4280904ea',
     'Andrei',
+    'Amaral',
     'test@gmail.com',
     '$2b$10$uzg17qBIb9ct6AIcjca8huWvURpEHuBSRklubJx4t7gxCGVmH.Fwy'
   );
 
-INSERT INTO "public"."User" ("id", "name", "email", "password") VALUES 
-  ('b1111111-1111-4111-8111-111111111111', 'Carlos Silva', 'carlos@gmail.com', '$2b$10$uzg17qBIb9ct6AIcjca8huWvURpEHuBSRklubJx4t7gxCGVmH.Fwy'),
-  ('b2222222-2222-4222-8222-222222222222', 'Mariana Costa', 'mariana@gmail.com', '$2b$10$uzg17qBIb9ct6AIcjca8huWvURpEHuBSRklubJx4t7gxCGVmH.Fwy'),
-  ('b3333333-3333-4333-8333-333333333333', 'João Pedro', 'joao@gmail.com', '$2b$10$uzg17qBIb9ct6AIcjca8huWvURpEHuBSRklubJx4t7gxCGVmH.Fwy'),
-  ('b4444444-4444-4444-8444-444444444444', 'Beatriz Souza', 'beatriz@gmail.com', '$2b$10$uzg17qBIb9ct6AIcjca8huWvURpEHuBSRklubJx4t7gxCGVmH.Fwy'),
-  ('b5555555-5555-4555-8555-555555555555', 'Felipe Santos', 'felipe@gmail.com', '$2b$10$uzg17qBIb9ct6AIcjca8huWvURpEHuBSRklubJx4t7gxCGVmH.Fwy'),
-  ('b6666666-6666-4666-8666-666666666666', 'Ana Paula', 'ana@gmail.com', '$2b$10$uzg17qBIb9ct6AIcjca8huWvURpEHuBSRklubJx4t7gxCGVmH.Fwy'),
-  ('b7777777-7777-4777-8777-777777777777', 'Lucas Oliveira', 'lucas@gmail.com', '$2b$10$uzg17qBIb9ct6AIcjca8huWvURpEHuBSRklubJx4t7gxCGVmH.Fwy');
+INSERT INTO "public"."User" ("id", "firstName", "lastName", "email", "password") VALUES 
+  ('b1111111-1111-4111-8111-111111111111', 'Carlos', 'Silva', 'carlos@gmail.com', '$2b$10$uzg17qBIb9ct6AIcjca8huWvURpEHuBSRklubJx4t7gxCGVmH.Fwy'),
+  ('b2222222-2222-4222-8222-222222222222', 'Mariana', 'Costa', 'mariana@gmail.com', '$2b$10$uzg17qBIb9ct6AIcjca8huWvURpEHuBSRklubJx4t7gxCGVmH.Fwy'),
+  ('b3333333-3333-4333-8333-333333333333', 'João', 'Pedro', 'joao@gmail.com', '$2b$10$uzg17qBIb9ct6AIcjca8huWvURpEHuBSRklubJx4t7gxCGVmH.Fwy'),
+  ('b4444444-4444-4444-8444-444444444444', 'Beatriz', 'Souza', 'beatriz@gmail.com', '$2b$10$uzg17qBIb9ct6AIcjca8huWvURpEHuBSRklubJx4t7gxCGVmH.Fwy'),
+  ('b5555555-5555-4555-8555-555555555555', 'Felipe', 'Santos', 'felipe@gmail.com', '$2b$10$uzg17qBIb9ct6AIcjca8huWvURpEHuBSRklubJx4t7gxCGVmH.Fwy'),
+  ('b6666666-6666-4666-8666-666666666666', 'Ana', 'Paula', 'ana@gmail.com', '$2b$10$uzg17qBIb9ct6AIcjca8huWvURpEHuBSRklubJx4t7gxCGVmH.Fwy'),
+  ('b7777777-7777-4777-8777-777777777777', 'Lucas', 'Oliveira', 'lucas@gmail.com', '$2b$10$uzg17qBIb9ct6AIcjca8huWvURpEHuBSRklubJx4t7gxCGVmH.Fwy');
 
 
 INSERT INTO "public"."Spot" (
