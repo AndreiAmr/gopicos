@@ -1,5 +1,6 @@
 import { executeAnonymous } from '../../../../test/graphql';
 import { createUser } from '../../../../test/factories';
+import { prisma } from '../../../../test/db';
 import { useTestDatabase } from '../../../../test/db';
 
 const LOGIN = `
@@ -9,6 +10,8 @@ const LOGIN = `
       id
       email
       name
+      exp
+      reactivated
     }
   }
 `;
@@ -42,13 +45,66 @@ describe('mutation login (integração)', () => {
     expect(errors?.[0].extensions?.statusCode).toBe(401);
   });
 
-  it('retorna USER_NOT_FOUND para e-mail inexistente', async () => {
-    const { errors } = await executeAnonymous(LOGIN, {
+  it('retorna a mesma mensagem INVALID_CREDENTIALS para e-mail inexistente e senha errada', async () => {
+    const user = await createUser();
+
+    const wrongPassword = await executeAnonymous(LOGIN, {
+      props: { email: user.email, password: 'senha-errada' },
+    });
+    const unknownEmail = await executeAnonymous(LOGIN, {
       props: { email: 'ninguem@test.com', password: 'qualquer' },
     });
 
-    expect(errors?.[0].extensions?.type).toBe('USER_NOT_FOUND');
-    expect(errors?.[0].extensions?.statusCode).toBe(404);
+    expect(unknownEmail.errors?.[0].extensions?.type).toBe('INVALID_CREDENTIALS');
+    expect(unknownEmail.errors?.[0].extensions?.statusCode).toBe(401);
+    expect(unknownEmail.errors?.[0].message).toBe(
+      wrongPassword.errors?.[0].message,
+    );
+  });
+
+  it('retorna exp ~7 dias à frente e reactivated false', async () => {
+    const user = await createUser();
+
+    const { data } = await executeAnonymous(LOGIN, {
+      props: { email: user.email, password: user.plainPassword },
+    });
+
+    const now = Math.floor(Date.now() / 1000);
+    expect(data.login.reactivated).toBe(false);
+    expect(Math.abs(data.login.exp - (now + 7 * 24 * 3600))).toBeLessThan(10);
+  });
+
+  it('reativa conta desativada com senha correta e retorna reactivated true', async () => {
+    const user = await createUser();
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { deactivatedAt: new Date() },
+    });
+
+    const { data, errors } = await executeAnonymous(LOGIN, {
+      props: { email: user.email, password: user.plainPassword },
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.login.reactivated).toBe(true);
+    const after = await prisma.user.findUnique({ where: { id: user.id } });
+    expect(after?.deactivatedAt).toBeNull();
+  });
+
+  it('não reativa conta desativada com senha errada', async () => {
+    const user = await createUser();
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { deactivatedAt: new Date() },
+    });
+
+    const { errors } = await executeAnonymous(LOGIN, {
+      props: { email: user.email, password: 'senha-errada' },
+    });
+
+    expect(errors?.[0].extensions?.type).toBe('INVALID_CREDENTIALS');
+    const after = await prisma.user.findUnique({ where: { id: user.id } });
+    expect(after?.deactivatedAt).not.toBeNull();
   });
 
   it('não expõe password nem hash na resposta', async () => {
