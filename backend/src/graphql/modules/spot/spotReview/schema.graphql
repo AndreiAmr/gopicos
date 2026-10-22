@@ -10,5 +10,5 @@ type SpotReviewReturn {
 }
 
 extend type Mutation {
-  createSpotReview(data: SpotReview): SpotReviewReturn @Authenticated
+  createSpotReview(data: SpotReview!): SpotReviewReturn @Authenticated
 }
