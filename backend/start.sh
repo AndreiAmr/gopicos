@@ -1,8 +1,12 @@
 #!/bin/sh
+set -e
 
-chmod +x ./wait-for.sh
-./wait-for.sh
+# Aplica as migrations pendentes antes de subir o servidor
+yarn migrate:deploy
 
-yarn setup
+# Seed opcional (apenas dados de teste): defina RUN_SEED=true no ambiente de QA
+if [ "$RUN_SEED" = "true" ]; then
+  yarn mock
+fi
 
-yarn start
+exec yarn start

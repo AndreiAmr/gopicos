@@ -96,9 +96,6 @@ jobs:
             📝 Commit:
             `${{ github.event.head_commit.message }}`
 
-            🌐 API:
-            https://SEU-BACKEND.onrender.com
-
       - name: Discord Erro
         if: failure()
 
