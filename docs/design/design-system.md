@@ -1,6 +1,6 @@
 # GoPicos - Design System (fundação de tokens)
 
-Issue: #9 (GP-001). Status: v0.1, aguardando aprovação do dono nas decisões da seção 9.
+Issue: #9 (GP-001). Status: v1.0, decisões da seção 9 aprovadas pelo dono em 2026-10-22 (logotipo ainda pendente).
 Figma (tokens como variáveis + swatches claro/escuro): https://www.figma.com/design/cFlDLcx1lxM6RouTMSrJQN
 
 Escopo desta versão: princípios, tokens e diretrizes de uso, com mapeamento para Tailwind (web) e Tamagui (mobile). Os componentes (Button, Input, StarRating, BottomSheet etc.) são especificados e implementados nas histórias GP-002/GP-003; aqui só definimos as regras que eles devem seguir (seção 8). O esboço antigo do Figma foi usado apenas como referência de conteúdo, não de estilo.
@@ -268,9 +268,9 @@ Acessibilidade geral: foco visível sempre (nunca `outline: none` sem substituto
 
 ## 9. Decisões e justificativas
 
-**D1. Modo claro e escuro: ambos, seguindo o sistema.** O backlog dizia "se decidido". Decisão: entregar os dois nos tokens agora, porque o custo é mínimo quando feito desde a fundação (refazer depois custa muito) e o mapa em modo noturno é um uso real (skate à noite). Toggle manual fica como opção pós-MVP; no MVP segue o tema do sistema. **Precisa de confirmação do dono** (se preferir só claro no MVP, a implementação pode ficar só com o tema claro sem retrabalho).
+**D1. Modo claro e escuro: ambos, seguindo o sistema.** O backlog dizia "se decidido". Decisão: entregar os dois nos tokens agora, porque o custo é mínimo quando feito desde a fundação (refazer depois custa muito) e o mapa em modo noturno é um uso real (skate à noite). Toggle manual fica como opção pós-MVP; no MVP segue o tema do sistema. **Aprovado pelo dono (2026-10-22).**
 
-**D2. Acento laranja queimado, neutros quentes.** Evita o azul genérico de apps de mapa (a base do Google/Mapbox já é azul/verde) e remete a asfalto + cone/grip. O laranja foi escurecido para passar AA com texto branco. **Precisa de confirmação do dono** (cor da marca); trocar o acento é mudar 5 tokens.
+**D2. Acento laranja queimado, neutros quentes.** Evita o azul genérico de apps de mapa (a base do Google/Mapbox já é azul/verde) e remete a asfalto + cone/grip. O laranja foi escurecido para passar AA com texto branco. **Aprovado pelo dono (2026-10-22).** Trocar o acento no futuro é mudar 5 tokens.
 
 **D3. Bordas de input fortes (3:1).** Bordas claras ficam invisíveis sob sol e seriam reprovadas pelo AA de componentes não-textuais. Custo: visual um pouco mais marcado; benefício: legibilidade em campo.
 
@@ -294,6 +294,6 @@ Acessibilidade geral: foco visível sempre (nunca `outline: none` sem substituto
 - Suporte a tablet/dobráveis no mobile.
 
 ## 11. Pendências para o dono
-1. Aprovar acento laranja queimado como cor da marca (D2).
-2. Confirmar claro + escuro desde o MVP, seguindo o sistema (D1).
+1. ~~Aprovar acento laranja queimado como cor da marca (D2).~~ Aprovado em 2026-10-22.
+2. ~~Confirmar claro + escuro desde o MVP, seguindo o sistema (D1).~~ Aprovado em 2026-10-22.
 3. Existe nome/logo definitivo? O DS ainda não define logotipo.
