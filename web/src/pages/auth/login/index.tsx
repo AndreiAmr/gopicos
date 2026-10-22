@@ -17,7 +17,7 @@ export const LoginPage = () => {
 
   return (
     <div className="h-full w-full flex flex-1 justify-center items-center border border-black">
-      <Card className="flex flex-col shadow-double gap-1 p-10 rounded-2x justify-center items-center border-none">
+      <Card className="flex flex-col bg-gp-surface shadow-2 gap-1 p-10 rounded-2x justify-center items-center border-none">
         <div className="flex items-center gap-1 ">
           <img src="/logo.svg" alt="logo" />
           <h1 className="font-bold text-2xl">GoPicos</h1>

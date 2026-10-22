@@ -8,7 +8,5 @@ export const spotDetailsController = async (id: string) => {
     throw new Error('Spot not founded');
   }
 
-  await new Promise((resolve) => setTimeout(resolve, 10000));
-
   return new SpotModel(spot);
 };

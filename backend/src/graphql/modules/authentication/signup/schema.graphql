@@ -2,7 +2,6 @@ input SignupProp {
   name: String!
   password: String!
   email: String!
-  nickname: String
 }
 
 type Response {
@@ -10,5 +9,5 @@ type Response {
 }
 
 extend type Mutation {
-  signup(props: SignupProp): Response
+  signup(props: SignupProp!): Response
 }

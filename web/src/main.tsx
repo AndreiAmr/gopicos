@@ -9,6 +9,7 @@ import { RouterProvider } from 'react-router-dom';
 import { store } from './store/index.ts';
 import { apolloClient } from './config/apollo-client.ts';
 import { router } from './routes/routes.tsx';
+import { ThemeProvider } from 'next-themes';
 import { Toaster } from './atomic/atoms/sonner';
 
 const queryClient = new QueryClient({
@@ -22,6 +23,7 @@ const queryClient = new QueryClient({
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
     <QueryClientProvider client={queryClient}>
       <ApolloProvider client={apolloClient}>
         <Provider store={store}>
@@ -30,5 +32,6 @@ createRoot(document.getElementById('root')!).render(
         </Provider>
       </ApolloProvider>
     </QueryClientProvider>
+    </ThemeProvider>
   </StrictMode>,
 );
