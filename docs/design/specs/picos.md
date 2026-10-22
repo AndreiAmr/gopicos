@@ -86,7 +86,7 @@ Pendência de DS (a incluir na seção 8 do DS quando o dono aprovar): `SpotPin`
 
 ### 3.3 Nome do autor em contexto público (D36, aprovada pelo dono)
 Em todo contexto público o nome aparece como **"Nome S."** (primeiro nome + inicial do sobrenome): "Criado por Marina S." no detalhe e o nome em cada `ReviewItem`. Nome completo só no próprio perfil. Nome sem sobrenome: só o nome. Conta desativada: "Usuário Desativado". Iniciais do avatar: primeira letra do nome.
-**Impacto técnico:** `author.name` do #104 hoje devolve o nome completo. Para não entregar o sobrenome ao cliente, o ideal é o backend devolver o nome já formatado (ex.: `author.displayName`) nos contratos de detalhe e de listagem de avaliações; isso depende da separação nome/sobrenome do cadastro (#97) e vira issue de backend. Enquanto isso, o cliente formata a partir de `name` (último termo vira inicial), com função única compartilhada. Limites de texto coerentes com o perfil (D37: nome e sobrenome 40 cada; aqui comentário 500, nome do pico 80, descrição 1000).
+**Impacto técnico:** o formato é **montado no backend** (ex.: `author.displayName`), nos contratos de detalhe e de avaliações, para não entregar o sobrenome ao cliente; hoje o #104 devolve `author.name` completo, então vira issue de backend (depende da separação nome/sobrenome, #97). Web e mobile só exibem o campo, sem formatar. Limites de texto coerentes com o perfil (D37: nome e sobrenome 40 cada; aqui comentário 500, nome do pico 80, descrição 1000).
 
 ---
 
@@ -255,7 +255,7 @@ Escopo (issue): geocoding de **cidade ou endereço** para centralizar o mapa. **
 ### 9A.1 Seção "Avaliações" (abaixo das ações do autor)
 1. Cabeçalho `h2` "Avaliações" com média grande ("4,6", `h1` sem fonte de marca), `StarRating` 20 e "23 avaliações". Sem avaliações: só o estado vazio abaixo.
 2. **Minha avaliação** (se existir), fixada no topo da lista, com selo "Sua avaliação" e ações **Editar** e **Excluir** (ghost, alvo 44).
-3. **Lista** da mais recente para a mais antiga. Cada item (`ReviewItem`, componente novo): avatar com iniciais (32), nome (`body-strong`) ou "Usuário Desativado", data relativa em `caption` ("há 2 dias"; data completa no rótulo de acessibilidade), `StarRating` 16, comentário (`body`, até 4 linhas com "Ver mais" que expande). Sem comentário: só a nota. Divisor `divider` entre itens.
+3. **Lista** da mais recente para a mais antiga. Cada item (`ReviewItem`, componente novo): avatar com iniciais (32), nome (`body-strong`) ou "Usuário Desativado", data relativa em `caption` ("há 2 dias"; data completa no rótulo de acessibilidade), `StarRating` 16, comentário (`body`, até 3 linhas com "Ver mais" que expande). Sem comentário: só a nota. Divisor `divider` entre itens.
 4. **Paginação:** 10 por página. Mobile: carrega a próxima ao chegar ao fim da seção, com linha "Carregando mais..." e, em falha, "Não foi possível carregar mais. Tentar novamente". Web: botão **"Carregar mais"** (critério GP-065), foco volta ao primeiro item novo.
 
 ### 9A.2 Formulário de avaliação (nova e edição)
