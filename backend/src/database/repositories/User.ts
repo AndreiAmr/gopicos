@@ -77,6 +77,14 @@ export class UserRepository implements IUserRepository {
     });
   }
 
+  /** Atualiza campos do próprio usuário (nome, sobrenome, senha). */
+  async updateById(
+    id: string,
+    data: Partial<Pick<User, 'firstName' | 'lastName' | 'password'>>,
+  ): Promise<void> {
+    await prisma.user.update({ where: { id }, data });
+  }
+
   update(prop: IUpdateUser): Promise<void> {
     throw new Error('Method not implemented.');
   }
