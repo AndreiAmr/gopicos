@@ -21,7 +21,8 @@ export const signupController = async (props: SignupInput) => {
   const hashedPassword = await bcrypt.hash(props.password, salts);
 
   await signUpService({
-    name: props.name.trim(),
+    firstName: props.firstName.trim(),
+    lastName: props.lastName.trim(),
     email: normalizeEmail(props.email),
     password: hashedPassword,
   });

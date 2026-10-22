@@ -22,7 +22,8 @@ const LOGIN = `
 `;
 
 const valid = {
-  name: 'Skatista',
+  firstName: 'Tony',
+  lastName: 'Hawk',
   email: 'novo@test.com',
   password: 'senha-forte-123',
 };
@@ -37,7 +38,8 @@ describe('mutation signup (integração)', () => {
     expect(data.signup).toEqual({ message: 'Usuário criado com sucesso' });
 
     const user = await prisma.user.findUnique({ where: { email: valid.email } });
-    expect(user?.name).toBe('Skatista');
+    expect(user?.firstName).toBe('Tony');
+    expect(user?.lastName).toBe('Hawk');
     expect(user?.password).not.toBe(valid.password);
     expect(await bcrypt.compare(valid.password, user!.password)).toBe(true);
   });
@@ -82,7 +84,8 @@ describe('mutation signup (integração)', () => {
     ['email', { email: '' }],
     ['password', { password: '1234567' }],
     ['password', { password: '' }],
-    ['name', { name: '   ' }],
+    ['firstName', { firstName: '   ' }],
+    ['lastName', { lastName: '' }],
   ])('retorna VALIDATION_ERROR indicando o campo %s', async (field, override) => {
     const { errors } = await executeAnonymous(SIGNUP, {
       props: { ...valid, ...override },

@@ -1,6 +1,9 @@
 import { URL } from './url';
 
-export type NavigateOptions = { replace?: boolean };
+export type NavigateOptions = {
+  replace?: boolean;
+  state?: unknown;
+};
 
 type NavigateFn = (path: string, options?: NavigateOptions) => void;
 

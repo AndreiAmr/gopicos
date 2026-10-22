@@ -6,13 +6,14 @@ import { prisma } from './db';
 export const DEFAULT_PASSWORD = 'senha123';
 
 export const createUser = async (
-  overrides: Partial<{ name: string; email: string; password: string }> = {},
+  overrides: Partial<{ firstName: string; lastName: string; email: string; password: string }> = {},
 ) => {
   const password = overrides.password ?? DEFAULT_PASSWORD;
 
   const user = await prisma.user.create({
     data: {
-      name: overrides.name ?? 'Usuário Teste',
+      firstName: overrides.firstName ?? 'Usuário',
+      lastName: overrides.lastName ?? 'Teste',
       email: overrides.email ?? `user-${randomUUID()}@test.com`,
       // custo baixo: só acelera os testes
       password: await bcrypt.hash(password, 4),

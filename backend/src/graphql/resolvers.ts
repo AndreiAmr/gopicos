@@ -24,4 +24,5 @@ export const resolvers = {
     ...resetPasswordResolvers.Mutation,
     ...spotResolvers.Mutation,
   },
+  SpotAuthor: spotDetailsResolver.SpotAuthor,
 };

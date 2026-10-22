@@ -7,6 +7,7 @@ type LoginTokenResult = {
   name: string;
   email: string;
   id: string;
+  reactivated?: boolean | null;
 };
 
 export type LoginMutationResult = {
@@ -32,6 +33,7 @@ export const loginMutation: TypedDocumentNode<
       name
       email
       id
+      reactivated
     }
   }
 `;

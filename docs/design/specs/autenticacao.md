@@ -143,6 +143,7 @@ Observação: no Login, e-mail e senha são validados **só quanto a "vazio" e f
 | Sessão expirada | **Só** quando havia um token salvo e ele expirou ou foi rejeitado (o app detecta `UNAUTHENTICATED` **com token presente**, apaga o token e navega ao Login). `UNAUTHENTICATED` sem token (primeiro acesso, logout, usuário que nunca entrou) **não** mostra o banner. `AlertBanner` info no topo: **"Sua sessão expirou. Entre de novo para continuar."** |
 | Vindo do cadastro (UX-15) | `AlertBanner` success: "Conta criada! Entre com seu e-mail e senha." |
 | Vindo da recuperação de senha | `AlertBanner` success: **"Senha alterada. Entre com a nova senha."** E-mail preenchido, foco na senha. |
+| Vindo de excluir conta (spec de perfil, D34) | `AlertBanner` info: **"Conta excluída. Se quiser voltar, entre com seu e-mail e senha e ela será reativada."** E-mail preenchido, foco na senha. Chega por parâmetro da navegação (`replace`), nunca pela URL. |
 | **Conta reativada** | Decisão UX-14: toast na Home (o login devolve `reactivated: true`), **"Bem-vindo de volta! Sua conta foi reativada."** |
 
 ### 4.4 Layout mobile

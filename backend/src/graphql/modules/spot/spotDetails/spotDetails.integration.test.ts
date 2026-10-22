@@ -11,14 +11,14 @@ import {
 } from '../../../../test/graphql';
 
 const GET_SPOT = `query ($id: String!) { getSpotById(id: $id) {
-  id name coordinates ratingAverage reviewsCount isOwner author { id name }
+  id name coordinates ratingAverage reviewsCount isOwner author { id name firstName lastName }
 } }`;
 
 describe('getSpotById (integração)', () => {
   useTestDatabase();
 
   it('retorna campos, autor, média, contagem e isOwner=true para o autor', async () => {
-    const author = await createUser({ name: 'Autor' });
+    const author = await createUser({ firstName: 'Auto', lastName: 'Silva' });
     const spot = await createSpot({ authorId: author.id });
     await createSpotReview({ spotId: spot.id, rating: 5 });
     await createSpotReview({ spotId: spot.id, rating: 4 });
@@ -31,7 +31,7 @@ describe('getSpotById (integração)', () => {
     expect(res.data.getSpotById).toMatchObject({
       id: spot.id,
       name: 'Pico Teste',
-      author: { id: author.id, name: 'Autor' },
+      author: { id: author.id, name: 'Auto Silva', firstName: 'Auto', lastName: 'Silva' },
       ratingAverage: 4.5,
       reviewsCount: 2,
       isOwner: true,

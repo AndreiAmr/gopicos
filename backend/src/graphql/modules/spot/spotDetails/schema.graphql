@@ -1,6 +1,8 @@
 type SpotAuthor {
   id: String
   name: String
+  firstName: String
+  lastName: String
 }
 
 type SpotDetails {
