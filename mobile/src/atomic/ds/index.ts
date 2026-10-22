@@ -18,6 +18,9 @@ export {
   SheetHandle,
 } from './molecules/Sheet';
 export { BottomSheet } from './molecules/BottomSheet';
+export { SpotCard, SpotCardSkeleton } from './molecules/SpotCard';
+export { SpotPin } from './molecules/SpotPin';
+export { SpotPreview } from './molecules/SpotPreview';
 export { Toast, ToastProvider, useToast } from './molecules/Toast';
 export { AlertBanner } from './auth/AlertBanner';
 export { TextLink } from './auth/TextLink';

@@ -5,6 +5,8 @@ type Profile {
   lastName: String!
   email: String!
   createdAt: String!
+  spotsCount: Int!
+  reviewsCount: Int!
 }
 
 extend type Query {

@@ -9,6 +9,7 @@ export type RootStackParamList = {
     | undefined;
   Signup: undefined;
   Home: undefined;
+  SpotDetails: { id: string };
 };
 
 export type ProfileStackParamList = {

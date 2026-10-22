@@ -1,8 +1,6 @@
-import { SpotModel } from '../../../models/spot/spotModel';
+import { SpotsFilter } from '../../../database/repositories/Spot';
 import { listAllSpotsService } from '../../../services/spot/listAllSpots/listAllSpots.service';
 
-export const listAllSpotsController = async () => {
-  const spots = await listAllSpotsService();
-
-  return spots.map((spot) => new SpotModel(spot));
+export const listAllSpotsController = async (filter?: SpotsFilter) => {
+  return listAllSpotsService(filter);
 };
