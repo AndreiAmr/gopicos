@@ -8,7 +8,14 @@ type CreateSpotProps = {
   authorId: string;
 };
 
+export type SpotDetailsData = Spot & {
+  author: { id: string; name: string };
+  ratingAverage: number | null;
+  reviewsCount: number;
+};
+
 type ISpotRepository = IRepository<string, CreateSpotProps, Spot, Spot> & {
+  findDetails(id: string): Promise<SpotDetailsData | null>;
   insertImage(spotId: string, url: string): Promise<Spot>;
   listAll(): Promise<Spot[]>;
 };
@@ -31,20 +38,31 @@ export class SpotRepository implements ISpotRepository {
       where: {
         id,
       },
-      include: {
-        reviews: {
-          include: {
-            author: {
-              omit: {
-                password: true,
-              },
-            },
-          },
-        },
-      },
     });
 
     return spot;
+  }
+
+  async findDetails(id: string): Promise<SpotDetailsData | null> {
+    const [spot, stats] = await Promise.all([
+      prisma.spot.findUnique({
+        where: { id },
+        include: { author: { select: { id: true, name: true } } },
+      }),
+      prisma.spotReview.aggregate({
+        where: { spotId: id },
+        _avg: { rating: true },
+        _count: { _all: true },
+      }),
+    ]);
+
+    if (!spot) return null;
+
+    return {
+      ...spot,
+      ratingAverage: stats._avg.rating,
+      reviewsCount: stats._count._all,
+    };
   }
 
   update(prop: Spot): Promise<void> {
