@@ -590,7 +590,7 @@ Então recebo UNAUTHENTICATED
 **GP-071 - Editar perfil (backend)** | M | BE | Dep.: GP-070
 Atualiza nome (e-mail apenas se D7 permitir).
 ```gherkin
-Quando envio nome válido (não vazio, até 60 caracteres)
+Quando envio nome e sobrenome válidos (não vazios, até 40 caracteres cada - D37, GP-081)
 Então o perfil é atualizado e recebo o novo perfil
 Quando tento alterar o perfil de outro usuário
 Então a operação ignora o input de id (usa o do token)
