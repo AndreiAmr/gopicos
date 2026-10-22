@@ -28,6 +28,12 @@ export class SpotReviewRepository implements ISpotReviewRepository {
     throw new Error('Method not implemented.');
   }
 
+  async findByAuthorAndSpot(authorId: string, spotId: string) {
+    return prisma.spotReview.findUnique({
+      where: { authorId_spotId: { authorId, spotId } },
+    });
+  }
+
   update(prop: any): Promise<void> {
     throw new Error('Method not implemented.');
   }
