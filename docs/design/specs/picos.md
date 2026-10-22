@@ -1,7 +1,7 @@
 # Spec de UX - Picos (mapa, detalhe, criar, editar, excluir, busca, filtros e avaliações)
 
 Issues: #34 (GP-031 home mobile), #35 (GP-032 home web), #37 (GP-034 detalhe mobile), #38 (GP-035 detalhe web), #40 (GP-037 criar web), #41 (GP-038 criar mobile, marcar local), #42 (GP-039 criar mobile, detalhes e fotos), #44 (GP-041 editar web), #45 (GP-042 editar mobile), #47 (GP-044 excluir web), #48 (GP-045 excluir mobile), #49 (GP-046 busca de lugar), #50 (GP-047 filtros). Avaliações (estrelas + comentários): GP-064 a GP-067 (listar, avaliar, editar e excluir minha avaliação, mobile e web) e GP-068 (nota no mapa), na seção 9A.
-Base: `docs/design/design-system.md` **v2.0** (PR #100 entra em `main` antes desta spec). Esta spec **não cria cor, fonte, espaço ou raio novos**; só usa tokens do DS.
+Base: `docs/design/design-system.md` **v2.0** (já em `main`). Esta spec **não cria cor, fonte, espaço ou raio novos**; só usa tokens do DS.
 Decisões numeradas **UX-P1 a UX-P26** (seção 12), para não colidir com UX-1..27 da spec de autenticação.
 Protótipo: ver seção 13 (Figma ficou parcial por limite do plano; há protótipo HTML).
 
@@ -27,13 +27,22 @@ Home (mapa) --toque no pico--> Resumo --Ver detalhes--> Detalhe --Editar--> Edit
    \--FAB "+" / "Novo pico" --> Criar, passo 1 (marcar local) --> passo 2 (detalhes e fotos) --> Detalhe do novo pico
 ```
 
-Rotas web: `/` (home), `/spot/:id`, `/spot/:id/edit`, `/spot/new-spot` (passo 1) e `/spot/new-spot/details` (passo 2), como o código existente.
+Rotas web (no código, `/` é o **Login**):
+| Rota | Tela | Situação |
+|---|---|---|
+| `/home` | Home com mapa (#35) | existente |
+| `/spot/new-spot` | Criar, passo 1 | existente |
+| `/spot/new-spot/details` | Criar, passo 2 | existente |
+| `/spot/:id` | Detalhe (#38) | **nova, a criar** |
+| `/spot/:id/edit` | Editar (#44) | **nova, a criar** |
+
+As rotas estáticas `new-spot` têm precedência sobre `/spot/:id` no React Router. Mobile: telas `SpotDetails`, `SpotEdit`, `SpotCreateMap`, `SpotCreateDetails` na stack, com a Home como aba Mapa.
 
 ---
 
 ## 2. Componentes do DS usados e o que falta
 
-Existentes no DS v2.0: `Button` (primário, ghost), `Input` (e `Textarea`, mesma regra de campo), `Checkbox`, `Chip` de sticker (seção 13.5 do DS), `StarRating` (leitura), `BottomSheet`/`Dialog`, `TabBar`, `Toast`, `AlertBanner`, `Stepper`, `TitleBrand`.
+Existentes no DS v2.0: `Button` (primário, ghost), `Input` (e `Textarea`, mesma regra de campo), `Checkbox`, `Chip` de sticker (seção 13.5 do DS), `StarRating` (leitura 16 e entrada 32), variante `destructive` do `Button`, `BottomSheet`/`Dialog`, `TabBar`, `Toast`, `AlertBanner`, `Stepper`, `TitleBrand`.
 
 **Novos componentes a especificar (nomes iguais em web e mobile):**
 
@@ -41,18 +50,19 @@ Existentes no DS v2.0: `Button` (primário, ghost), `Input` (e `Textarea`, mesma
 |---|---|
 | `SpotPin` | Marcador no mapa em formato de pílula: `★ 4,6` (nota média). Sem avaliações: `Novo`. Altura 26, fundo `surface`, borda `border` 1,5, raio `full`, sombra `elevation.1`. **Selecionado:** fundo `primary`, texto `on-primary`, borda `ink`, altura 30. Alvo de toque 44 (área invisível maior que o desenho). Rótulo de acessibilidade: "{nome}, nota {média}, {n} avaliações". |
 | `SpotPolygon` | Camada do polígono: preenchimento `primary` a 22% (38% selecionado), contorno `primary` 2 px (selecionado 3 px em `primary-text`). Nunca só cor: o selecionado também ganha o pin maior. |
-| `SpotPreview` | Cartão de resumo: foto 72x72 (raio `sm`... usa `md`), nome (`h3`), chip de modalidade, `StarRating` com média e contagem, distância (quando há localização), botão "Ver detalhes". Fundo `surface`, raio `lg`, `elevation.2`. |
+| `SpotCard` | **Card de pico, variante compacta de lista** (consumida também por "Meus picos" na spec de perfil). Linha de altura mínima 96, padding `space.3`, fundo `surface`, raio `lg`, borda `divider`. Esquerda: foto 72x72 (raio `md`; sem foto ou falha: tile `sunken` com ícone). Direita: nome (`h3`, até 2 linhas), chip de modalidade (sticker amarelo, 28), `StarRating` 16 com "4,6 (23)" ou "Sem avaliações". **Não traz endereço** (não existe em nenhum contrato), nem botões, nem ações de editar/excluir. O **card inteiro é o alvo** (>= 96 de altura, toque abre o detalhe), com estados pressed e focus. Rótulo: "{nome}, {modalidade}, nota {média}, {n} avaliações". **Skeleton:** foto e 3 barras em `sunken`. Estados: padrão, pressed, focus, loading. |
+| `SpotPreview` | Resumo do mapa: o **`SpotCard` compacto reaproveitado**, acrescido de distância em `caption` (quando há localização) e do botão "Ver detalhes"; fundo `surface`, `elevation.2`. Fundo `surface`, raio `lg`, `elevation.2`. |
 | `FilterChip` | Chip do DS (sticker) selecionável: desmarcado `surface` + `border`; marcado amarelo `brand-yellow` + `sticker-border` + `sticker-shadow`. Alvo mínimo 44 (altura visual 36). |
 | `PhotoPicker` | Grade de 3 colunas, miniaturas 100 de altura, raio `md`; tile "+ Adicionar" tracejado; botão remover (X) 28 com alvo 44; primeira foto marcada "Capa"; contador "2 de 5 fotos". |
 | `InfoRow` | Linha rótulo (`text-muted`, 14) + valor (`body-strong`, 14), altura 44, divisor `divider`. |
 | `Segmented` | 2 a 4 opções exclusivas, altura 44, borda `border`, selecionado `primary`/`on-primary`. Usado em Entrada e Nota mínima. |
 | `Switch` | 48x28, ligado `primary`. Usado em "Aberto 24 horas" e "Somente cobertos". |
 | `MapControls` | Camada sobre o mapa: busca, chips de filtro, FAB, botão de localização, seletor de camadas (#51, existente). |
-| `StarInput` | Entrada de nota: 5 estrelas de 40 (alvo 48), cor `star`, vazias em contorno `border`; grupo de rádio; rótulo textual da nota. |
+| `StarInput` | Entrada de nota: 5 estrelas de 32 (DS; alvo 48 com espaço), cor `star`, vazias em contorno `border`; grupo de rádio; rótulo textual da nota. |
 | `ReviewItem` | Item de avaliação: avatar de iniciais 32, nome, data relativa, `StarRating` 16, comentário com "Ver mais". Variante "minha avaliação" com selo e ações. |
-| `DestructiveButton` | Botão preenchido `error` com texto `on-error` (branco no claro, escuro no escuro; contraste AA, ver DS). Só em confirmações. |
+| (sem componente novo) | Ações destrutivas usam o `Button` variante **`destructive`** do DS (fundo `error`). Texto do botão: `surface` no claro (branco sobre `#B3201F`, 6,68:1) e `bg` `#0F1113` no escuro (sobre `#FF8A80`, acima de 8,39:1). **Um único valor no escuro**, o mesmo da spec de perfil; não se cria token `on-error`. |
 
-Pendência de DS (se aprovada esta spec): acrescentar `SpotPin`, `SpotPolygon`, `SpotPreview`, `PhotoPicker`, `Segmented`, `Switch`, `StarInput` (entrada de nota) e `ReviewItem` à seção 8 do DS e criar o token `on-error` caso ainda não exista (`#FFFFFF` claro; `#1A0B0B` escuro, verificar AA).
+Pendência de DS (a incluir na seção 8 do DS quando o dono aprovar): `SpotPin`, `SpotPolygon`, `SpotCard`, `SpotPreview`, `PhotoPicker`, `Segmented`, `Switch`, `StarInput`, `ReviewItem`. Sem token novo: o texto da variante `destructive` usa `surface` (claro) e `bg` (escuro), tokens que já existem.
 
 ---
 
@@ -68,11 +78,15 @@ Pendência de DS (se aprovada esta spec): acrescentar `SpotPin`, `SpotPolygon`, 
 | Sessão expirada | Vai ao Login com `AlertBanner` info "Sua sessão expirou. Entre novamente." | idem | idem; rascunho do formulário não é guardado (decisão D24) |
 
 ### 3.2 Acessibilidade comum
-- Alvos de toque >= 48 (visual pode ser 36 com área invisível). Tudo com rótulo; foco visível `focus`.
+- Alvos de toque >= 44 (mínimo do DS; 48 é o padrão dos botões e campos); o visual pode ser menor (36) com área invisível. Tudo com rótulo; foco visível `focus`.
 - O mapa não é navegável por leitor de tela: toda ação do mapa tem equivalente fora dele (ver UX-P17). A informação dos picos também chega por busca e resumo.
 - Cor nunca é a única pista: polígono selecionado = contorno mais grosso + pin maior; filtro ativo = texto "(2)" no botão + chips com marcador de seleção.
 - Respeitar "reduzir movimento": a animação de centralizar o mapa vira salto.
 - Fonte a 130%: nada trunca; chips quebram linha.
+
+### 3.3 Nome do autor em contexto público (D36, aprovada pelo dono)
+Em todo contexto público o nome aparece como **"Nome S."** (primeiro nome + inicial do sobrenome): "Criado por Marina S." no detalhe e o nome em cada `ReviewItem`. Nome completo só no próprio perfil. Nome sem sobrenome: só o nome. Conta desativada: "Usuário Desativado". Iniciais do avatar: primeira letra do nome.
+**Impacto técnico:** `author.name` do #104 hoje devolve o nome completo. Para não entregar o sobrenome ao cliente, o ideal é o backend devolver o nome já formatado (ex.: `author.displayName`) nos contratos de detalhe e de listagem de avaliações; isso depende da separação nome/sobrenome do cadastro (#97) e vira issue de backend. Enquanto isso, o cliente formata a partir de `name` (último termo vira inicial), com função única compartilhada. Limites de texto coerentes com o perfil (D37: nome e sobrenome 40 cada; aqui comentário 500, nome do pico 80, descrição 1000).
 
 ---
 
@@ -121,11 +135,11 @@ Busca: "Buscar cidade ou endereço". Chips: "Filtros", "Filtros (2)". Resumo: "A
 1. **Galeria** (altura 260, largura total): swipe horizontal, contador "1 / 4", botão voltar circular sobre a foto (44, `surface`, sombra).
 2. **Título** (`TitleBrand`, Permanent Marker 28) com traço de spray.
 3. Chips: modalidade (sticker amarelo), "Gratuito" ou o valor ("R$ 20"), "Coberto" (se for).
-4. Nota: `StarRating` 20 + "4,6" + "23 avaliações" (sem avaliações: "Sem avaliações ainda").
+4. Nota: `StarRating` 16 + "4,6" + "23 avaliações" (sem avaliações: "Sem avaliações ainda").
 5. Descrição (`body`).
 6. `InfoRow`s: Entrada, Horário, Cobertura, Equipamento.
 7. **Mini-mapa** do polígono (altura 160, raio `lg`); toque abre o mapa na Home centralizado no pico.
-8. "Criado por {nome}" em `caption`; autor desativado: **"Criado por Usuário Desativado"**, sem link nem avatar.
+8. "Criado por {Nome S.}" em `caption` (formato do autor, ver 3.3); autor desativado: **"Criado por Usuário Desativado"**, sem link nem avatar.
 9. **Ações do autor** (só se `isOwner`): "Editar" (ghost) e "Excluir" (ghost em `error`), lado a lado.
 10. **Seção "Avaliações"** (9A): resumo (média grande, distribuição não incluída no MVP), minha avaliação, lista.
 11. **Barra fixa inferior:** botão primário "Avaliar este pico" (abre o formulário de avaliação, seção 9A; quando já avaliei, vira "Ver minha avaliação" e rola até a minha; para o autor do pico o botão **não existe**).
@@ -156,8 +170,10 @@ Dois passos (UX-P4): (1) marcar o local, (2) detalhes e fotos.
 **Mobile (#41):** mapa em tela cheia com cabeçalho "Passo 1 de 2 - Marque o local" (e seta voltar). Painel inferior (sheet fixo): endereço sugerido (geocoding reverso do centro/primeiro ponto, `caption`), instrução, contador "{n} pontos", botões **Desfazer**, **Limpar**, **Usar minha posição** (ghost) e **Continuar** (primário).
 - **Toque no mapa** adiciona um vértice (círculo 18 com borda `primary-text`); **arrastar** o vértice o move; o polígono fecha sozinho (a figura fica fechada a partir de 3 pontos).
 - **Continuar** só habilita com **>= 3 pontos** (critério). Com menos, o botão fica `disabled` e o contador diz "Marque pelo menos 3 pontos".
+- **Adicionar ponto no centro do mapa** (botão ghost no painel, mobile e web; rótulo de acessibilidade "Adicionar ponto no centro do mapa"): cria um vértice sob a mira central do mapa (cruz de 24 desenhada no centro durante este passo). Permite marcar o polígono sem tocar com precisão e sem enxergar o mapa: o mapa em si não é navegável por leitor de tela, então o fluxo todo (mover o mapa por gestos/botões de zoom e adicionar pontos) tem equivalente fora do toque direto. Anuncia "Ponto {n} adicionado". Web: tecla `Enter` com o mapa focado faz o mesmo.
 - **Usar minha posição:** centraliza o mapa e adiciona um vértice na posição atual; se sem permissão, toast info com orientação.
 - Sair com pontos marcados: confirma "Descartar o local marcado?" (Descartar / Continuar editando).
+Painel mobile, ordem dos botões: **Adicionar ponto no centro do mapa**, Desfazer, Limpar, Usar minha posição, Continuar.
 **Web (#40):** mesma lógica em tela com mapa e painel lateral esquerdo de 360 (instrução, contador, botões, endereço). Clique adiciona vértice; arrastar move; `Backspace`/`Ctrl+Z` desfaz o último.
 
 ### 6.2 Passo 2 - Detalhes e fotos
@@ -199,7 +215,7 @@ Validação no blur e ao tocar "Criar pico"; ao falhar, rola e foca o primeiro c
 - **Uma única tela** (não repete o wizard): mesmo formulário do passo 2, preenchido, com o resumo do local ("Local marcado, {n} pontos" + "Alterar local", que abre o editor de polígono do passo 1 com o polígono atual). Título "Editar pico"; botão **"Salvar alterações"**; link/ação secundária "Cancelar".
 - **Fotos:** mostrar as existentes; remover e adicionar respeitando 1 a 5 (não deixa remover a última sem adicionar outra: erro "O pico precisa ter ao menos 1 foto.").
 - **Sem mudanças:** "Salvar alterações" fica ativo, mas ao salvar sem diferença só volta ao detalhe (sem erro).
-- **Sucesso:** volta ao detalhe atualizado, toast "Alterações salvas."
+- **Sucesso:** volta ao detalhe atualizado, toast "Alterações salvas." O detalhe **e o mapa refletem a mudança sem recarregar**: pin, polígono e resumo na Home também atualizam (cache invalidado/atualizado).
 - **Sair com alterações:** "Descartar alterações?" (Descartar / Continuar editando).
 - Estados de loading (carregar o pico), erro e não encontrado como em 3.1; falha ao salvar preserva as edições.
 
@@ -211,7 +227,7 @@ Validação no blur e ao tocar "Criar pico"; ao falhar, rola e foca o primeiro c
 - **Confirmação** (mobile: bottom sheet; web: dialog 420 centralizado):
   - Título: **"Excluir este pico?"**
   - Texto: **"Esta ação não pode ser desfeita. O pico, as fotos e as avaliações dele serão removidos."**
-  - Botões: **"Excluir pico"** (`DestructiveButton`) e **"Cancelar"** (ghost). Mobile: destrutivo em cima, cancelar embaixo, tamanho total. Web: Cancelar à esquerda, Excluir à direita.
+  - Botões: **"Excluir pico"** (`Button` `destructive`) e **"Cancelar"** (ghost). Mobile: destrutivo em cima, cancelar embaixo, tamanho total. Web: Cancelar à esquerda, Excluir à direita.
   - **Foco inicial em "Cancelar"**; `Esc` e toque fora cancelam; sem exigir digitar o nome (UX-P11).
 - **Excluindo:** botão `loading`, ambos desabilitados.
 - **Sucesso:** o pico some do mapa; volta à Home com toast "Pico excluído."
@@ -244,14 +260,14 @@ Escopo (issue): geocoding de **cidade ou endereço** para centralizar o mapa. **
 
 ### 9A.2 Formulário de avaliação (nova e edição)
 - **Mobile:** bottom sheet (altura do conteúdo; sobe com o teclado). **Web:** dialog 480 centralizado (`<640` vira sheet). Título "Avaliar este pico" (edição: "Editar sua avaliação").
-- Conteúdo: `StarInput` (componente novo): 5 estrelas de 40 com alvo 48, toque seleciona; rótulo textual abaixo muda com a nota ("Ruim", "Regular", "Bom", "Muito bom", "Excelente"). Campo "Comentário (opcional)" `Textarea` de 96 de altura, contador "0/500" em `caption` (vira `error` ao passar). Botão primário **"Enviar avaliação"** (edição: "Salvar") e ghost "Cancelar".
+- Conteúdo: `StarInput` (componente novo): 5 estrelas de 32 com alvo 48, toque seleciona; rótulo textual abaixo muda com a nota ("Ruim", "Regular", "Bom", "Muito bom", "Excelente"). Campo "Comentário (opcional)" `Textarea` de 96 de altura, contador "0/500" em `caption` (vira `error` ao passar). Botão primário **"Enviar avaliação"** (edição: "Salvar") e ghost "Cancelar".
 - **Enviar fica desabilitado sem estrelas** (critério); a dica "Escolha de 1 a 5 estrelas" aparece sob as estrelas desde o início, não só como erro.
 - **Acessível:** `StarInput` é um grupo de rádio ("Nota", 5 opções, "3 de 5 estrelas"); no teclado, setas mudam a nota. Mobile: cada estrela é botão com rótulo "{n} estrelas".
-- **Enviando:** botão `loading`, campos somente leitura. **Sucesso:** fecha, minha avaliação aparece no topo da lista, a média e a contagem atualizam na hora, toast success "Avaliação enviada!" (edição: "Avaliação atualizada."). **Erro de rede:** `AlertBanner` dentro do formulário, "Não foi possível enviar sua avaliação. Tente novamente.", nota e texto preservados. `REVIEW_ALREADY_EXISTS`: fecha o formulário, mostra minha avaliação existente e toast info "Você já avaliou este pico. Edite sua avaliação." `VALIDATION_ERROR`: mensagem do servidor junto ao campo. Sessão expirada: como 3.1.
+- **Enviando:** botão `loading`, campos somente leitura. **Sucesso:** fecha, minha avaliação aparece no topo da lista, a média e a contagem atualizam na hora, toast success "Avaliação enviada!" (edição: "Avaliação atualizada."). **Erro de rede:** `AlertBanner` dentro do formulário, "Não foi possível enviar sua avaliação. Tente novamente.", nota e texto preservados. `REVIEW_ALREADY_EXISTS` (código **a confirmar com o contrato de GP-061**; hoje não existe em `main`): fecha o formulário, mostra minha avaliação existente e toast info "Você já avaliou este pico. Edite sua avaliação." `VALIDATION_ERROR`: mensagem do servidor junto ao campo. Sessão expirada: como 3.1.
 - **Sair com texto digitado:** descartar sem confirmação se estiver vazio; se tiver comentário ou nota, confirma "Descartar sua avaliação?".
 
 ### 9A.3 Excluir minha avaliação
-Confirmação curta (sheet/dialog menor): "Excluir sua avaliação?" / "Sua nota e seu comentário serão removidos. Você poderá avaliar de novo depois." / **"Excluir avaliação"** (`DestructiveButton`) e "Cancelar" (foco inicial em Cancelar). Sucesso: some da lista, média atualizada, o botão "Avaliar este pico" volta, toast "Avaliação excluída." Erro: banner na confirmação.
+Confirmação curta (sheet/dialog menor): "Excluir sua avaliação?" / "Sua nota e seu comentário serão removidos. Você poderá avaliar de novo depois." / **"Excluir avaliação"** (`Button` `destructive`) e "Cancelar" (foco inicial em Cancelar). Sucesso: some da lista, média atualizada, o botão "Avaliar este pico" volta, toast "Avaliação excluída." Erro: banner na confirmação.
 
 ### 9A.4 Estados da seção
 | Estado | Descrição |
@@ -374,26 +390,26 @@ Filtros pedidos: **modalidade**, **pago/gratuito**, **coberto**, **nota mínima*
 
 ---
 
-## 15. Decisões pendentes para o dono (D18 em diante)
+## 15. Decisões D18-D26 (aprovadas pelo dono conforme a recomendação) e impacto
 
-Continuam a numeração do backlog (D1-D17). Cada uma traz a recomendação do UX; sem resposta, o Dev segue a recomendação.
+Continuam a numeração do backlog (D1-D17). **D27-D29 ficaram reservadas**: foram separadas no planejamento e nenhuma spec de design as usa; a spec de perfil começa em D30. Por isso a numeração salta de D26 para D30, sem decisão faltando aqui. Registro oficial em `docs/produto/backlog.md`.
 
-| # | Pergunta | Recomendação |
+| # | Decisão (recomendação aprovada) | Impacto |
 |---|---|---|
-| D18 | **Equipamento:** o campo é "exige equipamento de proteção (capacete, joelheira)" ou "tem equipamento no local (rampas, obstáculos)"? | Exige proteção (rótulo usado nesta spec); "equipamento no local" seria melhor como lista de obstáculos, pós-MVP. |
-| D19 | **Entrada paga:** valor em texto livre ("R$ 20")? | Sim, texto livre (o backend guarda string); validar número é pós-MVP. |
-| D20 | **Busca do mapa:** só lugar (cidade/endereço) ou também picos por nome? | Só lugar no MVP, como a issue #49; busca por nome pós-MVP. |
-| D21 | **Nota mínima nos filtros** (o backend GP-030 não filtra por nota): filtrar no app ou pedir ao backend? | Pedir ao backend (parâmetro `minRating`); filtrar no app só enxerga o que já foi carregado e engana. Se custar muito, cortar este filtro do MVP. |
-| D22 | **Editar o local** (polígono) depois de criado? | Sim, por "Alterar local". |
-| D23 | **Limites de texto:** nome até 80, descrição até 1000? (comentário já é 500, D3) | Sim. |
-| D24 | **Rascunho do cadastro** se a sessão expirar no meio: aceitamos perder? | Sim no MVP (7 dias de sessão, D8, torna raro). |
-| D25 | **TabBar:** só Mapa e Perfil, criar pico no FAB? | Sim. |
-| D26 | **Excluir minha avaliação** pede confirmação? | Sim, curta (seção 9A.3), pois remove nota e texto escritos. |
+| D18 | Equipamento = "exige equipamento de proteção" | Só rótulo e microcopy; campo booleano já existe. Se fosse "equipamento no local", seria lista de obstáculos (modelo novo no backend). |
+| D19 | Valor da entrada paga em texto livre | Nenhum no backend (string). Sem máscara no app; validação numérica fica pós-MVP. |
+| D20 | Busca do mapa só de lugar | #49 como escrita (geocoding Mapbox). Busca por nome exigiria query nova no backend: pós-MVP. |
+| D21 | Nota mínima filtrada no backend | **`minRating` não existe em GP-030**: precisa de **nova issue de backend** (parâmetro no filtro e teste), antes de #50 poder entregar o filtro. Alternativa: cortar o filtro do MVP e ajustar o critério de #50. Filtrar no app foi descartado (só vê o que já carregou). |
+| D22 | Editar o polígono depois de criado ("Alterar local") | **Amplia #44/#45**: a mutação de edição precisa aceitar `coordinates`, e o editor do passo 1 é reutilizado com o polígono atual. Sem isso, "Alterar local" some e o escopo diminui. |
+| D23 | Limites: nome 80, descrição 1000 (comentário 500, D3) | **Validação no backend** (hoje não há) em criar/editar pico, com `VALIDATION_ERROR` por campo; mesma regra nos formulários de web e mobile. Coerente com D37 do perfil (40/40). |
+| D24 | Sem rascunho do cadastro | Nenhum custo; sessão de 7 dias (D8) torna a perda rara. Rascunho viraria armazenamento local (pós-MVP). |
+| D25 | TabBar com Mapa e Perfil; criar pico no FAB | Mobile: 2 abas, FAB na Home. Se virasse 3 abas, muda a navegação e a TabBar do DS. |
+| D26 | Confirmar antes de excluir minha avaliação | Um sheet/dialog a mais em #66/#67; sem impacto no backend. |
 
 ---
 
 ## 16. Acessibilidade (checklist de aceite)
-- Alvos >= 48 (visual >= 36); foco visível; ordem de foco = ordem visual; `StarInput` como grupo de rádio.
+- Alvos >= 44 (48 padrão; visual >= 32); foco visível; ordem de foco = ordem visual; `StarInput` como grupo de rádio.
 - Contraste conforme DS v2 (texto sobre laranja é escuro; `star` do DS para estrelas, nunca só cor: sempre acompanhadas do número).
 - Mapa sem acesso por leitor de tela, com equivalentes (UX-P17).
 - Erros anunciados; loading anunciado ("Salvando", "Carregando avaliações").
