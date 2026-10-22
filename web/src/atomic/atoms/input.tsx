@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { AlertCircleIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -17,32 +18,53 @@ function Input({
   containerStyle,
   isLoading = false,
   error,
+  id,
   ...props
 }: InputProps) {
+  const generatedId = React.useId();
+  const inputId = id ?? generatedId;
+  const errorId = `${inputId}-error`;
+
   return (
-    <div className={cn('gap-0', containerStyle)}>
+    <div className={cn('flex flex-col gap-1', containerStyle)}>
       <label
-        className={cn('text-sm mb-0 text-gray-700', error && 'text-red-500')}
+        htmlFor={inputId}
+        className={cn(
+          'text-body-sm font-semibold text-gp-text',
+          error && 'text-gp-error',
+        )}
       >
         {label}
       </label>
 
-      {isLoading && <Skeleton className="w-full h-9 shadow" />}
+      {isLoading && <Skeleton className="h-12 w-full" />}
       {!isLoading && (
         <>
           <input
+            id={inputId}
             type={type}
             data-slot="input"
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? errorId : undefined}
             className={cn(
-              ' file:text-foreground placeholder:text-muted-foreground selection:bg-muted-foreground selection:text-primary-foreground dark:bg-input/30  h-9 w-full min-w-0 rounded-md bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-              'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-              'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-white shadow',
+              'h-12 w-full min-w-0 rounded-md border border-input bg-gp-surface px-3 py-1 text-body text-gp-text shadow-1 transition-colors duration-150 outline-none',
+              'placeholder:text-gp-text-subtle file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium',
+              'focus-visible:ring-2 focus-visible:ring-gp-focus focus-visible:border-gp-focus',
+              'disabled:cursor-not-allowed disabled:opacity-40',
+              'aria-invalid:border-gp-error aria-invalid:focus-visible:ring-gp-error',
               className,
-              error && 'border border-destructive',
             )}
             {...props}
           />
-          {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+          {error && (
+            <p
+              id={errorId}
+              className="mt-1 flex items-center gap-1 text-caption text-gp-error"
+            >
+              <AlertCircleIcon className="size-4 shrink-0" aria-hidden="true" />
+              {error}
+            </p>
+          )}
         </>
       )}
     </div>
