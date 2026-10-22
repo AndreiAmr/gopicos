@@ -22,6 +22,8 @@ export const loginStrings = {
     registered: 'Conta criada! Entre com seu e-mail e senha.',
     passwordChanged: 'Senha alterada. Entre com a nova senha.',
     sessionExpired: 'Sua sessão expirou. Entre de novo para continuar.',
+    accountDeleted:
+      'Conta excluída. Se quiser voltar, entre com seu e-mail e senha e ela será reativada.',
   },
 } as const;
 

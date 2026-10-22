@@ -22,6 +22,11 @@ export const useProfileHome = () => {
     [navigation],
   );
 
+  const goToDelete = useCallback(
+    () => navigation.navigate('DeleteAccount'),
+    [navigation],
+  );
+
   // P7: confirmação antes de sair; o foco inicial fica em "Cancelar".
   const confirmLogout = useCallback(() => {
     Alert.alert(profileStrings.logoutTitle, profileStrings.logoutMessage, [
@@ -44,6 +49,7 @@ export const useProfileHome = () => {
     refresh,
     goToEdit,
     goToPassword,
+    goToDelete,
     confirmLogout,
   };
 };
