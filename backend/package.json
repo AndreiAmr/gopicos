@@ -8,9 +8,10 @@
     "migrate": "prisma migrate dev --schema=./src/prisma/schema.prisma",
     "generate": "prisma generate --schema=./src/prisma/schema.prisma",
     "mock": "tsx src/database/inserts/populate/index.ts",
-    "build": "yarn generate && tsc",
+    "build": "yarn generate && tsc && node scripts/copy-prisma-client.js",
     "prisma:studio": "prisma studio --schema ./src/prisma/schema.prisma",
     "test": "tsx --test \"src/**/*.test.ts\"",
+    "migrate:deploy": "prisma migrate deploy --schema=./src/prisma/schema.prisma",
     "setup": "yarn migrate && yarn mock"
   },
   "keywords": [],
