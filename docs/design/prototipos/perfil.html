@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Protótipo - Perfil - GoPicos</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F0F3F5;--surface:#fff;--sunken:#E3E8EC;--text:#18181B;--muted:#565757;--border:#7D858C;--divider:#D5DBE0;--primary:#F97316;--on-primary:#18181B;--soft:#FFEDD5;--ptext:#A84300;--star:#C77700;--error:#B3201F;--on-error:#fff}
+[data-theme=dark]{--bg:#0F1113;--surface:#181B1F;--sunken:#0A0B0D;--text:#F5F6F7;--muted:#B2B8BE;--border:#838B93;--divider:#2C3138;--primary:#FB923C;--on-primary:#1A0B02;--soft:#3A2008;--ptext:#FDBA74;--star:#FBBF24;--error:#FF8A80;--on-error:#0F1113}
+*{box-sizing:border-box}body{margin:0;background:#9aa3ab;font:16px/24px Inter,system-ui,sans-serif;color:var(--text);padding:16px}
+h1,h2,h3,p{margin:0}.bar{display:flex;gap:12px;align-items:center;margin-bottom:16px;color:#111}
+button{font:inherit;cursor:pointer}.tog{padding:8px 14px;border-radius:6px;border:1px solid #333;background:#fff}
+.row{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+figure{margin:0}figcaption{font-size:13px;font-weight:600;margin-bottom:6px;color:#111}
+.phone{width:360px;height:700px;background:var(--bg);border-radius:24px;border:6px solid #111;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.scr{flex:1;overflow:auto;padding:16px}
+.top{padding:14px 16px;font:600 20px/26px Inter,sans-serif;display:flex;gap:8px;align-items:center}
+.tabs{display:flex;border-top:1px solid var(--divider);background:var(--surface);padding:8px 0 14px}
+.tabs span{flex:1;text-align:center;font-size:12px;line-height:16px;color:var(--muted);padding:6px}
+.tabs .on{color:var(--ptext);font-weight:600}
+.av{width:96px;height:96px;border-radius:999px;background:var(--soft);color:var(--ptext);border:1.5px solid var(--border);display:grid;place-items:center;font:600 32px/1 Inter,sans-serif}
+.center{text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px}
+.mut{color:var(--muted)}.cap{font-size:12px;line-height:16px;color:var(--muted)}.sm{font-size:14px;line-height:20px}
+.tiles{display:flex;gap:12px;margin:24px 0}.tile{flex:1;background:var(--surface);border:1px solid var(--divider);border-radius:12px;padding:12px;min-height:64px}
+.tile b{font:600 20px/26px Inter,sans-serif;display:block}
+.sec{font:500 14px/20px Inter,sans-serif;color:var(--muted);margin:0 0 8px}
+.grp{background:var(--surface);border:1px solid var(--divider);border-radius:12px;margin-bottom:24px}
+.li{display:flex;align-items:center;gap:12px;min-height:56px;padding:0 16px;font-weight:600;border-bottom:1px solid var(--divider)}
+.li:last-child{border-bottom:0}.li small{margin-left:auto;font-weight:400;color:var(--muted)}.li.d{color:var(--error)}
+.ico{width:24px;text-align:center;color:var(--muted)}.d .ico{color:var(--error)}
+label{display:block;font:500 14px/20px Inter,sans-serif;color:var(--muted);margin-bottom:4px}
+.in{height:48px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);padding:0 12px;display:flex;align-items:center;margin-bottom:4px}
+.in.ro{background:var(--sunken);border-color:transparent;color:var(--muted)}.in.err{border-color:var(--error)}
+.help{font-size:14px;line-height:20px;color:var(--muted);margin-bottom:16px}.errt{font-size:14px;line-height:20px;color:var(--error);margin-bottom:16px}
+.btn{display:flex;align-items:center;justify-content:center;height:48px;border-radius:6px;font-weight:600;border:1.5px solid transparent;background:var(--primary);color:var(--on-primary);width:100%}
+.btn.dis{opacity:.4}.btn.sec{background:var(--surface);border-color:var(--border);color:var(--text)}.btn.dst{background:var(--error);color:var(--on-error)}
+.dock{padding:12px 16px 16px;background:var(--bg);display:grid;gap:12px;border-top:1px solid var(--divider)}
+ul.w{list-style:none;margin:12px 0 16px;padding:0;display:grid;gap:10px}ul.w li{display:flex;gap:10px}
+.card{display:flex;gap:12px;background:var(--surface);border:1px solid var(--divider);border-radius:12px;padding:8px;margin-bottom:12px}
+.th{width:72px;height:72px;border-radius:6px;background:var(--sunken);flex:none}
+.chip{display:inline-block;background:var(--soft);border:2px solid #18181B;border-radius:4px;padding:0 6px;font:600 12px/18px Inter,sans-serif;color:#18181B;box-shadow:2px 2px 0 #18181B}
+.star{color:var(--star)}
+.empty{text-align:center;padding:32px 8px;display:grid;gap:8px;justify-items:center}
+.pin{font:32px/1 'Permanent Marker',cursive}
+.web{width:1000px;max-width:100%;background:var(--bg);border-radius:8px;overflow:hidden;border:1px solid #333}
+.hdr{height:56px;background:var(--surface);border-bottom:1px solid var(--divider);display:flex;align-items:center;padding:0 24px;gap:16px}
+.hdr .av{width:32px;height:32px;font-size:12px;border-width:1px;margin-left:auto}
+.wb{display:grid;grid-template-columns:240px 1fr;gap:32px;padding:32px}
+.nav a{display:block;padding:12px 16px;border-radius:6px;font-weight:600;border-left:3px solid transparent;color:var(--text);text-decoration:none}
+.nav a.on{background:var(--soft);color:var(--ptext);border-left-color:var(--primary)}.nav a.d{color:var(--error)}
+.dz{border:1.5px solid var(--error);border-radius:12px;padding:16px;margin-top:32px}.dz h3{color:var(--error);font:600 17px/24px Inter,sans-serif}
+.dlg{background:var(--surface);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.3);padding:24px;width:480px;max-width:100%}
+.acts{display:flex;justify-content:flex-end;gap:12px}.acts .btn{width:auto;padding:0 20px}
+@media(max-width:700px){.wb{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="bar"><strong>GoPicos - Perfil (protótipo estático, referência da spec perfil.md)</strong>
+<button class="tog" onclick="var h=document.documentElement;h.dataset.theme=h.dataset.theme==='dark'?'light':'dark'">Alternar claro/escuro</button></div>
+
+<div class="row">
+<figure><figcaption>P1 Perfil (mobile)</figcaption><div class="phone">
+<div class="top">Perfil</div>
+<div class="scr">
+<div class="center"><div class="av">MS</div><h1 style="font:700 26px/32px Inter,sans-serif;margin-top:8px">Marina Souza</h1><p class="mut">marina@exemplo.com</p><p class="cap">Membro desde outubro de 2026</p></div>
+<div class="tiles"><div class="tile"><b>3</b><span class="sm mut">Picos</span></div><div class="tile"><b>5</b><span class="sm mut">Avaliações</span></div></div>
+<p class="sec">Conta</p><div class="grp"><div class="li"><span class="ico">✎</span>Editar dados<small>Marina Souza</small></div><div class="li"><span class="ico">🔒</span>Alterar senha</div></div>
+<p class="sec">Atividade</p><div class="grp"><div class="li"><span class="ico">📍</span>Meus picos</div><div class="li"><span class="ico">★</span>Minhas avaliações</div></div>
+<div class="grp"><div class="li"><span class="ico">⎋</span>Sair</div></div>
+<div style="height:16px"></div>
+<div class="grp"><div class="li d"><span class="ico">🗑</span>Excluir conta</div></div>
+</div>
+<div class="tabs"><span>Home</span><span>Novo pico</span><span class="on">Perfil</span></div></div></figure>
+
+<figure><figcaption>P2 Editar dados (mobile, com erro no sobrenome)</figcaption><div class="phone">
+<div class="top">← Editar dados</div>
+<div class="scr">
+<label>Nome</label><div class="in">Marina</div><div style="height:12px"></div>
+<label>Sobrenome</label><div class="in err">S</div><p class="errt">⚠ O sobrenome precisa ter ao menos 2 caracteres.</p>
+<label>E-mail</label><div class="in ro">🔒&nbsp; marina@exemplo.com</div><p class="help">O e-mail é o seu login e não pode ser alterado.</p>
+</div><div class="dock"><div class="btn">Salvar alterações</div></div></div></figure>
+
+<figure><figcaption>P3 Alterar senha (mobile, confirmação diferente)</figcaption><div class="phone">
+<div class="top">← Alterar senha</div>
+<div class="scr"><p class="mut help">Escolha uma senha nova com pelo menos 8 caracteres.</p>
+<label>Senha atual</label><div class="in">••••••••</div><div style="height:12px"></div>
+<label>Nova senha</label><div class="in">••••••••••</div><p class="help">Mínimo de 8 caracteres.</p>
+<label>Confirmar nova senha</label><div class="in err">•••••••••</div><p class="errt">⚠ As senhas não coincidem.</p></div>
+<div class="dock"><div class="btn">Alterar senha</div></div></div></figure>
+
+<figure><figcaption>P4 Excluir conta (mobile, senha vazia)</figcaption><div class="phone">
+<div class="top">← Excluir conta</div>
+<div class="scr"><p style="font-weight:600">Sua conta será desativada.</p>
+<ul class="w"><li><span>ⓘ</span>Seu perfil deixa de aparecer. Seu nome e e-mail ficam ocultos para outras pessoas.</li><li><span>✓</span>Seus 3 picos e 5 avaliações continuam no GoPicos, com o autor mostrado como "Usuário Desativado".</li><li><span>✓</span>As notas das suas avaliações continuam contando na média dos picos.</li><li><span>↺</span>Você pode reativar a conta quando quiser: é só entrar de novo com seu e-mail e senha.</li></ul>
+<label>Senha</label><div class="in err">&nbsp;</div><p class="errt">⚠ Informe sua senha para continuar.</p></div>
+<div class="dock"><div class="btn dst">Excluir conta</div><div class="btn sec">Cancelar</div></div></div></figure>
+
+<figure><figcaption>P5 Meus picos (mobile)</figcaption><div class="phone">
+<div class="top">← Meus picos <span class="cap">2 picos</span></div>
+<div class="scr">
+<div class="card"><div class="th"></div><div><h3 style="font:600 17px/24px Inter,sans-serif">Praça da Sé</h3><span class="chip">Street</span><p class="sm"><span class="star">★★★★☆</span> 4,3 (12)</p><p class="cap">Centro, São Paulo</p></div></div>
+<div class="card"><div class="th"></div><div><h3 style="font:600 17px/24px Inter,sans-serif">Bowl do Ibirapuera</h3><span class="chip">Bowl/Pool</span><p class="sm mut">Sem avaliações ainda</p><p class="cap">Vila Mariana, São Paulo</p></div></div>
+</div><div class="tabs"><span>Home</span><span>Novo pico</span><span class="on">Perfil</span></div></div></figure>
+
+<figure><figcaption>P5 Meus picos - vazio (mobile)</figcaption><div class="phone">
+<div class="top">← Meus picos</div>
+<div class="scr"><div class="empty"><div class="pin">📍</div><h3 style="font:600 17px/24px Inter,sans-serif">Você ainda não cadastrou nenhum pico.</h3><p class="mut">Conhece um lugar bom para andar? Cadastre e ajude a galera.</p><div class="btn" style="width:220px;margin-top:8px">Cadastrar pico</div></div></div>
+<div class="tabs"><span>Home</span><span>Novo pico</span><span class="on">Perfil</span></div></div></figure>
+
+<figure><figcaption>P6 Minhas avaliações (mobile)</figcaption><div class="phone">
+<div class="top">← Minhas avaliações</div>
+<div class="scr">
+<div class="card" style="display:block;padding:12px"><h3 style="font:600 17px/24px Inter,sans-serif">Praça da Sé</h3><p class="sm"><span class="star">★★★★★</span> 5 de 5 <span class="cap">há 2 semanas</span></p><p>Piso liso, ótimos corrimãos. Vai cedo para pegar vazio.</p></div>
+<div class="card" style="display:block;padding:12px"><h3 style="font:600 17px/24px Inter,sans-serif">Bowl do Ibirapuera</h3><p class="sm"><span class="star">★★★☆☆</span> 3 de 5 <span class="cap">há 1 mês</span></p></div>
+</div><div class="tabs"><span>Home</span><span>Novo pico</span><span class="on">Perfil</span></div></div></figure>
+</div>
+
+<h2 style="margin:32px 0 8px;color:#111">Web</h2>
+<div class="row">
+<figure style="width:100%"><figcaption>/perfil (md+): Meus dados, menu lateral e zona de risco</figcaption><div class="web">
+<div class="hdr"><strong>GoPicos</strong><span class="av">MS</span></div>
+<div class="wb"><nav class="nav"><a class="on" href="#">Meus dados</a><a href="#">Alterar senha</a><a href="#">Meus picos</a><a href="#">Minhas avaliações</a><hr style="border:0;border-top:1px solid var(--divider)"><a href="#">Sair</a><a class="d" href="#">Excluir conta</a></nav>
+<div style="max-width:640px"><div style="display:flex;gap:16px;align-items:center;margin-bottom:24px"><div class="av">MS</div><div><h1 style="font:700 26px/32px Inter,sans-serif">Marina Souza</h1><p class="mut">marina@exemplo.com</p><p class="cap">Membro desde outubro de 2026</p></div></div>
+<h2 style="font:600 20px/26px Inter,sans-serif;margin-bottom:16px">Meus dados</h2>
+<div style="max-width:400px"><label>Nome</label><div class="in">Marina</div><div style="height:12px"></div><label>Sobrenome</label><div class="in">Souza</div><div style="height:12px"></div><label>E-mail</label><div class="in ro">🔒&nbsp; marina@exemplo.com</div><p class="help">O e-mail é o seu login e não pode ser alterado.</p><div class="btn dis" style="width:auto;padding:0 24px;display:inline-flex">Salvar alterações</div></div>
+<div class="dz"><h3>Excluir conta</h3><p class="mut sm" style="margin:4px 0 12px">Sua conta será desativada. Você pode reativá-la entrando de novo.</p><div class="btn sec" style="width:auto;display:inline-flex;padding:0 20px;color:var(--error);border-color:var(--error)">Excluir conta</div></div>
+</div></div></div></figure>
+
+<figure><figcaption>Diálogo Excluir conta (web, senha incorreta)</figcaption><div style="background:rgba(0,0,0,.5);padding:32px;border-radius:8px"><div class="dlg">
+<h2 style="font:600 20px/26px Inter,sans-serif;margin-bottom:8px">Excluir conta</h2><p style="font-weight:600">Sua conta será desativada.</p>
+<ul class="w"><li><span>ⓘ</span>Seu perfil deixa de aparecer. Seu nome e e-mail ficam ocultos para outras pessoas.</li><li><span>✓</span>Seus picos e avaliações continuam, com o autor "Usuário Desativado".</li><li><span>✓</span>As notas continuam contando na média dos picos.</li><li><span>↺</span>Para reativar, entre de novo com seu e-mail e senha.</li></ul>
+<label>Senha</label><div class="in err">••••••••</div><p class="errt">⚠ Senha incorreta.</p>
+<div class="acts"><div class="btn sec">Cancelar</div><div class="btn dst">Excluir conta</div></div></div></div></figure>
+</div>
+</body></html>
