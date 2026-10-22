@@ -23,3 +23,5 @@ export { AlertBanner } from './auth/AlertBanner';
 export { TextLink } from './auth/TextLink';
 export { PasswordInput } from './auth/PasswordInput';
 export { Tape, Halftone, Wordmark } from './auth/BrandDecor';
+export { Avatar, initialsOf } from './atoms/Avatar';
+export { SettingsRow, SettingsGroup } from './molecules/SettingsRow';

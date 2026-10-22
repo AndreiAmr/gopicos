@@ -10,3 +10,8 @@ export type RootStackParamList = {
   Signup: undefined;
   Home: undefined;
 };
+
+export type ProfileStackParamList = {
+  ProfileHome: undefined;
+  ProfileEdit: undefined;
+};
