@@ -1,5 +1,5 @@
 import { RefreshControl, ScrollView } from 'react-native';
-import { LogOut, Pencil } from 'lucide-react-native';
+import { Lock, LogOut, Pencil } from 'lucide-react-native';
 import { View, useTheme } from 'tamagui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
@@ -47,6 +47,7 @@ export const ProfileTemplate = () => {
     refreshing,
     refresh,
     goToEdit,
+    goToPassword,
     confirmLogout,
   } = useProfileHome();
 
@@ -121,8 +122,14 @@ export const ProfileTemplate = () => {
               }
               onPress={goToEdit}
               disabled={!profile}
-              isLast
               testID="profile-edit-row"
+            />
+            <SettingsRow
+              icon={Lock}
+              label={profileStrings.passwordRow}
+              onPress={goToPassword}
+              isLast
+              testID="profile-password-row"
             />
           </SettingsGroup>
         </View>
