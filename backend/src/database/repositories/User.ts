@@ -53,6 +53,14 @@ export class UserRepository implements IUserRepository {
     return !!user && user.deactivatedAt === null;
   }
 
+  /** Reativa uma conta desativada (login após GP-073). */
+  async reactivate(prop: WithIdProp): Promise<void> {
+    await prisma.user.update({
+      where: { id: prop.id },
+      data: { deactivatedAt: null },
+    });
+  }
+
   update(prop: IUpdateUser): Promise<void> {
     throw new Error('Method not implemented.');
   }
