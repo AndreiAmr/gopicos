@@ -42,6 +42,16 @@ export class UserRepository implements IUserRepository {
     return user;
   }
 
+  /** Usuário existe e não está desativado (deactivatedAt nulo). */
+  async isActive(id: string): Promise<boolean> {
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: { deactivatedAt: true },
+    });
+
+    return !!user && user.deactivatedAt === null;
+  }
+
   update(prop: IUpdateUser): Promise<void> {
     throw new Error('Method not implemented.');
   }

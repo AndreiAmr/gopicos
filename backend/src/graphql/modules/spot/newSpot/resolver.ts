@@ -14,9 +14,9 @@ export const newSpotResolver = {
     createSpot: async (
       _: any,
       { input }: CreateSpotResolverProps,
-      { auth }: ContextType
+      { auth }: ContextType,
     ) => {
-      return newSpotController(input, auth);
+      return newSpotController(input, auth!);
     },
   },
 };

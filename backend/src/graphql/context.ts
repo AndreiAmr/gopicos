@@ -11,7 +11,7 @@ export type ContextType = {
 /**
  * Ponto de extensão para invalidar tokens de usuários desativados (D4).
  * Retorna false quando o usuário não pode mais usar o token.
- * A implementação com o campo de desativação entra no GP-016.
+ * Implementação em ./isUserActive.ts (User.deactivatedAt).
  */
 export type IsUserActive = (userId: string) => Promise<boolean>;
 
