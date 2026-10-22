@@ -1,8 +1,10 @@
+"""
+Autor em contexto público (D36): só id e nome no formato "Nome S.".
+Conta desativada aparece como "Usuário Desativado".
+"""
 type SpotAuthor {
   id: String
-  name: String
-  firstName: String
-  lastName: String
+  displayName: String
 }
 
 type SpotDetails {
