@@ -72,7 +72,7 @@ describe('createSpotReview (integração)', () => {
     expect(await prisma.spotReview.count()).toBe(0);
   });
 
-  it('nota não inteira é rejeitada', async () => {
+  it('nota não inteira retorna VALIDATION_ERROR em pt-BR no campo rating', async () => {
     const user = await createUser();
     const spot = await createSpot();
 
@@ -80,8 +80,34 @@ describe('createSpotReview (integração)', () => {
       data: { spotId: spot.id, rating: 4.5 },
     });
 
-    expect(res.errors?.length).toBeGreaterThan(0);
+    expect(errorOf(res)).toMatchObject({
+      type: 'VALIDATION_ERROR',
+      field: 'rating',
+    });
+    expect(res.errors?.[0].message).toBe(
+      'A nota deve ser um número inteiro de 1 a 5.',
+    );
     expect(await prisma.spotReview.count()).toBe(0);
+  });
+
+  it('envios simultâneos: um salva e os outros recebem REVIEW_ALREADY_EXISTS', async () => {
+    const user = await createUser();
+    const spot = await createSpot();
+    const data = { spotId: spot.id, rating: 4 };
+
+    const results = await Promise.all(
+      [1, 2, 3].map(() =>
+        executeAuthenticated(tokenFor(user), CREATE, { data }),
+      ),
+    );
+
+    const outcomes = results.map((res) => errorOf(res)?.type ?? 'OK').sort();
+    expect(outcomes).toEqual([
+      'OK',
+      'REVIEW_ALREADY_EXISTS',
+      'REVIEW_ALREADY_EXISTS',
+    ]);
+    expect(await prisma.spotReview.count()).toBe(1);
   });
 
   it('comentário acima de 500 caracteres retorna VALIDATION_ERROR', async () => {

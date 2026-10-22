@@ -1,3 +1,4 @@
+import { Prisma } from '../../../prisma/generated';
 import { spotRepository } from '../../../database/repositories/Spot';
 import { spotReviewRepository } from '../../../database/repositories/SpotReview';
 import { AppError } from '../../../utils/AppError';
@@ -10,6 +11,13 @@ type SpotReviewServiceProps = {
 };
 
 const MAX_DESCRIPTION = 500;
+
+const reviewAlreadyExists = () =>
+  new AppError({
+    type: 'REVIEW_ALREADY_EXISTS',
+    message: 'Você já avaliou este pico. Edite a sua avaliação.',
+    statusCode: 409,
+  });
 
 export const spotReviewService = async (data: SpotReviewServiceProps) => {
   if (!Number.isInteger(data.rating) || data.rating < 1 || data.rating > 5) {
@@ -54,12 +62,20 @@ export const spotReviewService = async (data: SpotReviewServiceProps) => {
   );
 
   if (existing) {
-    throw new AppError({
-      type: 'REVIEW_ALREADY_EXISTS',
-      message: 'Você já avaliou este pico. Edite a sua avaliação.',
-      statusCode: 409,
-    });
+    throw reviewAlreadyExists();
   }
 
-  return spotReviewRepository.create({ ...data, description });
+  try {
+    return await spotReviewRepository.create({ ...data, description });
+  } catch (err) {
+    // Envio simultâneo (ex.: duplo toque): o unique (authorId, spotId) decide.
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === 'P2002'
+    ) {
+      throw reviewAlreadyExists();
+    }
+
+    throw err;
+  }
 };
