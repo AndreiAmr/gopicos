@@ -21,10 +21,10 @@ export const buttonVariants = cva(
       size: {
         md: 'h-11 px-4 text-sm',
         lg: 'h-12 px-6 text-base',
-        sm: 'h-8 gap-1.5 px-3 text-sm',
+        sm: 'h-11 gap-1.5 px-3 text-sm',
         icon: 'size-12',
         default: 'h-11 px-4 text-sm',
-        'icon-sm': 'size-8',
+        'icon-sm': 'size-11',
         'icon-lg': 'size-12',
       },
     },
