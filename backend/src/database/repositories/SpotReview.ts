@@ -3,8 +3,8 @@ import { IRepository } from '../..';
 import { prisma } from '../../prisma/prisma';
 
 type AddReviewProps = {
-  title: string;
-  description: string;
+  rating: number;
+  description?: string | null;
   spotId: string;
   authorId: string;
 };
@@ -39,8 +39,8 @@ export class SpotReviewRepository implements ISpotReviewRepository {
   async create(props: AddReviewProps) {
     const result = await prisma.spotReview.create({
       data: {
-        title: props.title,
-        description: props.description,
+        rating: props.rating,
+        description: props.description ?? null,
 
         author: {
           connect: {

@@ -1,5 +1,5 @@
 import { IRepository } from '../..';
-import { Spot } from '../../prisma/generated';
+import { Modality, Spot } from '../../prisma/generated';
 import { prisma } from '../../prisma/prisma';
 import { NewSpotInput } from '../../controllers/spot/newSpot/newSpot.controller';
 
@@ -39,7 +39,6 @@ export class SpotRepository implements ISpotRepository {
                 password: true,
               },
             },
-            replies: true,
           },
         },
       },
@@ -62,7 +61,7 @@ export class SpotRepository implements ISpotRepository {
     const spotData = {
       name: data.name,
       description: data.description,
-      modality: data.modality,
+      modality: data.modality as Modality,
       equipmentRequired: data.equipmentRequired || false,
       isPaid: data.isPaid,
       alwaysOpen: data.alwaysOpen,

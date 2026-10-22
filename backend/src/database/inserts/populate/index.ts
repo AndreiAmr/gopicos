@@ -12,7 +12,13 @@ async function main() {
 
   const commands = sql
     .split(';')
-    .map((cmd) => cmd.trim())
+    .map((cmd) =>
+      cmd
+        .split('\n')
+        .filter((line) => !line.trim().startsWith('--'))
+        .join('\n')
+        .trim()
+    )
     .filter((cmd) => cmd.length > 0);
 
   let lastTableName = '';

@@ -1,5 +1,6 @@
 generator client {
   provider      = "prisma-client-js"
+  output        = "./generated"
   binaryTargets = ["native", "linux-arm64-openssl-3.0.x"]
 }
 
@@ -8,22 +9,49 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Modality {
+  street
+  park
+  bowl_pool
+  vertical
+  downhill
+  mixed
+}
+
 model User {
-  id       String       @unique() @default(uuid())
-  email    String       @unique
-  name     String
-  password String
-  spot     Spot[]
-  reviews  SpotReview[]
+  id            String              @unique() @default(uuid())
+  email         String              @unique
+  name          String
+  password      String
+  // Desativação lógica: o usuário nunca é apagado fisicamente (D4).
+  deactivatedAt DateTime?
+  spot          Spot[]
+  reviews       SpotReview[]
+  resetCodes    PasswordResetCode[]
+}
+
+// Código de recuperação de senha (D1): 6 dígitos guardados com hash,
+// expira em 15 min, uso único e no máximo 5 tentativas (regras aplicadas no service).
+model PasswordResetCode {
+  id        String    @unique() @default(uuid())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Restrict)
+  userId    String
+  codeHash  String
+  expiresAt DateTime
+  usedAt    DateTime?
+  attempts  Int       @default(0)
+  createdAt DateTime  @default(now())
+
+  @@index([userId, createdAt])
 }
 
 model Spot {
   id                String       @unique() @default(uuid())
   name              String
   description       String
-  author            User         @relation(fields: [authorId], references: [id])
+  author            User         @relation(fields: [authorId], references: [id], onDelete: Restrict)
   authorId          String
-  modality          String
+  modality          Modality
   equipmentRequired Boolean
   isPaid            Boolean
   alwaysOpen        Boolean
@@ -34,18 +62,23 @@ model Spot {
   images            String[]
   reviews           SpotReview[] @relation("SpotReviews")
   createdAt         DateTime     @default(now())
+
+  @@index([authorId])
+  @@index([modality])
 }
 
+// Uma avaliação por usuário por pico (D2); nota 1-5 obrigatória (CHECK na migration)
+// e comentário opcional de até 500 caracteres (D3).
 model SpotReview {
-  id          String       @unique() @default(uuid())
-  title       String
-  description String
-  author      User         @relation(fields: [authorId], references: [id])
+  id          String   @unique() @default(uuid())
+  rating      Int
+  description String?  @db.VarChar(500)
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Restrict)
   authorId    String
-  spot        Spot         @relation("SpotReviews", fields: [spotId], references: [id])
+  spot        Spot     @relation("SpotReviews", fields: [spotId], references: [id], onDelete: Cascade)
   spotId      String
-  parent      SpotReview?  @relation("ReviewReplies", fields: [parentId], references: [id])
-  parentId    String?
-  replies     SpotReview[] @relation("ReviewReplies")
-  createdAt   DateTime     @default(now())
+  createdAt   DateTime @default(now())
+
+  @@unique([authorId, spotId])
+  @@index([spotId])
 }
