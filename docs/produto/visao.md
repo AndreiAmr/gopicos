@@ -20,14 +20,15 @@ Entregar, em **backend, web e mobile**, o ciclo completo:
 
 ## Escopo do MVP (dentro)
 - Autenticação por e-mail/senha com JWT; operações sensíveis exigem usuário autenticado e identificado pelo token.
+- Recuperação de senha por código enviado por e-mail.
 - Mapa com picos (polígonos GeoJSON `[lng, lat]`), detalhe do pico, criar/editar/excluir (somente o autor).
 - Avaliação: nota de 1 a 5 estrelas (obrigatória) + comentário (opcional); média e contagem no pico; usuário edita/exclui a própria avaliação.
-- Perfil: visualizar, editar nome, alterar senha, excluir conta, ver "meus picos".
+- Perfil: visualizar, editar nome, alterar senha, excluir conta (desativação lógica; nada é apagado do banco e o login reativa), ver "meus picos".
 - Estados de loading, vazio e erro em todas as telas.
 - Busca por lugar e filtros básicos (Should).
 
 ## Fora do MVP (explicitamente)
-- Recuperação de senha, verificação de e-mail, login social.
+- Verificação de e-mail, login social.
 - Respostas a avaliações (threads), curtidas, seguidores, feed social.
 - Moderação, denúncia de pico/comentário, detecção de picos duplicados.
 - Modo offline, notificações push, rotas/navegação até o pico.

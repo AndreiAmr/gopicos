@@ -1,12 +1,13 @@
 # GoPicos - Backlog do MVP
 
-Fonte única do backlog (substitui `mobile/PLANO_DE_ACAO.md`). IDs `GP-xxx` são estáveis; não renumerar. Prioridade MoSCoW: **M**ust, **S**hould, **C**ould, **W**on't (neste MVP). Plataformas: BE = backend, WEB, MOB.
+A fonte única do backlog e das tarefas é o GitHub Project **GoPicos MVP** (https://github.com/users/AndreiAmr/projects/4), com uma issue por história. Este arquivo é o registro de referência do PO (substitui `mobile/PLANO_DE_ACAO.md`) e deve ser mantido em sincronia com as issues. IDs `GP-xxx` são estáveis; não renumerar. Prioridade MoSCoW: **M**ust, **S**hould, **C**ould, **W**on't (neste MVP). Plataformas: BE = backend, WEB, MOB.
 
 Convenções de regra de negócio (valem para todas as histórias):
 - Operações de escrita exigem usuário autenticado; a identidade vem **sempre do token**, nunca do input.
 - Somente o autor edita/exclui o próprio pico e a própria avaliação.
 - Erros devolvem `type` + `message` em pt-BR (padrão `AppError`); telas mostram mensagem amigável, nunca texto técnico.
 - Coordenadas: polígono GeoJSON em `[lng, lat]`.
+- Usuário **nunca é excluído fisicamente** do banco: "Excluir conta" apenas desativa (D4).
 
 ## Estado atual por plataforma
 
@@ -141,7 +142,7 @@ Então existe um exemplo de teste de saga e de hook usando o padrão a ser segui
 ```
 
 **GP-015 - Padronizar erros GraphQL e tratamento nos clientes** | S | BE, WEB, MOB | Dep.: GP-012
-Códigos estáveis (`INVALID_CREDENTIALS`, `EMAIL_ALREADY_EXISTS`, `FORBIDDEN`, `NOT_FOUND`, `VALIDATION_ERROR`, `UNAUTHENTICATED`) e função única nos clientes que os traduz em mensagem para o usuário.
+Códigos estáveis (`INVALID_CREDENTIALS`, `EMAIL_ALREADY_EXISTS`, `FORBIDDEN`, `NOT_FOUND`, `VALIDATION_ERROR`, `UNAUTHENTICATED`, `INVALID_RESET_CODE`) e função única nos clientes que os traduz em mensagem para o usuário.
 ```gherkin
 Dado um erro conhecido do backend
 Quando o cliente o recebe
@@ -149,11 +150,21 @@ Então exibe a mensagem amigável correspondente; para erro desconhecido ou de r
 ```
 
 **GP-016 - Modelo de dados: preparar migrations do MVP** | M | BE | Dep.: decisões D2, D4, D6, D10
-Migration única e coordenada: rating em `SpotReview`, remoção/ajuste de `title`, unicidade (autor, pico), `onDelete` conforme regra de exclusão de conta, enum de modalidade, índices.
+Migration única e coordenada: rating em `SpotReview`, remoção/ajuste de `title`, unicidade (autor, pico), desativação lógica de usuário (ex.: `deactivatedAt`, sem `onDelete` em cascata a partir de `User`), tabela/campos de código de recuperação de senha (D1), enum de modalidade, índices.
 ```gherkin
 Quando rodo yarn migrate em banco existente
 Então as migrations aplicam sem perda de dados dos picos atuais
 E o seed (yarn mock) gera avaliações com nota
+```
+
+**GP-017 - Envio de e-mail transacional (backend)** | M | BE | Dep.: nenhuma
+Como sistema, quero enviar e-mails transacionais (inicialmente o código de recuperação de senha), para permitir o fluxo de D1. Provedor é decisão técnica do Dev; credenciais só via `.env`/secrets.
+```gherkin
+Dado o provedor configurado por variáveis de ambiente
+Quando o sistema solicita o envio de um e-mail
+Então o e-mail é enviado com remetente do GoPicos e texto em pt-BR
+Dado ambiente local/teste sem provedor configurado
+Então o envio é simulado (registrado sem dados sensíveis) e não quebra o fluxo
 ```
 
 ---
@@ -183,6 +194,10 @@ Então recebo token, exp, id, name e email
 Dado e-mail inexistente ou senha errada
 Quando faço login
 Então recebo a MESMA mensagem INVALID_CREDENTIALS (não revelar qual campo falhou)
+Dado uma conta desativada (GP-073) e senha correta
+Quando faço login
+Então a conta é reativada, recebo o token normalmente
+E meus picos e avaliações voltam a exibir meu nome
 ```
 
 **GP-022 - Login mobile completo** | M | MOB | Dep.: GP-021, merge `feature/mobile-home-map`
@@ -253,6 +268,40 @@ Então sou redirecionado ao login e, após logar, volto à rota pretendida
 Quando clico em Sair
 Então a sessão é encerrada e vou ao login
 ```
+
+**GP-029 - Recuperar senha (backend)** | M | BE | Dep.: GP-017, GP-016, D1
+Como usuário que esqueceu a senha, quero receber um código por e-mail e definir uma nova senha, para voltar a acessar o app. Código numérico de 6 dígitos (funciona igual no mobile e na web, sem deep link), válido por 15 minutos e de uso único.
+```gherkin
+Cenário: solicitar código
+  Quando informo um e-mail
+  Então recebo SEMPRE a mesma resposta de sucesso, exista ou não a conta (não revelar e-mails cadastrados)
+  E, se a conta existe, um código é enviado e códigos anteriores deixam de valer
+Cenário: redefinir senha
+  Dado um código válido e uma nova senha com ao menos 8 caracteres
+  Quando redefino a senha
+  Então a nova senha é gravada com hash e o código é invalidado
+Cenário: código inválido, expirado ou já usado
+  Então recebo INVALID_RESET_CODE e nada muda
+Cenário: força bruta
+  Dado 5 tentativas erradas para o mesmo código
+  Então o código é invalidado e é preciso solicitar outro
+Cenário: conta desativada
+  Quando redefino a senha de uma conta desativada
+  Então a senha é alterada e a conta é reativada no próximo login (GP-021)
+```
+
+**GP-098 - Recuperar senha (mobile e web)** | M | WEB, MOB | Dep.: GP-029, GP-022, GP-026
+Link "Esqueci minha senha" no Login, tela para informar o e-mail e tela para código + nova senha + confirmação.
+```gherkin
+Quando informo meu e-mail e confirmo
+Então vejo "Se o e-mail estiver cadastrado, enviamos um código" e vou à tela do código
+Quando informo código válido, nova senha e confirmação iguais
+Então vejo confirmação e volto ao Login com o e-mail preenchido
+Quando o código é inválido ou expirou
+Então vejo o erro no campo e a opção "Reenviar código"
+E loading, erro de rede e botão desabilitado durante o envio são tratados
+```
+Nota: ID fora da faixa do épico porque os IDs são estáveis e a faixa E3 estava cheia.
 
 ---
 
@@ -540,14 +589,18 @@ Dado senha atual incorreta
 Então recebo INVALID_CREDENTIALS e nada muda
 ```
 
-**GP-073 - Excluir conta (backend)** | M | BE | Dep.: GP-070, D4
-Regra recomendada: ao excluir a conta, as avaliações do usuário são removidas; os picos são mantidos e passam a exibir autor "Usuário removido".
+**GP-073 - Excluir (desativar) conta (backend)** | M | BE | Dep.: GP-070, GP-016, D4
+Regra (D4): "Excluir conta" **nunca apaga o usuário do banco**, apenas o desativa. Picos e avaliações são mantidos e exibem o autor como "Usuário Desativado"; as avaliações continuam contando na média. A conta é reativada se o usuário fizer login de novo (GP-021).
 ```gherkin
 Dado que tenho picos e avaliações
 Quando excluo minha conta informando a senha
-Então o usuário é removido, minhas avaliações são excluídas e as médias recalculadas
-E meus picos permanecem sem vínculo com meus dados pessoais
-E o token deixa de ser válido
+Então o usuário é marcado como desativado (nenhum registro é apagado)
+E meus picos e avaliações continuam visíveis com autor "Usuário Desativado"
+E as médias dos picos não mudam
+E meu nome e e-mail não aparecem em nenhuma resposta da API para outros usuários
+E o token atual deixa de ser válido (UNAUTHENTICATED)
+Dado senha incorreta
+Então recebo INVALID_CREDENTIALS e nada muda
 ```
 
 **GP-074 - Ver e editar perfil (mobile)** | M | MOB | Dep.: GP-071, GP-024
@@ -574,7 +627,7 @@ Então vejo erro no campo antes de enviar
 **GP-077 - Excluir conta (mobile)** | M | MOB | Dep.: GP-073, GP-074
 ```gherkin
 Quando toco em "Excluir conta"
-Então vejo aviso claro do que será apagado e peço a senha
+Então vejo aviso claro do que acontece (perfil desativado, picos e avaliações ficam como "Usuário Desativado", reativação ao entrar de novo) e peço a senha
 E ao confirmar a sessão encerra e volto ao Login
 ```
 
@@ -598,7 +651,7 @@ Então vejo estado vazio com atalho para cadastrar
 ## E7 - Qualidade e entrega
 
 **GP-090 - Testes de integração do backend para fluxos do MVP** | M | BE | Dep.: GP-013
-Cobrir auth, CRUD de picos (inclusive permissão FORBIDDEN), avaliações (duplicada, nota inválida) e perfil (inclusive exclusão de conta).
+Cobrir auth (inclusive recuperação de senha e reativação no login), CRUD de picos (inclusive permissão FORBIDDEN), avaliações (duplicada, nota inválida) e perfil (inclusive desativação de conta).
 ```gherkin
 Quando rodo a suíte
 Então todos os cenários de aceite de backend dos épicos E3 a E6 estão cobertos e passam
@@ -625,19 +678,21 @@ Então o APK é gerado e o dono consegue instalar e executar o fluxo MVP
 **GP-094 - Testes de web (sagas/hooks) dos fluxos novos** | S | WEB | Dep.: GP-014
 
 **GP-095 - Moderação, denúncia e picos duplicados** | W | todos | Pós-MVP.
-**GP-096 - Recuperação de senha e verificação de e-mail** | W | todos | Pós-MVP.
+**GP-096 - Verificação de e-mail** | W | todos | Pós-MVP. (Recuperação de senha entrou no MVP: GP-029 e GP-098.)
 **GP-097 - Internacionalização (en/es)** | W | WEB, MOB | Pós-MVP.
 
 ---
 
-## Decisões pendentes do dono
+## Decisões do dono
 
-| # | Decisão | Recomendação do PO |
+Decididas em 2026-10-22. D1 e D4 foram alteradas pelo dono; as demais seguem a recomendação do PO.
+
+| # | Decisão | Decisão final |
 |---|---|---|
-| D1 | Recuperação de senha e verificação de e-mail no MVP? | Fora do MVP (GP-096). Aceitar o risco de contas com e-mail digitado errado. |
+| D1 | Recuperação de senha e verificação de e-mail no MVP? | **Recuperação de senha entra no MVP** (GP-017, GP-029, GP-098), por código de 6 dígitos enviado por e-mail. Verificação de e-mail continua fora (GP-096). |
 | D2 | Regra de avaliação: uma por usuário por pico? | Sim, uma por usuário por pico, editável/excluível. Fora do MVP: respostas e curtidas. |
 | D3 | Comentário obrigatório? Manter campo `title`? | Estrelas obrigatórias; comentário opcional (até 500 caracteres); remover `title`. Respostas (`parentId`) ficam fora do MVP. |
-| D4 | O que acontece com picos e avaliações ao excluir a conta? | Avaliações removidas; picos preservados com autor "Usuário removido" (valor comunitário). Exige `authorId` anulável ou usuário "removido" (decisão técnica do Dev). |
+| D4 | O que acontece com picos e avaliações ao excluir a conta? | **"Excluir conta" nunca apaga o usuário do banco, só desativa.** Picos e avaliações continuam visíveis com autor "Usuário Desativado" e as avaliações seguem contando na média. Login com a senha correta reativa a conta. |
 | D5 | O autor do pico pode avaliar o próprio pico? | Não, para manter a nota confiável. |
 | D6 | `Spot.modality` é texto livre. Lista fechada? | Lista fechada (ex.: street, park, bowl/pool, vertical, downhill, mista). O dono/UX confirma a lista. |
 | D7 | Perfil: editar e-mail e avatar? | MVP edita só o nome; e-mail imutável (é o login); avatar é Could (GP-080). O `nickname` do input de signup será removido (não existe no modelo). |
@@ -649,4 +704,4 @@ Então o APK é gerado e o dono consegue instalar e executar o fluxo MVP
 | D13 | Qualquer usuário pode editar fotos/dados de qualquer pico (wiki) ou só o autor? | Só o autor (regra atual do time). Colaboração aberta e moderação ficam pós-MVP. |
 
 ## Resumo de priorização
-Total: 69 histórias - Must 49, Should 14, Could 2, Won't 4 (atualizar ao alterar o backlog).
+Total: 72 histórias - Must 52, Should 14, Could 2, Won't 4 (atualizar ao alterar o backlog).
