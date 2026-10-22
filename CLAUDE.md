@@ -26,7 +26,7 @@ Banco local: `docker-compose up database` na raiz (Postgres, credenciais em `.en
 
 - Tarefas no **GitHub Projects** (repo `AndreiAmr/gopicos`). Cada tarefa = uma issue.
 - **Uma branch por tarefa a partir de `main`**: `feature/<issue>-<slug>`, `fix/<issue>-<slug>`, `chore/<slug>`.
-- Dev commita e faz push sozinho, abre PR para `main` referenciando a issue (`Closes #N`). QA revisa e aprova ou devolve.
+- Dev commita e faz push sozinho, abre PR para `main` referenciando a issue (`Closes #N`). QA revisa e aprova ou devolve. Como todos os agentes usam a conta do dono, o GitHub não aceita approve/request-changes: o parecer do QA é um comentário de review começando por `QA: APROVADO` ou `QA: MUDANÇAS NECESSÁRIAS`, e vale como aprovação oficial.
 - **`development` é exclusiva para gerar APK** de teste em dispositivo físico (workflow `mobile-qa-build.yml`). Nunca abrir PR de feature para ela; só o orquestrador faz merge de `main` → `development` quando houver entrega para o dono testar.
 - Commits no padrão Conventional Commits, em português: `feat(mobile): ...`, `fix(backend): ...`.
 - Nunca commitar `.env`, segredos ou `console.log` de debug.
@@ -41,7 +41,7 @@ Banco local: `docker-compose up database` na raiz (Postgres, credenciais em `.en
 
 ## Estratégia de testes
 - **Backend:** testes de integração dos resolvers/serviços com Jest contra o Postgres local (seed via `yarn mock`).
-- **Web/Mobile:** testes unitários de hooks, sagas e lógica com Jest.
+- **Web/Mobile:** testes unitários de hooks, sagas e lógica — **web com Vitest** (reaproveita o `vite.config.ts`), **mobile com Jest** (preset RN). Exemplos de referência e helper `runSaga` em `*/src/test-utils/`.
 - **E2E mobile:** fluxos críticos (login, cadastro, criar/editar pico, avaliar) com Maestro no iOS simulator.
 - Validação manual pelo QA no simulador/browser contra os critérios de aceite.
 
