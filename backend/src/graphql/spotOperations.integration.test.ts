@@ -59,20 +59,17 @@ describe('proteção das operações de pico (integração)', () => {
     expect(saved.spotId).toBe(spot.id);
   });
 
-  it('getSpotById expõe o autor da avaliação com nome completo e separado', async () => {
+  it('getSpotById expõe o autor do pico com nome completo e separado', async () => {
     const user = await createUser({ firstName: 'Tony', lastName: 'Hawk' });
-    const spot = await createSpot();
-    await prisma.spotReview.create({
-      data: { rating: 4, description: 'ok', authorId: user.id, spotId: spot.id },
-    });
+    const spot = await createSpot({ authorId: user.id });
 
     const res = await executeAuthenticated(
       tokenFor(user),
-      `query { getSpotById(id: "${spot.id}") { reviews { author { name firstName lastName } } } }`,
+      `query { getSpotById(id: "${spot.id}") { author { name firstName lastName } } }`,
     );
 
     expect(res.errors).toBeUndefined();
-    expect(res.data.getSpotById.reviews[0].author).toEqual({
+    expect(res.data.getSpotById.author).toEqual({
       name: 'Tony Hawk',
       firstName: 'Tony',
       lastName: 'Hawk',

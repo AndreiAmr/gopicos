@@ -18,5 +18,5 @@ export const resolvers = {
     ...signupResolvers.Mutation,
     ...spotResolvers.Mutation,
   },
-  Author: spotDetailsResolver.Author,
+  SpotAuthor: spotDetailsResolver.SpotAuthor,
 };
