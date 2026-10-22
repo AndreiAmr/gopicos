@@ -3,6 +3,7 @@ export type AppErrorType =
   | 'INVALID_CREDENTIALS'
   | 'USER_NOT_FOUND'
   | 'UNAUTHORIZED'
+  | 'UNAUTHENTICATED'
   | 'INTERNAL_ERROR';
 
 type AppErrorProps = {

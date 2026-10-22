@@ -4,15 +4,11 @@ import { mergedTypeDefs } from './typeDefs';
 import { resolvers } from './resolvers';
 import { makeExecutableSchema } from 'graphql-tools';
 import { authDirectiveTransformer } from './directives/authenticationDirective';
-import { getTokenData } from '../utils/jwt';
+import { buildContext } from './context';
 import express from 'express';
 import bodyParser from 'body-parser';
 import { expressMiddleware } from '@as-integrations/express4';
 import cors from 'cors';
-import {
-  AuthenticationModel,
-  IAuthentication,
-} from '../models/authentication/authenticationModel';
 import { AppError } from '../utils/AppError';
 
 async function startServer() {
@@ -41,12 +37,14 @@ async function startServer() {
       const originalError = error?.originalError;
 
       if (originalError instanceof AppError) {
-        console.log('🚀 ~ formatError ~ originalError:', originalError);
-
         return {
           message: originalError.message,
           type: originalError.type,
           statusCode: originalError.statusCode,
+          extensions: {
+            type: originalError.type,
+            statusCode: originalError.statusCode,
+          },
         };
       }
 
@@ -82,21 +80,8 @@ async function startServer() {
   app.use(
     '/graphql',
     expressMiddleware(server, {
-      context: async (props) => {
-        const token = props.req.headers['authorization'];
-
-        if (!token) return {};
-
-        const [_, tokenValue] = token.split(' ');
-
-        const data = getTokenData(tokenValue);
-
-        if (!data) return {};
-
-        return {
-          auth: new AuthenticationModel(data as IAuthentication),
-        };
-      },
+      context: async (props) =>
+        buildContext(props.req.headers['authorization']),
     }),
   );
 
