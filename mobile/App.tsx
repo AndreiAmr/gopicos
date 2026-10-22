@@ -4,6 +4,7 @@ import { TamaguiProvider } from 'tamagui';
 import { ThemeProvider } from 'styled-components/native';
 import { theme } from './src/constants/theme';
 import { Navigation } from './src/routes';
+import { navigationRef } from './src/routes/navigationRef';
 import { ApolloClientProvider } from './src/providers/ApolloClient';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
@@ -32,7 +33,7 @@ function App() {
             <BottomSheetModalProvider>
               <ToastProvider>
                 <ApolloClientProvider>
-                  <Navigation />
+                  <Navigation ref={navigationRef} />
                 </ApolloClientProvider>
               </ToastProvider>
             </BottomSheetModalProvider>

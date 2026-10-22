@@ -11,3 +11,8 @@ export type RootStackParamList = {
   Home: undefined;
   SpotDetails: { id: string };
 };
+
+export type ProfileStackParamList = {
+  ProfileHome: undefined;
+  ProfileEdit: undefined;
+};
