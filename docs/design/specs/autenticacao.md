@@ -2,7 +2,7 @@
 
 Issues: #24 (GP-022 login mobile), #25 (GP-023 cadastro mobile), #28 (GP-026 login web), #29 (GP-027 cadastro web), #32 (GP-098 recuperar senha, mobile e web), #90 (GP-099 termos de uso e política de privacidade).
 Nomenclatura: as decisões desta spec são **UX-1 a UX-19** (seção 10), para não colidir com as decisões D1 a D13 do backlog do PO. Referências a "D" do backlog dizem "do backlog".
-Base: `docs/design/design-system.md` **na versão 2.0** (PR #100: paleta laranja, neutros frios, raios menores e camada de expressão de marca de rua/skate; **esta spec depende de o PR #100 entrar em `main` antes**) (tokens, componentes e regras). Esta spec **não define cor, fonte, espaço ou raio novos**: só usa tokens do DS.
+Base: `docs/design/design-system.md` **na versão 2.0** (PR #100: paleta laranja, neutros frios, raios menores e camada de expressão de marca de rua/skate; **o PR #100 entra em `main` antes deste (#89)**) (tokens, componentes e regras). Esta spec **não define cor, fonte, espaço ou raio novos**: só usa tokens do DS.
 Figma: ver seção 13.
 
 Regras de negócio que moldam as telas (backlog do PO, decisões D1, D4 e D8 do backlog):
@@ -222,7 +222,10 @@ Texto: "Li e aceito os [Termos de uso] e a [Política de privacidade]." Fica dep
 | **Enviando** | Botão "Criar conta" em `loading` (largura mantida), campos e checkbox somente leitura, "Voltar" e links desativados, anúncio "Criando sua conta". Impede cadastro duplicado. |
 | **Sucesso** | Conta criada, **sem login** (UX-15): navega ao Login com `replace`, e-mail preenchido, foco na senha e `AlertBanner` success "Conta criada! Entre com seu e-mail e senha." Nada do cadastro (inclusive senha) permanece em memória. |
 | **`EMAIL_ALREADY_EXISTS`** (só chega no envio final) | **Volta ao passo 2** (`replace` do passo, Stepper "Passo 2 de 3"), com o erro **no campo E-mail**: "Este e-mail já tem cadastro." + `TextLink` "Entrar" (leva ao Login com o e-mail preenchido); foco no campo E-mail e anúncio ao leitor de tela ("Voltamos ao passo 2: este e-mail já tem cadastro."). Confirmação de e-mail, nome, senha e aceite **preservados**; ao trocar o e-mail, a confirmação precisa coincidir de novo antes de continuar. |
-| `VALIDATION_ERROR` com campo indicado | Regra geral: a tela **leva ao passo do campo** (`firstName`/`lastName` -> 1; `email` -> 2; `password`/aceite -> 3) com a mensagem do cliente equivalente no campo. |
+| `VALIDATION_ERROR` com campo indicado | A tela **leva ao passo do campo** (`firstName`/`lastName` -> 1; `email` -> 2; `password`/`acceptedTerms` -> 3) e mostra a mensagem **do servidor** no campo (ver abaixo). Hoje o backend devolve `field: 'name'` (campo único); o mapeamento `firstName`/`lastName` -> passo 1 só vale depois da issue #97. Até lá, `name` leva ao passo 1 e a mensagem aparece no campo Nome. O aceite dos termos usa o campo `acceptedTerms` (passo 3). |
+| `VALIDATION_ERROR` **sem `field`** (ou com campo desconhecido) | **Fallback:** `AlertBanner` de erro no **passo atual**, acima do botão, com a mensagem do servidor; sem mudar de passo, dados preservados. |
+
+**Qual mensagem vale:** se o servidor rejeita algo que o cliente já tinha validado (regra diferente entre as duas pontas), vale a **mensagem do servidor**, que é a fonte de verdade; a validação do cliente existe só para poupar a ida à rede.
 | **Erro de rede / servidor** | `AlertBanner` (3.2) acima do botão no passo 3 com "Tentar novamente"; permanece no passo 3; dados preservados. |
 
 ### 5.5 Layout
@@ -303,7 +306,7 @@ Texto: "Li e aceito os [Termos de uso] e a [Política de privacidade]." Fica dep
 |---|---|---|---|
 | Código | "Código de 6 dígitos" | `inputMode="numeric"` / `keyboardType="number-pad"`, `autoComplete="one-time-code"`, iOS `textContentType="oneTimeCode"`, `maxLength` 6, `autoCapitalize="none"`; fonte `h2` com `letter-spacing` positivo (4 px) e `tabular-nums`, alinhado à esquerda; aceita colar com espaços/traço (remove tudo que não for dígito) | vazio ou menos de 6 dígitos: "Digite os 6 dígitos do código." |
 | Nova senha | "Nova senha" | `autoComplete="new-password"`, `textContentType="newPassword"` | vazio: "Crie uma nova senha."; menos de 8: "A senha precisa ter ao menos 8 caracteres." |
-| Confirmar nova senha | "Confirmar nova senha" | `autoComplete="new-password"` | diferente: "As senhas não são iguais." (valida no blur do campo e revalida quando a nova senha muda) |
+| Confirmar nova senha | "Confirmar nova senha" | `autoComplete="new-password"` | diferente: **"As senhas não coincidem."** (valida no blur do campo e revalida quando a nova senha muda) |
 
 Quando o código chega pelo SMS/e-mail e o sistema oferece o preenchimento automático (iOS sugere código na barra do teclado), ele preenche o campo único sem esforço: motivo da decisão UX-5.
 
@@ -383,7 +386,7 @@ Mesmo em web e mobile: nomes de componentes, microcopy, regras de validação, o
 - Todos os campos com rótulo associado (`<label for>` / `accessibilityLabel`); placeholders não carregam informação essencial.
 - Erros: ícone + texto + `aria-invalid`; anunciados ao enviar (`role="alert"` / `AccessibilityInfo.announceForAccessibility`).
 - Alvos de toque >= 48 (inclusive o olho de mostrar senha e os `TextLink`).
-- Contrastes (já verificados no DS): texto de erro `error`/`surface` 6,68 claro e 7,60 escuro; `primary-text` sobre `bg` 6,80 / 9,59; borda de campo `border` >= 3:1.
+- Contrastes (já verificados no DS): texto de erro `error` (escuro) sobre `surface` 7,57; `primary-text` sobre `bg` 5,43 no claro e 11,22 no escuro (valores do DS v2.0); borda de campo `border` >= 3:1.
 - O Login não distingue "e-mail inexistente" de "senha errada" nem visual nem semanticamente (nem em `aria-invalid`).
 - Toda funcionalidade por teclado na web; sem armadilhas de foco.
 - Nunca bloquear colar nos campos de senha ou do código.
