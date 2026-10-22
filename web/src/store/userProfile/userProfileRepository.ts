@@ -1,7 +1,15 @@
 import { apolloClient } from '@/config/apollo-client';
 
-import { meQuery, updateProfileMutation } from './userProfileQueries';
-import { IUpdateProfileInput, IUserProfile } from './userProfileTypes';
+import {
+  changePasswordMutation,
+  meQuery,
+  updateProfileMutation,
+} from './userProfileQueries';
+import {
+  IChangePasswordInput,
+  IUpdateProfileInput,
+  IUserProfile,
+} from './userProfileTypes';
 
 const getMe = async (): Promise<IUserProfile> => {
   const { data } = await apolloClient.query<{ me: IUserProfile | null }>({
@@ -29,7 +37,15 @@ const updateProfile = async (
   return data.updateProfile;
 };
 
+const changePassword = async (props: IChangePasswordInput): Promise<void> => {
+  await apolloClient.mutate({
+    mutation: changePasswordMutation,
+    variables: { props },
+  });
+};
+
 export const userProfileRepository = {
+  changePassword,
   getMe,
   updateProfile,
 };
