@@ -1,16 +1,14 @@
 import { mapSchema, MapperKind, getDirective } from '@graphql-tools/utils';
-import { ApolloError } from 'apollo-server-errors';
 import {
   GraphQLSchema,
   GraphQLFieldConfig,
   GraphQLFieldResolver,
   defaultFieldResolver,
 } from 'graphql';
-import { IAuthentication } from '../../models/authentication/authenticationModel';
+import { AppError } from '../../utils/AppError';
+import { ContextType } from '../context';
 
-export type ContextType = {
-  auth: IAuthentication;
-};
+export type { ContextType };
 
 export function authDirectiveTransformer(schema: GraphQLSchema): GraphQLSchema {
   return mapSchema(schema, {
@@ -24,18 +22,12 @@ export function authDirectiveTransformer(schema: GraphQLSchema): GraphQLSchema {
           fieldConfig.resolve ?? defaultFieldResolver;
 
         fieldConfig.resolve = async (parent, args, context, info) => {
-          console.log(
-            // '🚀 ~ authDirectiveTransformer ~ context.auth:',
-            context.auth,
-          );
           if (!context.auth) {
-            throw new ApolloError(
-              'Usuário não autenticado',
-              'UNAUTHENTICATED',
-              {
-                statusCode: 401,
-              },
-            );
+            throw new AppError({
+              type: 'UNAUTHENTICATED',
+              message: 'Usuário não autenticado. Faça login para continuar.',
+              statusCode: 401,
+            });
           }
           return originalResolve(parent, args, context, info);
         };
