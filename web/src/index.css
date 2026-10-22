@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @tailwind utilities;
 @import 'tailwindcss';
@@ -11,44 +12,45 @@
  * O modo escuro usa a classe .dark no <html>, aplicada pelo next-themes seguindo o sistema.
  */
 :root {
-  --gp-bg: #f6f5f2;
+  --gp-bg: #f0f3f5;
   --gp-surface: #ffffff;
-  --gp-sunken: #eceae5;
-  --gp-text: #17171a;
-  --gp-text-muted: #585861;
-  --gp-text-subtle: #64646e;
-  --gp-border: #8a8a93;
-  --gp-divider: #dedcd6;
-  --gp-primary: #b93c08;
-  --gp-primary-hover: #9a3206;
-  --gp-on-primary: #ffffff;
-  --gp-primary-soft: #fde8dc;
-  --gp-primary-text: #9a3206;
+  --gp-sunken: #e3e8ec;
+  --gp-text: #18181b;
+  --gp-text-muted: #565757;
+  --gp-text-subtle: #5c646a;
+  --gp-border: #7d858c;
+  --gp-divider: #d5dbe0;
+  --gp-primary: #f97316;
+  --gp-primary-hover: #ea580c;
+  --gp-on-primary: #18181b;
+  --gp-primary-soft: #ffedd5;
+  --gp-primary-text: #a84300;
   --gp-star: #c77700;
   --gp-success: #146c35;
   --gp-error: #b3201f;
   --gp-warning: #8f5200;
   --gp-info: #1d4ed8;
   --gp-focus: #1d4ed8;
-  --gp-shadow-1: 0 1px 2px rgb(23 23 26 / 0.1);
-  --gp-shadow-2: 0 4px 12px rgb(23 23 26 / 0.14);
-  --gp-shadow-3: 0 12px 32px rgb(23 23 26 / 0.22);
+  --gp-brand-yellow: #facc15;
+  --gp-shadow-1: 0 1px 2px rgb(24 24 27 / 0.1);
+  --gp-shadow-2: 0 4px 12px rgb(24 24 27 / 0.14);
+  --gp-shadow-3: 0 12px 32px rgb(24 24 27 / 0.22);
 }
 
 .dark {
-  --gp-bg: #0f0f11;
-  --gp-surface: #1a1a1e;
-  --gp-sunken: #09090a;
-  --gp-text: #f5f5f6;
-  --gp-text-muted: #b0b0b9;
-  --gp-text-subtle: #9a9aa4;
-  --gp-border: #82828c;
-  --gp-divider: #2e2e34;
-  --gp-primary: #ff8a4c;
-  --gp-primary-hover: #ffa070;
+  --gp-bg: #0f1113;
+  --gp-surface: #181b1f;
+  --gp-sunken: #0a0b0d;
+  --gp-text: #f5f6f7;
+  --gp-text-muted: #b2b8be;
+  --gp-text-subtle: #9aa1a8;
+  --gp-border: #838b93;
+  --gp-divider: #2c3138;
+  --gp-primary: #fb923c;
+  --gp-primary-hover: #fdba74;
   --gp-on-primary: #1a0b02;
-  --gp-primary-soft: #3a1d0c;
-  --gp-primary-text: #ffa070;
+  --gp-primary-soft: #3a2008;
+  --gp-primary-text: #fdba74;
   --gp-star: #fbbf24;
   --gp-success: #4ade80;
   --gp-error: #ff8a80;
@@ -79,7 +81,7 @@
   --border: var(--gp-divider);
   --input: var(--gp-border);
   --ring: var(--gp-focus);
-  --radius: 10px;
+  --radius: 6px;
 
   /* Sidebar (shadcn) apontando para os mesmos tokens */
   --sidebar: var(--gp-surface);
@@ -150,10 +152,12 @@
   --color-gp-focus: var(--gp-focus);
 
   --font-sans: 'Inter', system-ui, sans-serif;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  --font-display: 'Permanent Marker', 'Inter', system-ui, sans-serif;
+  --color-gp-brand-yellow: var(--gp-brand-yellow);
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 12px;
+  --radius-xl: 20px;
   --shadow-1: var(--gp-shadow-1);
   --shadow-2: var(--gp-shadow-2);
   --shadow-3: var(--gp-shadow-3);

@@ -9,7 +9,7 @@ import {
 } from './signInTypes';
 
 const INITIAL_STATE: ISignInState = {
-  signIn: { isLoading: false, isError: false },
+  signIn: { isLoading: false, error: null },
 };
 
 const setIsLoadingSignIn: ISignInReducer = (
@@ -20,16 +20,16 @@ const setIsLoadingSignIn: ISignInReducer = (
     draft.signIn.isLoading = payload?.isLoading || false;
   });
 
-const setIsErrorSignIn: ISignInReducer = (
+const setErrorSignIn: ISignInReducer = (
   state: ISignInState,
   payload?: ISignInPayload
 ) =>
   produce(state, (draft) => {
-    draft.signIn.isError = payload?.isError || false;
+    draft.signIn.error = payload?.error ?? null;
   });
 
 const signInReducerMap = new Map<SignInActionTypes, ISignInReducer>([
-  [SignInActionTypes.SET_IS_ERROR_SIGN_IN, setIsErrorSignIn],
+  [SignInActionTypes.SET_ERROR_SIGN_IN, setErrorSignIn],
   [SignInActionTypes.SET_IS_LOADING_SIGN_IN, setIsLoadingSignIn],
 ]);
 

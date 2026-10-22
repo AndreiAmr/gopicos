@@ -8,10 +8,12 @@ export enum ProfileActionTypes {
 export interface IProfile {
   token: string;
   exp: number;
-  createdAt: number;
+  createdAt?: number;
   name: string;
   email: string;
   id: string;
+  /** true só quando o login reativou uma conta desativada. */
+  reactivated?: boolean | null;
 }
 
 export interface IProfileModule {

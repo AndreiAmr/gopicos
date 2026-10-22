@@ -1,17 +1,24 @@
-import { getCookie } from '@/utils/cookies';
+import { getToken } from '@/utils/session';
 import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client';
-
-const token = getCookie('token');
+import { setContext } from '@apollo/client/link/context';
 
 const httpLink = new HttpLink({
   uri: 'http://localhost:4000/graphql',
-  headers: {
-    Authorization: token ? `Bearer ${token}` : '',
-  },
+});
+
+// Lê o token a cada requisição: o login acontece depois de o client ser criado.
+const authLink = setContext((_, { headers }) => {
+  const token = getToken();
+  return {
+    headers: {
+      ...headers,
+      Authorization: token ? `Bearer ${token}` : '',
+    },
+  };
 });
 
 const apolloClient = new ApolloClient({
-  link: httpLink,
+  link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
 });
 
