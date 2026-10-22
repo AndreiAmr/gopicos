@@ -1,0 +1,11 @@
+type Profile {
+  id: String!
+  name: String!
+  email: String!
+  createdAt: String!
+}
+
+extend type Query {
+  me: Profile @Authenticated
+  getProfile: Profile @Authenticated
+}
