@@ -1,5 +1,5 @@
 import { RefreshControl, ScrollView } from 'react-native';
-import { Lock, LogOut, Pencil } from 'lucide-react-native';
+import { Lock, LogOut, Pencil, Trash2 } from 'lucide-react-native';
 import { View, useTheme } from 'tamagui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
@@ -48,6 +48,7 @@ export const ProfileTemplate = () => {
     refresh,
     goToEdit,
     goToPassword,
+    goToDelete,
     confirmLogout,
   } = useProfileHome();
 
@@ -144,6 +145,20 @@ export const ProfileTemplate = () => {
             testID="profile-logout-row"
           />
         </SettingsGroup>
+
+        {/* Ação destrutiva: última linha, afastada do resto (UX-P16). */}
+        <View marginTop={space[4]}>
+          <SettingsGroup>
+            <SettingsRow
+              icon={Trash2}
+              label={profileStrings.deleteRow}
+              onPress={goToDelete}
+              destructive
+              isLast
+              testID="profile-delete-row"
+            />
+          </SettingsGroup>
+        </View>
       </ScrollView>
     </View>
   );
