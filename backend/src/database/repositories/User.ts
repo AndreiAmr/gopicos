@@ -69,6 +69,14 @@ export class UserRepository implements IUserRepository {
     return !!user && user.deactivatedAt === null;
   }
 
+  /** Desativa a conta (D4): nada é apagado; o token deixa de valer via isActive. */
+  async deactivate(prop: WithIdProp): Promise<void> {
+    await prisma.user.update({
+      where: { id: prop.id },
+      data: { deactivatedAt: new Date() },
+    });
+  }
+
   /** Reativa uma conta desativada (login após GP-073). */
   async reactivate(prop: WithIdProp): Promise<void> {
     await prisma.user.update({
