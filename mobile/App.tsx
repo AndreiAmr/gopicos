@@ -1,5 +1,5 @@
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { createTamagui, TamaguiProvider, View } from 'tamagui';
+import { TamaguiProvider } from 'tamagui';
 
 import { ThemeProvider } from 'styled-components/native';
 import { theme } from './src/constants/theme';
@@ -7,9 +7,9 @@ import { Navigation } from './src/routes';
 import { ApolloClientProvider } from './src/providers/ApolloClient';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { StyleSheet } from 'react-native';
-import { defaultConfig } from '@tamagui/config/v5';
+import { StyleSheet, useColorScheme } from 'react-native';
 import { config } from './src/config/tamagui/tamagui.config';
+import { ToastProvider } from './src/atomic/ds';
 
 const styles = StyleSheet.create({
   root: {
@@ -17,18 +17,24 @@ const styles = StyleSheet.create({
   },
 });
 
-const tamaguiConfig = createTamagui(config);
-
 function App() {
+  // Tema claro/escuro segue o sistema (DS decisão D1).
+  const colorScheme = useColorScheme();
+
   return (
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
-        <TamaguiProvider config={tamaguiConfig} defaultTheme="light">
+        <TamaguiProvider
+          config={config}
+          defaultTheme={colorScheme === 'dark' ? 'dark' : 'light'}
+        >
           <ThemeProvider theme={theme}>
             <BottomSheetModalProvider>
-              <ApolloClientProvider>
-                <Navigation />
-              </ApolloClientProvider>
+              <ToastProvider>
+                <ApolloClientProvider>
+                  <Navigation />
+                </ApolloClientProvider>
+              </ToastProvider>
             </BottomSheetModalProvider>
           </ThemeProvider>
         </TamaguiProvider>
