@@ -32,7 +32,7 @@ Tema com dois modos: **claro** e **escuro**, seguindo o sistema operacional por 
 | `sunken` | `#ECEAE5` | `#09090A` | áreas rebaixadas, skeleton, chips inativos |
 | `text` | `#17171A` | `#F5F5F6` | texto principal |
 | `text-muted` | `#585861` | `#B0B0B9` | texto secundário, descrições |
-| `text-subtle` | `#6B6B75` | `#9A9AA4` | placeholder, metadados (ainda AA) |
+| `text-subtle` | `#64646E` | `#9A9AA4` | placeholder, metadados (ainda AA) |
 | `border` | `#8A8A93` | `#82828C` | borda de input/controle (>= 3:1) |
 | `divider` | `#DEDCD6` | `#2E2E34` | linhas decorativas (não é controle) |
 | `primary` | `#B93C08` | `#FF8A4C` | botão primário, link, seleção |
@@ -47,7 +47,7 @@ Tema com dois modos: **claro** e **escuro**, seguindo o sistema operacional por 
 | `info` | `#1D4ED8` | `#7FA8FF` | informação |
 | `focus` | `#1D4ED8` | `#7FA8FF` | anel de foco (teclado/leitor de tela) |
 
-Cor fixa para o mapa/camadas (iguais nos dois modos): `spot-fill` = `#B93C08` a 25% de opacidade e `spot-stroke` = `#B93C08` (polígono de pico); `spot-selected` = `#1D4ED8`. Decisão: o polígono usa o mesmo laranja da marca, e a seleção usa azul para distinguir do estado normal sobre imagem de satélite.
+Cor fixa para o mapa/camadas (iguais nos dois modos): `spot-fill` = `#B93C08` a 25% de opacidade e `spot-stroke` = `#B93C08` (polígono de pico); `spot-selected` = `#1D4ED8`. Decisão: o polígono usa o mesmo laranja da marca e a seleção usa azul; como a diferença de luminância entre os dois é pequena, a seleção também muda a forma: traço de 4 px (normal: 2 px), preenchimento a 40% e halo branco de 2 px por fora do traço. Assim o estado não depende só da cor.
 
 ### Contraste verificado (WCAG AA)
 
@@ -57,7 +57,10 @@ Cor fixa para o mapa/camadas (iguais nos dois modos): `spot-fill` = `#B93C08` a 
 | `text` / `surface` | 17.89 | 15.92 | idem |
 | `text-muted` / `bg` | 6.46 | 8.90 | AA |
 | `text-muted` / `surface` | 7.04 | 8.06 | AA |
-| `text-subtle` / `surface` | 5.27 | 6.22 | AA |
+| `text-subtle` / `surface` | 5.85 | 6.22 | AA |
+| `text-subtle` / `bg` | 5.37 | 6.87 | AA |
+| `text-subtle` / `sunken` | 4.87 | 7.14 | AA |
+| `text-muted` / `sunken` | 5.85 | 9.25 | AA |
 | `on-primary` / `primary` | 5.66 | 8.23 | AA |
 | `on-primary` / `primary-hover` | 7.41 | 9.62 | AA |
 | `primary-text` / `primary-soft` | 6.27 | 7.73 | AA |
@@ -129,46 +132,58 @@ No React Native: iOS usa `shadowColor/Offset/Opacity/Radius`; Android usa `eleva
 O projeto usa Tailwind v4 com `@theme inline` em `web/src/index.css` e shadcn (`new-york`, `cssVariables: true`). Os tokens viram variáveis CSS; os nomes shadcn existentes apontam para os nossos para os componentes do shadcn funcionarem sem alteração.
 
 ```css
-@theme inline` em `web/src/index.css` e shadcn (`new-york`, `cssVariables: true`). Os tokens viram variáveis CSS; os nomes shadcn existentes apontam para os nossos para os componentes do shadcn funcionarem sem alteração.
-
-```css
+/* 1) Valores crus do GoPicos, em namespace próprio (--gp-*) para não colidir com os nomes do shadcn */
 :root {
-  --color-bg: #F6F5F2;  --color-surface: #FFFFFF;  --color-sunken: #ECEAE5;
-  --color-text: #17171A; --color-text-muted: #585861; --color-text-subtle: #6B6B75;
-  --color-border: #8A8A93; --color-divider: #DEDCD6;
-  --color-primary: #B93C08; --color-primary-hover: #9A3206; --color-on-primary: #FFFFFF;
-  --color-primary-soft: #FDE8DC; --color-primary-text: #9A3206;
-  --color-star: #C77700; --color-success: #146C35; --color-error: #B3201F;
-  --color-warning: #8F5200; --color-info: #1D4ED8; --color-focus: #1D4ED8;
-  --shadow-1: 0 1px 2px rgb(23 23 26 / .10);
-  --shadow-2: 0 4px 12px rgb(23 23 26 / .14);
-  --shadow-3: 0 12px 32px rgb(23 23 26 / .22);
+  --gp-bg: #F6F5F2;  --gp-surface: #FFFFFF;  --gp-sunken: #ECEAE5;
+  --gp-text: #17171A; --gp-text-muted: #585861; --gp-text-subtle: #64646E;
+  --gp-border: #8A8A93; --gp-divider: #DEDCD6;
+  --gp-primary: #B93C08; --gp-primary-hover: #9A3206; --gp-on-primary: #FFFFFF;
+  --gp-primary-soft: #FDE8DC; --gp-primary-text: #9A3206;
+  --gp-star: #C77700; --gp-success: #146C35; --gp-error: #B3201F;
+  --gp-warning: #8F5200; --gp-info: #1D4ED8; --gp-focus: #1D4ED8;
+  --gp-shadow-1: 0 1px 2px rgb(23 23 26 / .10);
+  --gp-shadow-2: 0 4px 12px rgb(23 23 26 / .14);
+  --gp-shadow-3: 0 12px 32px rgb(23 23 26 / .22);
 }
-:root.dark, .dark {
-  --color-bg: #0F0F11;  --color-surface: #1A1A1E;  --color-sunken: #09090A;
-  --color-text: #F5F5F6; --color-text-muted: #B0B0B9; --color-text-subtle: #9A9AA4;
-  --color-border: #82828C; --color-divider: #2E2E34;
-  --color-primary: #FF8A4C; --color-primary-hover: #FFA070; --color-on-primary: #1A0B02;
-  --color-primary-soft: #3A1D0C; --color-primary-text: #FFA070;
-  --color-star: #FBBF24; --color-success: #4ADE80; --color-error: #FF8A80;
-  --color-warning: #FBBF24; --color-info: #7FA8FF; --color-focus: #7FA8FF;
-  --shadow-1: 0 0 0 1px rgb(255 255 255 / .06);
-  --shadow-2: 0 0 0 1px rgb(255 255 255 / .08);
-  --shadow-3: 0 0 0 1px rgb(255 255 255 / .10), 0 12px 32px rgb(0 0 0 / .5);
+.dark {
+  --gp-bg: #0F0F11;  --gp-surface: #1A1A1E;  --gp-sunken: #09090A;
+  --gp-text: #F5F5F6; --gp-text-muted: #B0B0B9; --gp-text-subtle: #9A9AA4;
+  --gp-border: #82828C; --gp-divider: #2E2E34;
+  --gp-primary: #FF8A4C; --gp-primary-hover: #FFA070; --gp-on-primary: #1A0B02;
+  --gp-primary-soft: #3A1D0C; --gp-primary-text: #FFA070;
+  --gp-star: #FBBF24; --gp-success: #4ADE80; --gp-error: #FF8A80;
+  --gp-warning: #FBBF24; --gp-info: #7FA8FF; --gp-focus: #7FA8FF;
+  --gp-shadow-1: 0 0 0 1px rgb(255 255 255 / .06);
+  --gp-shadow-2: 0 0 0 1px rgb(255 255 255 / .08);
+  --gp-shadow-3: 0 0 0 1px rgb(255 255 255 / .10), 0 12px 32px rgb(0 0 0 / .5);
 }
 
+/* 2) Ponte: nomes que o shadcn espera apontam para os tokens GoPicos (substitui os valores atuais do index.css) */
+:root {
+  --background: var(--gp-bg);            --foreground: var(--gp-text);
+  --card: var(--gp-surface);             --card-foreground: var(--gp-text);
+  --popover: var(--gp-surface);          --popover-foreground: var(--gp-text);
+  --primary: var(--gp-primary);          --primary-foreground: var(--gp-on-primary);
+  --secondary: var(--gp-sunken);         --secondary-foreground: var(--gp-text);
+  --muted: var(--gp-sunken);             --muted-foreground: var(--gp-text-muted);
+  --accent: var(--gp-sunken);            --accent-foreground: var(--gp-text);
+  --destructive: var(--gp-error);
+  --border: var(--gp-divider);           --input: var(--gp-border);
+  --ring: var(--gp-focus);               --radius: 10px;
+}
+
+/* 3) Utilitários Tailwind v4 (bg-gp-surface, text-gp-text-muted, bg-gp-primary, shadow-2 ...) */
 @theme inline {
-  --color-bg: var(--bg);  /* utilitários: bg-bg, text-text, border-border ... */
-  --color-surface: var(--surface);  --color-sunken: var(--sunken);
-  --color-text: var(--text);  --color-text-muted: var(--text-muted);  --color-text-subtle: var(--text-subtle);
-  --color-border: var(--border);  --color-divider: var(--divider);
-  --color-primary: var(--primary);  --color-primary-hover: var(--primary-hover);  --color-on-primary: var(--on-primary);
-  --color-primary-soft: var(--primary-soft);  --color-primary-text: var(--primary-text);
-  --color-star: var(--star);  --color-success: var(--success);  --color-error: var(--error);
-  --color-warning: var(--warning);  --color-info: var(--info);  --color-focus: var(--focus);
+  --color-gp-bg: var(--gp-bg);  --color-gp-surface: var(--gp-surface);  --color-gp-sunken: var(--gp-sunken);
+  --color-gp-text: var(--gp-text);  --color-gp-text-muted: var(--gp-text-muted);  --color-gp-text-subtle: var(--gp-text-subtle);
+  --color-gp-border: var(--gp-border);  --color-gp-divider: var(--gp-divider);
+  --color-gp-primary: var(--gp-primary);  --color-gp-primary-hover: var(--gp-primary-hover);  --color-gp-on-primary: var(--gp-on-primary);
+  --color-gp-primary-soft: var(--gp-primary-soft);  --color-gp-primary-text: var(--gp-primary-text);
+  --color-gp-star: var(--gp-star);  --color-gp-success: var(--gp-success);  --color-gp-error: var(--gp-error);
+  --color-gp-warning: var(--gp-warning);  --color-gp-info: var(--gp-info);  --color-gp-focus: var(--gp-focus);
   --font-sans: 'Inter', system-ui, sans-serif;
   --radius-sm: 6px; --radius-md: 10px; --radius-lg: 16px; --radius-xl: 24px;
-  --shadow-1: var(--sh-1); --shadow-2: var(--sh-2); --shadow-3: var(--sh-3);
+  --shadow-1: var(--gp-shadow-1); --shadow-2: var(--gp-shadow-2); --shadow-3: var(--gp-shadow-3);
   --text-display: 2rem;  --text-display--line-height: 2.375rem;
   --text-h1: 1.625rem;   --text-h1--line-height: 2rem;
   --text-h2: 1.25rem;    --text-h2--line-height: 1.625rem;
@@ -180,7 +195,7 @@ O projeto usa Tailwind v4 com `@theme inline` em `web/src/index.css` e shadcn (`
 }
 ```
 
-Observação: as variáveis "cruas" (`--bg`, `--primary`...) mudam por modo no `:root`/`.dark`; o `@theme inline` as expõe como utilitários (`bg-bg`, `text-text-muted`, `bg-primary`, `rounded-md`, `shadow-2`). Isso evita variável referenciando a si mesma.
+Observação: os valores crus (`--gp-*`) mudam por modo (`:root` / `.dark`). O bloco de ponte faz o shadcn ler os mesmos valores, então os componentes do shadcn mudam de tema sem alteração. Em telas novas, prefira os utilitários `gp-*` (`bg-gp-surface`, `text-gp-text-muted`); as classes semânticas do shadcn (`bg-primary`, `bg-background`) também funcionam, pois apontam para o mesmo token. O namespace `gp-` evita colisão com `--primary`, `--border` etc. que já existem no `index.css`.
 
 **Ponte com shadcn** (nomes que o shadcn espera):
 
@@ -226,6 +241,8 @@ const light = { bg, surface, sunken, text, textMuted, textSubtle, border, divide
 const dark = { /* mesmos nomes, valores escuros */ };
 export const config = createTamagui({ ...defaultConfig, tokens, themes: { light, dark } });
 ```
+
+Os temas devem referenciar os tokens de cor com `$` (definidos em `createTokens`) em vez de repetir hex, para que haja uma única fonte de valores. Atenção: o `tamagui.config.ts` atual usa `defaultConfig` v5 com `themes` comentado; o Dev deve verificar a API real instalada (Tamagui ^2.5.1) na GP-003 antes de aplicar o esboço acima, que é ilustrativo.
 
 Uso: `color="$text"`, `backgroundColor="$surface"`, `borderColor="$border"`, `padding="$4"`, `borderRadius="$md"`. Dark/claro automático via `useColorScheme` do React Native passado como `defaultTheme`/`<TamaguiProvider>`.
 
