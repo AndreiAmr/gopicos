@@ -1,10 +1,6 @@
-import { describe, it, before } from 'node:test';
-import assert from 'node:assert/strict';
 import jwt from 'jsonwebtoken';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { graphql } from 'graphql';
-
-process.env.JWT_SECRET = 'test-secret';
 
 import { buildContext } from './context';
 import { authDirectiveTransformer } from './directives/authenticationDirective';
@@ -16,53 +12,53 @@ const validToken = () => generateToken({ id: 'user-1', email: 'a@b.com' }).token
 describe('buildContext', () => {
   it('expõe o id do usuário com token válido', async () => {
     const ctx = await buildContext(`Bearer ${validToken()}`);
-    assert.equal(ctx.auth?.id, 'user-1');
+    expect(ctx.auth?.id).toBe('user-1');
   });
 
   it('não autentica sem header', async () => {
-    assert.deepEqual(await buildContext(undefined), {});
+    expect(await buildContext(undefined)).toEqual({});
   });
 
   it('não autentica com token inválido', async () => {
-    assert.deepEqual(await buildContext('Bearer lixo'), {});
+    expect(await buildContext('Bearer lixo')).toEqual({});
   });
 
   it('não autentica com esquema diferente de Bearer', async () => {
-    assert.deepEqual(await buildContext(`Basic ${validToken()}`), {});
+    expect(await buildContext(`Basic ${validToken()}`)).toEqual({});
   });
 
   it('não autentica com token expirado', async () => {
-    const expired = jwt.sign({ id: 'user-1' }, 'test-secret', {
+    const expired = jwt.sign({ id: 'user-1' }, process.env.JWT_SECRET as string, {
       expiresIn: -10,
     });
-    assert.deepEqual(await buildContext(`Bearer ${expired}`), {});
+    expect(await buildContext(`Bearer ${expired}`)).toEqual({});
   });
 
   it('não autentica com token assinado por outro segredo', async () => {
     const forged = jwt.sign({ id: 'user-1' }, 'outro');
-    assert.deepEqual(await buildContext(`Bearer ${forged}`), {});
+    expect(await buildContext(`Bearer ${forged}`)).toEqual({});
   });
 
   it('não autentica token sem id', async () => {
-    const noId = jwt.sign({ email: 'a@b.com' }, 'test-secret');
-    assert.deepEqual(await buildContext(`Bearer ${noId}`), {});
+    const noId = jwt.sign({ email: 'a@b.com' }, process.env.JWT_SECRET as string);
+    expect(await buildContext(`Bearer ${noId}`)).toEqual({});
   });
 
   it('não autentica quando o usuário está desativado', async () => {
     const ctx = await buildContext(`Bearer ${validToken()}`, async () => false);
-    assert.deepEqual(ctx, {});
+    expect(ctx).toEqual({});
   });
 
   it('gera token com validade de 7 dias', () => {
     const { exp, createdAt } = generateToken({ id: 'x' });
-    assert.equal(exp - createdAt, 7 * 24 * 60 * 60);
+    expect(exp - createdAt).toBe(7 * 24 * 60 * 60);
   });
 });
 
 describe('diretiva @Authenticated', () => {
   let schema: ReturnType<typeof authDirectiveTransformer>;
 
-  before(() => {
+  beforeAll(() => {
     schema = authDirectiveTransformer(
       makeExecutableSchema({
         typeDefs: `
@@ -82,20 +78,21 @@ describe('diretiva @Authenticated', () => {
       source: '{ me }',
       contextValue: await buildContext(`Bearer ${validToken()}`),
     });
-    assert.equal(res.data?.me, 'user-1');
+    expect(res.data?.me).toBe('user-1');
   });
 
   it('retorna UNAUTHENTICATED 401 sem auth', async () => {
     const res = await graphql({ schema, source: '{ me }', contextValue: {} });
     const err = res.errors?.[0].originalError;
-    assert.ok(err instanceof AppError);
-    assert.equal(err.type, 'UNAUTHENTICATED');
-    assert.equal(err.statusCode, 401);
-    assert.match(err.message, /não autenticado/);
+    expect(err).toBeInstanceOf(AppError);
+    const appError = err as AppError;
+    expect(appError.type).toBe('UNAUTHENTICATED');
+    expect(appError.statusCode).toBe(401);
+    expect(appError.message).toMatch(/não autenticado/);
   });
 
   it('não bloqueia campos sem a diretiva', async () => {
     const res = await graphql({ schema, source: '{ open }', contextValue: {} });
-    assert.equal(res.data?.open, 'ok');
+    expect(res.data?.open).toBe('ok');
   });
 });

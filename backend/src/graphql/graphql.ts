@@ -1,15 +1,10 @@
-import { ApolloServer } from '@apollo/server';
 import http from 'http';
-import { mergedTypeDefs } from './typeDefs';
-import { resolvers } from './resolvers';
-import { makeExecutableSchema } from 'graphql-tools';
-import { authDirectiveTransformer } from './directives/authenticationDirective';
+import { createApolloServer } from './server';
 import { buildContext } from './context';
 import express from 'express';
 import bodyParser from 'body-parser';
 import { expressMiddleware } from '@as-integrations/express4';
 import cors from 'cors';
-import { AppError } from '../utils/AppError';
 
 async function startServer() {
   const app = express();
@@ -24,39 +19,7 @@ async function startServer() {
     'graphql-upload/graphqlUploadExpress.mjs',
   );
 
-  const executableSchema = makeExecutableSchema({
-    typeDefs: mergedTypeDefs,
-    resolvers,
-  });
-
-  const schema = authDirectiveTransformer(executableSchema);
-
-  const server = new ApolloServer({
-    schema,
-    formatError: (formattedError, error: any) => {
-      const originalError = error?.originalError;
-
-      if (originalError instanceof AppError) {
-        return {
-          message: originalError.message,
-          type: originalError.type,
-          statusCode: originalError.statusCode,
-          extensions: {
-            type: originalError.type,
-            statusCode: originalError.statusCode,
-          },
-        };
-      }
-
-      return {
-        message: formattedError.message,
-        extensions: {
-          type: 'INTERNAL_ERROR',
-          statusCode: 500,
-        },
-      };
-    },
-  });
+  const server = createApolloServer();
 
   await server.start();
 
