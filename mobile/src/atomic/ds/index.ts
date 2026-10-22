@@ -19,3 +19,7 @@ export {
 } from './molecules/Sheet';
 export { BottomSheet } from './molecules/BottomSheet';
 export { Toast, ToastProvider, useToast } from './molecules/Toast';
+export { AlertBanner } from './auth/AlertBanner';
+export { TextLink } from './auth/TextLink';
+export { PasswordInput } from './auth/PasswordInput';
+export { Tape, Halftone, Wordmark } from './auth/BrandDecor';
