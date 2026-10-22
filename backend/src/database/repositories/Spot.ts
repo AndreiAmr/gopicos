@@ -9,7 +9,12 @@ type CreateSpotProps = {
 };
 
 export type SpotDetailsData = Spot & {
-  author: { id: string; firstName: string; lastName: string };
+  author: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    deactivatedAt: Date | null;
+  };
   ratingAverage: number | null;
   reviewsCount: number;
 };
@@ -47,7 +52,16 @@ export class SpotRepository implements ISpotRepository {
     const [spot, stats] = await Promise.all([
       prisma.spot.findUnique({
         where: { id },
-        include: { author: { select: { id: true, firstName: true, lastName: true } } },
+        include: {
+          author: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              deactivatedAt: true,
+            },
+          },
+        },
       }),
       prisma.spotReview.aggregate({
         where: { spotId: id },

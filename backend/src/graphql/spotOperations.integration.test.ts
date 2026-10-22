@@ -59,21 +59,29 @@ describe('proteção das operações de pico (integração)', () => {
     expect(saved.spotId).toBe(spot.id);
   });
 
-  it('getSpotById expõe o autor do pico com nome completo e separado', async () => {
+  it('getSpotById expõe o autor só como "Nome S." (D36)', async () => {
     const user = await createUser({ firstName: 'Tony', lastName: 'Hawk' });
     const spot = await createSpot({ authorId: user.id });
 
     const res = await executeAuthenticated(
       tokenFor(user),
-      `query { getSpotById(id: "${spot.id}") { author { name firstName lastName } } }`,
+      `query { getSpotById(id: "${spot.id}") { author { displayName } } }`,
     );
 
     expect(res.errors).toBeUndefined();
-    expect(res.data.getSpotById.author).toEqual({
-      name: 'Tony Hawk',
-      firstName: 'Tony',
-      lastName: 'Hawk',
-    });
+    expect(res.data.getSpotById.author).toEqual({ displayName: 'Tony H.' });
+  });
+
+  it('getSpotById não expõe o sobrenome do autor', async () => {
+    const user = await createUser();
+    const spot = await createSpot({ authorId: user.id });
+
+    const res = await executeAuthenticated(
+      tokenFor(user),
+      `query { getSpotById(id: "${spot.id}") { author { lastName } } }`,
+    );
+
+    expect(res.errors?.length).toBeGreaterThan(0);
   });
 
   it('createSpotReview rejeita authorId vindo no input', async () => {
