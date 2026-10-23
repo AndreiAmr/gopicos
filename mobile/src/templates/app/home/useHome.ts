@@ -28,6 +28,9 @@ export const useHome = () => {
   const [userPosition, setUserPosition] = useState<[number, number] | null>(
     null,
   );
+  // Controla o sheet do estado vazio. O vazio é um estado persistente (não um
+  // evento): abrimos quando ele aparece e deixamos o usuário fechar por gesto.
+  const [emptySheetOpen, setEmptySheetOpen] = useState(true);
 
   // Sessão expirada: limpa o token e volta ao Login com o aviso.
   useEffect(() => {
@@ -66,6 +69,16 @@ export const useHome = () => {
     navigation.navigate('Home', { screen: 'NewSpot' } as never);
   }, [navigation]);
 
+  const empty = !loading && !error && spots.length === 0;
+
+  // Enquanto o vazio persistir, cada nova transição para "vazio" reabre o
+  // sheet. Fechar por gesto é respeitado até a Home sair e voltar ao vazio.
+  useEffect(() => {
+    if (empty) {
+      setEmptySheetOpen(true);
+    }
+  }, [empty]);
+
   return {
     spots,
     selected,
@@ -74,9 +87,11 @@ export const useHome = () => {
     // Mostra "Carregando" só na primeira carga; depois mantém o último resultado.
     loading: loading && spots.length === 0,
     hasError: error && !unauthenticated,
-    isEmpty: !loading && !error && spots.length === 0,
+    isEmpty: empty,
     select: setSelectedId,
     clearSelection: () => setSelectedId(null),
+    emptySheetOpen,
+    dismissEmptySheet: () => setEmptySheetOpen(false),
     setUserPosition,
     openDetails,
     createSpot,
