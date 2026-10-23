@@ -67,13 +67,28 @@ describe('useHome', () => {
     expect(result.current.selected).toBeNull();
   });
 
-  it('lista vazia fica no estado vazio', async () => {
+  it('lista vazia fica no estado vazio e abre o sheet', async () => {
     const { result } = await render([
       { request: { query: spotsQuery }, result: { data: { getAllSpots: [] } } },
     ]);
 
     await waitFor(() => expect(result.current.isEmpty).toBe(true));
     expect(result.current.hasError).toBe(false);
+    // Vazio é estado persistente: o sheet começa aberto.
+    expect(result.current.emptySheetOpen).toBe(true);
+  });
+
+  it('fechar o sheet do vazio é respeitado enquanto o vazio persistir', async () => {
+    const { result } = await render([
+      { request: { query: spotsQuery }, result: { data: { getAllSpots: [] } } },
+    ]);
+
+    await waitFor(() => expect(result.current.isEmpty).toBe(true));
+
+    await act(async () => result.current.dismissEmptySheet());
+    expect(result.current.emptySheetOpen).toBe(false);
+    // Continua vazio, mas o sheet não deve reabrir sozinho.
+    expect(result.current.isEmpty).toBe(true);
   });
 
   it('falha de rede expõe o erro', async () => {
