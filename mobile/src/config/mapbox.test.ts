@@ -1,15 +1,19 @@
 /* eslint-env jest */
-const setAccessToken = jest.fn();
+const mockSetAccessToken = jest.fn();
 
 jest.mock('@rnmapbox/maps', () => ({
   __esModule: true,
-  default: { setAccessToken: (...args: unknown[]) => setAccessToken(...args) },
+  default: {
+    setAccessToken: (...args: unknown[]) => mockSetAccessToken(...args),
+  },
 }));
 
 const load = (token: string | undefined) => {
   jest.resetModules();
-  setAccessToken.mockClear();
-  jest.doMock('@env', () => ({ MAPBOX_ACCESS_TOKEN: token }));
+  mockSetAccessToken.mockClear();
+  jest.doMock('@env', () => ({ MAPBOX_ACCESS_TOKEN: token }), {
+    virtual: true,
+  });
   return require('./mapbox') as typeof import('./mapbox');
 };
 
@@ -18,13 +22,13 @@ describe('mapbox config', () => {
     const m = load('pk.abc');
     expect(m.isMapboxConfigured).toBe(true);
     expect(m.initMapbox()).toBe(true);
-    expect(setAccessToken).toHaveBeenCalledWith('pk.abc');
+    expect(mockSetAccessToken).toHaveBeenCalledWith('pk.abc');
   });
 
   it('não quebra nem registra sem token', () => {
     const m = load('');
     expect(m.isMapboxConfigured).toBe(false);
     expect(m.initMapbox()).toBe(false);
-    expect(setAccessToken).not.toHaveBeenCalled();
+    expect(mockSetAccessToken).not.toHaveBeenCalled();
   });
 });
