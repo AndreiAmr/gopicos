@@ -1,4 +1,4 @@
-import { SpotDetailsContent } from './SpotDetailsContent';
+import { ReadySpotDetails } from './ReadySpotDetails';
 import {
   SpotDetailsError,
   SpotDetailsLoading,
@@ -11,10 +11,11 @@ export const SpotDetailsPage = () => {
 
   if (page.status === 'ready' && page.spot) {
     return (
-      <SpotDetailsContent
+      <ReadySpotDetails
         spot={page.spot}
         onEdit={page.onEdit}
         onDelete={page.onDelete}
+        refreshSpot={page.refetch}
       />
     );
   }
