@@ -77,6 +77,14 @@ class CloudinaryModel {
       source.pipe(limiter).pipe(uploadStream);
     });
   }
+
+  /** Apaga as fotos do pico (pasta `{authorId}/{spotId}`) e a própria pasta. */
+  async deleteSpotImages(authorId: string, spotId: string): Promise<void> {
+    const folder = `${authorId}/${spotId}`;
+
+    await cloudinary.v2.api.delete_resources_by_prefix(`${folder}/`);
+    await cloudinary.v2.api.delete_folder(folder);
+  }
 }
 
 export const cloudinaryModel = new CloudinaryModel();

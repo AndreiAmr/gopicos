@@ -20,6 +20,9 @@ export const fakeUpload = ({
 /** URLs "enviadas" pelo mock do Cloudinary, na ordem. */
 export const uploadedFolders: string[] = [];
 
+/** Pastas cujas fotos foram apagadas pelo mock do Cloudinary. */
+export const deletedFolders: string[] = [];
+
 /**
  * Fábrica para `jest.mock('cloudinary', () => require('../test/uploads').cloudinaryMock())`:
  * consome o stream e devolve uma URL fake com a pasta usada.
@@ -29,6 +32,12 @@ export const cloudinaryMock = () => ({
   default: {
     v2: {
       config: () => undefined,
+      api: {
+        delete_resources_by_prefix: async (prefix: string) => {
+          deletedFolders.push(prefix.replace(/\/$/, ''));
+        },
+        delete_folder: async () => undefined,
+      },
       uploader: {
         upload_stream: (
           options: { folder: string },
