@@ -127,4 +127,51 @@ describe('useNewSpotLocation', () => {
     expect(alert).not.toHaveBeenCalled();
     alert.mockRestore();
   });
+
+  describe('modo edição (Alterar local)', () => {
+    const edit = {
+      id: 's1',
+      coordinates: {
+        type: 'Polygon' as const,
+        coordinates: [
+          [
+            [-46.65, -23.55],
+            [-46.64, -23.55],
+            [-46.64, -23.56],
+            [-46.65, -23.55],
+          ],
+        ],
+      },
+    };
+
+    it('abre com o polígono atual, centrado nele, e devolve o novo local ao formulário', async () => {
+      const { result } = await renderHook(() => useNewSpotLocation(edit));
+
+      expect(result.current.points).toHaveLength(3);
+      expect(result.current.focus).not.toBeNull();
+
+      await act(async () => result.current.move(0, [-46.7, -23.5]));
+      await act(async () => result.current.goNext());
+
+      expect(mockNavigate).toHaveBeenCalledWith('EditSpot', {
+        id: 's1',
+        coordinates: expect.objectContaining({ type: 'Polygon' }),
+      });
+    });
+
+    it('só pede confirmação ao sair se o local foi alterado', async () => {
+      const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+      const { result } = await renderHook(() => useNewSpotLocation(edit));
+
+      const untouched = { preventDefault: jest.fn(), data: { action: { type: 'GO_BACK' } } };
+      beforeRemove?.(untouched);
+      expect(untouched.preventDefault).not.toHaveBeenCalled();
+
+      await act(async () => result.current.move(0, [-46.7, -23.5]));
+      const changed = { preventDefault: jest.fn(), data: { action: { type: 'GO_BACK' } } };
+      beforeRemove?.(changed);
+      expect(changed.preventDefault).toHaveBeenCalled();
+      alert.mockRestore();
+    });
+  });
 });

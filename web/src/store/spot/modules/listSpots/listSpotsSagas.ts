@@ -12,7 +12,7 @@ export function* getListSpotsAsync(action?: IListSpotsAction) {
   try {
     yield put(listSpotsActions.setIsLoadingListSpots(true));
     yield put(listSpotsActions.setIsErrorListSpots(false));
-    const listSpots: IListSpots = yield call(
+    const listSpots: IListSpots[] = yield call(
       listSpotsRepository.getListSpots,
       action?.payload?.filter ?? null,
     );

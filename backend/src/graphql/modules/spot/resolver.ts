@@ -1,6 +1,7 @@
 import { deleteSpotResolver } from './deleteSpot/resolver';
 import { listSpotsResolvers } from './listSpots/resolver';
 import { newSpotResolver } from './newSpot/resolver';
+import { updateSpotResolver } from './updateSpot/resolver';
 import { spotReviewResolver } from './spotReview/resolver';
 
 export const spotResolvers = {
@@ -10,6 +11,7 @@ export const spotResolvers = {
 
   Mutation: {
     ...newSpotResolver.Mutation,
+    ...updateSpotResolver.Mutation,
     ...spotReviewResolver.Mutation,
     ...deleteSpotResolver.Mutation,
   },

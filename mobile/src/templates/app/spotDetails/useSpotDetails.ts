@@ -4,7 +4,6 @@ import type { RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSpotDetailsQuery } from '../../../hooks/query/spotDetails/useSpotDetailsQuery';
 import { clearSession } from '../../../services/session';
-import { useToast } from '../../../atomic/ds';
 import type { RootStackParamList } from '../../../routes/types';
 
 import { spotDetailsStrings } from './strings';
@@ -15,7 +14,6 @@ export const useSpotDetails = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { params } = useRoute<RouteProp<RootStackParamList, 'SpotDetails'>>();
-  const toast = useToast();
   const { spot, status, refetch } = useSpotDetailsQuery(params.id);
 
   useEffect(() => {
@@ -39,17 +37,18 @@ export const useSpotDetails = () => {
     }
   }, [navigation]);
 
-  // Editar (#45) entra na próxima issue; Excluir vive em useDeleteSpotFlow.
-  const notYet = useCallback(
-    () => toast.show({ type: 'info', message: spotDetailsStrings.comingSoon }),
-    [toast],
+  const onEdit = useCallback(
+    () => navigation.navigate('EditSpot', { id: params.id }),
+    [navigation, params.id],
   );
+
+  // Excluir (#48) vive em useDeleteSpotFlow (ver ReadySpotDetails).
 
   return {
     spot,
     status,
     retry: refetch,
     goBack,
-    onEdit: notYet,
+    onEdit,
   };
 };

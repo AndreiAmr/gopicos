@@ -5,9 +5,9 @@ import { apolloClient } from '@/config/apollo-client';
 
 const getListSpots = async (
   filter?: SpotsQueryFilter | null,
-): Promise<IListSpots | null> => {
+): Promise<IListSpots[] | null> => {
   const { data } = await apolloClient.query<{
-    getAllSpots: IListSpots;
+    getAllSpots: IListSpots[];
   }>({
     fetchPolicy: 'no-cache',
     query: getListSpotsQuery,

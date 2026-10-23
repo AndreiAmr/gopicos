@@ -99,6 +99,29 @@ export class SpotRepository implements ISpotRepository {
     throw new Error('Method not implemented.');
   }
 
+  async updateSpot(
+    id: string,
+    data: ValidSpotFields,
+    images: string[],
+  ): Promise<Spot> {
+    return prisma.spot.update({
+      where: { id },
+      data: {
+        name: data.name,
+        description: data.description,
+        modality: data.modality as Modality,
+        equipmentRequired: data.equipmentRequired,
+        isPaid: data.isPaid,
+        alwaysOpen: data.alwaysOpen,
+        entryAmount: data.entryAmount,
+        hasCoverage: data.hasCoverage,
+        coordinates: data.coordinates,
+        openingHours: data.openingHours,
+        images,
+      },
+    });
+  }
+
   delete(prop: Spot): Promise<void> {
     throw new Error('Method not implemented.');
   }

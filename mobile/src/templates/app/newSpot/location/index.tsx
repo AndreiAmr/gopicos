@@ -22,7 +22,9 @@ import { Button } from '../../../../atomic/ds/atoms/Button';
 import { Text } from '../../../../atomic/ds/atoms/Text';
 import { LngLat, draftShape } from '../../../../domain/spot/polygonDraft';
 import {
-  newSpotLocationStrings as strings,
+  EditLocation,
+  editSpotLocationStrings,
+  newSpotLocationStrings,
   useNewSpotLocation,
 } from './useNewSpotLocation';
 
@@ -32,9 +34,10 @@ const styles = StyleSheet.create({
   map: StyleSheet.absoluteFill,
 });
 
-export const NewSpotLocationTemplate = () => {
+export const NewSpotLocationTemplate = ({ edit }: { edit?: EditLocation }) => {
   const theme = useTheme();
-  const draft = useNewSpotLocation();
+  const draft = useNewSpotLocation(edit);
+  const strings = edit ? editSpotLocationStrings : newSpotLocationStrings;
   const shape = draftShape(draft.points);
 
   return (

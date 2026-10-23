@@ -11,7 +11,7 @@ const getListSpotsAsync = (filter?: SpotsQueryFilter | null): IListSpotsAction =
 });
 
 const setListSpots = (
-  listSpots: IListSpots,
+  listSpots: IListSpots[],
 ): IListSpotsAction => ({
   payload: { listSpots },
   type: ListSpotsActionTypes.SET_LIST_SPOTS,

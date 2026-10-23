@@ -88,10 +88,10 @@ export const newSpotSchema: yup.ObjectSchema<NewSpotFormData> = yup.object({
  * Acrescenta fotos respeitando o limite de 5 e recusando as acima de 5 MB.
  * Devolve a lista nova e as mensagens de recusa (spec 6.3).
  */
-export const addPhotos = (
-  current: PickedPhoto[],
-  picked: PickedPhoto[],
-): { photos: PickedPhoto[]; errors: string[] } => {
+export const addPhotos = <T extends PickedPhoto>(
+  current: T[],
+  picked: T[],
+): { photos: T[]; errors: string[] } => {
   const errors: string[] = [];
   const photos = [...current];
 
@@ -110,7 +110,7 @@ export const addPhotos = (
   return { photos, errors };
 };
 
-export const photosError = (photos: PickedPhoto[]): string | undefined =>
+export const photosError = (photos: unknown[]): string | undefined =>
   photos.length < PHOTO_LIMITS.min ? 'Adicione ao menos 1 foto.' : undefined;
 
 export const photoCounter = (count: number): string =>

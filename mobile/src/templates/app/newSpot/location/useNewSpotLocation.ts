@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -7,6 +7,7 @@ import {
   LngLat,
   addPoint,
   canContinue,
+  fromPolygon,
   movePoint,
   pointsCountText,
   toPolygon,
@@ -30,16 +31,41 @@ export const newSpotLocationStrings = {
   back: 'Voltar',
 } as const;
 
-export const useNewSpotLocation = () => {
+export const editSpotLocationStrings = {
+  ...newSpotLocationStrings,
+  header: 'Alterar local',
+  continue: 'Usar este local',
+  discardTitle: 'Descartar a alteração do local?',
+} as const;
+
+/** Modo edição: abre com o polígono atual do pico e devolve o novo ao formulário. */
+export type EditLocation = {
+  id: string;
+  coordinates: { type: 'Polygon'; coordinates: number[][][] };
+};
+
+const centroid = (points: LngLat[]): LngLat | null =>
+  points.length === 0
+    ? null
+    : [
+        points.reduce((sum, p) => sum + p[0], 0) / points.length,
+        points.reduce((sum, p) => sum + p[1], 0) / points.length,
+      ];
+
+export const useNewSpotLocation = (edit?: EditLocation) => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const toast = useToast();
 
-  const [points, setPoints] = useState<LngLat[]>([]);
+  const initial = useRef<LngLat[]>(edit ? fromPolygon(edit.coordinates) : []);
+  const done = useRef(false);
+  const [points, setPoints] = useState<LngLat[]>(initial.current);
   const [center, setCenter] = useState<LngLat | null>(null);
   const [userPosition, setUserPosition] = useState<LngLat | null>(null);
   /** Centro pedido à câmera ("Usar minha posição"). */
-  const [focus, setFocus] = useState<LngLat | null>(null);
+  const [focus, setFocus] = useState<LngLat | null>(() =>
+    centroid(initial.current),
+  );
 
   const add = useCallback((point: LngLat) => {
     setPoints(current => {
@@ -73,7 +99,14 @@ export const useNewSpotLocation = () => {
   // foi usado, não há o que descartar.
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', event => {
-      if (points.length === 0 || event.data.action.type === 'RESET') return;
+      if (
+        done.current ||
+        points.length === 0 ||
+        event.data.action.type === 'RESET' ||
+        JSON.stringify(points) === JSON.stringify(initial.current)
+      ) {
+        return;
+      }
 
       event.preventDefault();
       Alert.alert(newSpotLocationStrings.discardTitle, undefined, [
@@ -87,15 +120,22 @@ export const useNewSpotLocation = () => {
     });
 
     return unsubscribe;
-  }, [navigation, points.length]);
+  }, [navigation, points]);
 
   const goNext = useCallback(() => {
     const polygon = toPolygon(points);
-    if (polygon) {
+    if (polygon && edit) {
+      // Volta ao formulário de edição já aberto, com o novo local.
+      done.current = true;
+      navigation.navigate('EditSpot', {
+        id: edit.id,
+        coordinates: polygon,
+      });
+    } else if (polygon) {
       // O passo 1 fica na pilha: "Alterar" no passo 2 volta sem perder os pontos.
       navigation.navigate('NewSpotDetails', { coordinates: polygon });
     }
-  }, [navigation, points]);
+  }, [edit, navigation, points]);
 
   return {
     points,
