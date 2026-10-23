@@ -39,7 +39,7 @@ export const useSpotDetails = () => {
     }
   }, [navigation]);
 
-  // Editar (#45) e Excluir (#48) entram nas próximas issues.
+  // Editar (#45) entra na próxima issue; Excluir vive em useDeleteSpotFlow.
   const notYet = useCallback(
     () => toast.show({ type: 'info', message: spotDetailsStrings.comingSoon }),
     [toast],
@@ -51,6 +51,5 @@ export const useSpotDetails = () => {
     retry: refetch,
     goBack,
     onEdit: notYet,
-    onDelete: notYet,
   };
 };
