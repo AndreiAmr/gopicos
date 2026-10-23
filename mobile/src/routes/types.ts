@@ -20,6 +20,16 @@ export type RootStackParamList = {
   NewSpotDetails: {
     coordinates: { type: 'Polygon'; coordinates: number[][][] };
   };
+  /** Editar pico: `coordinates` traz o local alterado em "Alterar local". */
+  EditSpot: {
+    id: string;
+    coordinates?: { type: 'Polygon'; coordinates: number[][][] };
+  };
+  /** Alterar local do pico em edição (polígono atual, vértices arrastáveis). */
+  EditSpotLocation: {
+    id: string;
+    coordinates: { type: 'Polygon'; coordinates: number[][][] };
+  };
 };
 
 export type ProfileStackParamList = {
