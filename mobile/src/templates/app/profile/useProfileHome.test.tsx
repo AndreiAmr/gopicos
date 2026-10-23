@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import { act, renderHook } from '@testing-library/react-native';
 import { useProfileHome } from './useProfileHome';
 
@@ -40,20 +39,29 @@ describe('useProfileHome', () => {
     expect(result.current.hasError).toBe(true);
   });
 
-  it('Sair pede confirmação e só encerra a sessão ao confirmar', async () => {
-    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+  it('Sair abre o bottom sheet e só encerra a sessão ao confirmar', async () => {
     const { result } = await renderHook(() => useProfileHome());
+    const sheet = { present: jest.fn(), dismiss: jest.fn() };
+    (result.current.logoutSheetRef as { current: unknown }).current = sheet;
 
     await act(async () => result.current.confirmLogout());
-    expect(alert).toHaveBeenCalledWith(
-      'Sair do GoPicos?',
-      expect.any(String),
-      expect.any(Array),
-    );
+    expect(sheet.present).toHaveBeenCalled();
     expect(mockLogout).not.toHaveBeenCalled();
 
-    const buttons = alert.mock.calls[0][2] as { text: string; onPress?: () => void }[];
-    buttons.find(b => b.text === 'Sair')?.onPress?.();
-    expect(mockLogout).toHaveBeenCalled();
+    await act(async () => result.current.cancelLogout());
+    expect(sheet.dismiss).toHaveBeenCalledTimes(1);
+    expect(mockLogout).not.toHaveBeenCalled();
+
+    await act(async () => result.current.doLogout());
+    expect(mockLogout).toHaveBeenCalledTimes(1);
+    expect(sheet.dismiss).toHaveBeenCalledTimes(2);
+    expect(result.current.leaving).toBe(false);
+  });
+
+  it('falha ao encerrar não trava a tela', async () => {
+    mockLogout.mockRejectedValueOnce(new Error('keychain'));
+    const { result } = await renderHook(() => useProfileHome());
+    await act(async () => result.current.doLogout());
+    expect(result.current.leaving).toBe(false);
   });
 });
