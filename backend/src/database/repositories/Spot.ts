@@ -38,6 +38,7 @@ type ISpotRepository = IRepository<string, CreateSpotProps, Spot, Spot> & {
   findDetails(id: string): Promise<SpotDetailsData | null>;
   insertImage(spotId: string, url: string): Promise<Spot>;
   listAll(filter?: SpotsFilter): Promise<SpotListItem[]>;
+  deleteById(id: string): Promise<void>;
 };
 
 export class SpotRepository implements ISpotRepository {
@@ -123,6 +124,11 @@ export class SpotRepository implements ISpotRepository {
 
   delete(prop: Spot): Promise<void> {
     throw new Error('Method not implemented.');
+  }
+
+  /** Remove o pico; as avaliações saem em cascata (FK onDelete: Cascade). */
+  async deleteById(id: string): Promise<void> {
+    await prisma.spot.delete({ where: { id } });
   }
 
   async create({ id, data, images, authorId }: CreateSpotProps): Promise<Spot> {

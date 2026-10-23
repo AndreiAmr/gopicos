@@ -1,0 +1,8 @@
+type DeleteSpotResult {
+  id: String!
+}
+
+extend type Mutation {
+  "Só o autor exclui. Remove o pico, as avaliações (cascata) e as fotos do Cloudinary."
+  deleteSpot(id: String!): DeleteSpotResult! @Authenticated
+}

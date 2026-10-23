@@ -30,7 +30,6 @@ export const SpotDetailsTemplate = () => {
         spot={details.spot}
         onBack={details.goBack}
         onEdit={details.onEdit}
-        onDelete={details.onDelete}
         refreshSpot={details.retry}
       />
     );

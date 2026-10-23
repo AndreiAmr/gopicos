@@ -4,7 +4,9 @@ import { space } from '../../../../config/tamagui/tokens';
 import { Button } from '../../../../atomic/ds/atoms/Button';
 import type { SpotDetails } from '../../../../domain/spot/details';
 import { reviewStrings } from '../../../../domain/spot/reviews';
+import { useDeleteSpotFlow } from '../useDeleteSpotFlow';
 import { useReviewsFlow } from '../useReviewsFlow';
+import { DeleteSpotSheet } from './DeleteSpotSheet';
 import { ReviewFormSheet } from './ReviewFormSheet';
 import { ReviewsSection } from './ReviewsSection';
 import { SpotDetailsContent } from './SpotDetailsContent';
@@ -13,7 +15,6 @@ type ReadySpotDetailsProps = {
   spot: SpotDetails;
   onBack: () => void;
   onEdit: () => void;
-  onDelete: () => void;
   refreshSpot: () => void;
 };
 
@@ -22,10 +23,10 @@ export const ReadySpotDetails = ({
   spot,
   onBack,
   onEdit,
-  onDelete,
   refreshSpot,
 }: ReadySpotDetailsProps) => {
   const flow = useReviewsFlow({ spotId: spot.id, refreshSpot });
+  const deleteFlow = useDeleteSpotFlow(spot.id);
   const { reviews } = flow;
   const hasMine = Boolean(reviews.myReview);
 
@@ -54,7 +55,7 @@ export const ReadySpotDetails = ({
         spot={spot}
         onBack={onBack}
         onEdit={onEdit}
-        onDelete={onDelete}
+        onDelete={deleteFlow.open}
         scrollRef={flow.scrollRef}
         onScroll={flow.onScroll}
         bottomBar={bottomBar}
@@ -79,7 +80,16 @@ export const ReadySpotDetails = ({
           </View>
         }
       />
-      {spot.isOwner ? null : (
+      {spot.isOwner ? (
+        <DeleteSpotSheet
+          ref={deleteFlow.sheetRef}
+          deleting={deleteFlow.deleting}
+          error={deleteFlow.error}
+          onConfirm={deleteFlow.confirm}
+          onCancel={deleteFlow.cancel}
+          onClose={deleteFlow.clearError}
+        />
+      ) : (
         <ReviewFormSheet
           ref={flow.sheetRef}
           submitting={flow.submitting}
