@@ -1,11 +1,10 @@
-import { useCallback } from 'react';
-import { Alert } from 'react-native';
+import { useCallback, useRef, useState } from 'react';
+import type { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useProfile } from '../../../hooks/query/profile/useProfile';
 import { logout } from '../../../services/session/logout';
 import type { ProfileStackParamList } from '../../../routes/types';
-import { profileStrings } from './logic';
 
 export const useProfileHome = () => {
   const navigation =
@@ -37,18 +36,29 @@ export const useProfileHome = () => {
     [navigation],
   );
 
-  // P7: confirmação antes de sair; o foco inicial fica em "Cancelar".
+  // P7: confirmação em bottom sheet antes de sair.
+  const logoutSheetRef = useRef<BottomSheetModal>(null);
+  const [leaving, setLeaving] = useState(false);
+
   const confirmLogout = useCallback(() => {
-    Alert.alert(profileStrings.logoutTitle, profileStrings.logoutMessage, [
-      { text: profileStrings.cancel, style: 'cancel' },
-      {
-        text: profileStrings.logout,
-        style: 'destructive',
-        onPress: () => {
-          logout().catch(() => undefined);
-        },
-      },
-    ]);
+    logoutSheetRef.current?.present();
+  }, []);
+
+  const cancelLogout = useCallback(() => {
+    logoutSheetRef.current?.dismiss();
+  }, []);
+
+  // Apaga o token e o cache e reseta a pilha para o Login (sem voltar).
+  const doLogout = useCallback(async () => {
+    setLeaving(true);
+    logoutSheetRef.current?.dismiss();
+    try {
+      await logout();
+    } catch {
+      // A sessão é local: `logout` sempre leva ao Login.
+    } finally {
+      setLeaving(false);
+    }
   }, []);
 
   return {
@@ -63,5 +73,9 @@ export const useProfileHome = () => {
     goToReviews,
     goToDelete,
     confirmLogout,
+    logoutSheetRef,
+    leaving,
+    cancelLogout,
+    doLogout,
   };
 };

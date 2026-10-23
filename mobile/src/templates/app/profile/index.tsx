@@ -15,6 +15,7 @@ import { activityStrings } from './activity/logic';
 import { StatTile } from './StatTile';
 import { fullName, memberSince, profileStrings } from './logic';
 import { useProfileHome } from './useProfileHome';
+import { LogoutSheet } from './LogoutSheet';
 
 // Altura da TabBar flutuante (60) usada para não cobrir o último item.
 const TAB_BAR_HEIGHT = 60;
@@ -54,6 +55,10 @@ export const ProfileTemplate = () => {
     goToReviews,
     goToDelete,
     confirmLogout,
+    logoutSheetRef,
+    leaving,
+    cancelLogout,
+    doLogout,
   } = useProfileHome();
 
   return (
@@ -202,6 +207,13 @@ export const ProfileTemplate = () => {
           </SettingsGroup>
         </View>
       </ScrollView>
+
+      <LogoutSheet
+        ref={logoutSheetRef}
+        leaving={leaving}
+        onConfirm={doLogout}
+        onCancel={cancelLogout}
+      />
     </View>
   );
 };
