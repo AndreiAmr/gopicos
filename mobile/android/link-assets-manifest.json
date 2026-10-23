@@ -16,6 +16,10 @@
     {
       "path": "src/assets/fonts/Inter_SemiBold.ttf",
       "sha1": "f3e44abd6661d5b861e66db22f4f79a6c466cd00"
+    },
+    {
+      "path": "src/assets/fonts/PermanentMarker-Regular.ttf",
+      "sha1": "6d0bcddcb32c60bb9c75eacdffb5deef7913ebf2"
     }
   ]
 }
