@@ -57,4 +57,6 @@ function Button({
   )
 }
 
+// buttonVariants é exportado junto do componente (padrão do shadcn); o Fast Refresh só perde estado ao editar este arquivo.
+// eslint-disable-next-line react-refresh/only-export-components
 export { Button, buttonVariants }

@@ -27,7 +27,7 @@ export const useMap = ({
   }, [mapRef]);
 
   useEffect(() => {
-    mapRef.current?.loadImage('/skater-pin.png', (error, image) => {
+    mapRef.current?.loadImage('/skater-pin.png', (_error, image) => {
       if (!mapRef?.current?.hasImage('custom-skater') && image) {
         mapRef?.current?.addImage('custom-skater', image, {
           sdf: false,
