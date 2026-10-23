@@ -79,43 +79,35 @@ jobs:
       - name: Discord Sucesso
         if: success()
 
-        uses: Ilshidur/action-discord@master
+        uses: Ilshidur/action-discord@0.4.0
 
         env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_BACKEND || secrets.DISCORD_WEBHOOK }}
 
         with:
           args: |
-            ✅ **Deploy concluído com sucesso!**
-
-            🚀 Backend atualizado na Render.
+            ✅ **Backend de QA publicado**
 
             🌿 Branch: `${{ github.ref_name }}`
             👤 Autor: `${{ github.actor }}`
+            📝 Commit: `${{ github.event.head_commit.message }}`
 
-            📝 Commit:
-            `${{ github.event.head_commit.message }}`
+            🔗 ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
 
       - name: Discord Erro
         if: failure()
 
-        uses: Ilshidur/action-discord@master
+        uses: Ilshidur/action-discord@0.4.0
 
         env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_BACKEND || secrets.DISCORD_WEBHOOK }}
 
         with:
           args: |
-            ❌ **Deploy do backend falhou!**
+            ❌ **Falha no deploy do backend de QA**
 
-            🌿 Branch:
-            `${{ github.ref_name }}`
+            🌿 Branch: `${{ github.ref_name }}`
+            👤 Autor: `${{ github.actor }}`
+            📝 Commit: `${{ github.event.head_commit.message }}`
 
-            👤 Autor:
-            `${{ github.actor }}`
-
-            📝 Commit:
-            `${{ github.event.head_commit.message }}`
-
-            🔍 Logs:
-            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            🔍 Logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
