@@ -2,9 +2,9 @@
 
 Issues: #183 (GP-106, parte Home; criar/editar pico ficam para a próxima rodada da mesma issue) e #51 (GP-048, seletor de camadas). Relacionadas: #179 (GP-102, DS v3), GP-103 (BottomSheet e zonas reservadas), GP-114 (resumo do pico como sheet), GP-120/GP-121 (identidade do mapa).
 Pedido do dono (2026-10-23): a Home tem que deixar claro que é um app para skatistas (tags, grafite, pichação), com tab bar Mapa / Novo pico / Perfil, botões de camadas e de localização no canto direito, filtros com cara de rua e, no topo, quantos picos e quantos filtros.
-Base: `docs/design/design-system.md` v2.0 (seção 13, camada de marca), `specs/picos.md` e `specs/picos-fechamento.md`. **Onde esta spec divergir delas para a Home, vale esta.** Decisões novas: **UX-H1 a UX-H18** (seção 13).
-Premissas do PO no E8 (PR #209), **ainda pendentes do dono**: D41 (fonte de tag só em títulos fixos; no mapa só pins, polígonos e controles estilizados), D42 (gíria curta, nunca em erro), D43 (Permanent Marker nos títulos; lettering de pichação só como arte vetorial).
-Figma: **não desenhado nesta rodada.** O MCP do Figma devolveu o limite do plano Starter na segunda chamada (ver seção 16). Nenhum protótipo HTML foi feito (orientação do orquestrador: o Figma é o entregável principal).
+Base: `docs/design/design-system.md` v2.0 (seção 13, camada de marca), `specs/picos.md` e `specs/picos-fechamento.md`. **Onde esta spec divergir delas para a Home, vale esta.** Decisões novas: **UX-H1 a UX-H19** (seção 13).
+Decisões do dono no E8 (PR #209, mergeado), **aprovadas conforme a recomendação do PO**: D39 (exceções ao sheet: telas nativas do sistema, toasts, sugestões da busca inline), D40 (sem sheet sobre sheet), **D41** (fonte de tag só em títulos fixos; no mapa só pins, polígonos e controles estilizados), **D42** (gíria curta, nunca em erro) e **D43** (Permanent Marker nos títulos; lettering de pichação só como arte vetorial). Esta spec já as aplica.
+**Referência visual: protótipo HTML `docs/design/prototipos/home.html`** (autorizado pelo dono enquanto o Figma está sem cota). Abrir no navegador; seletor de tema, de estado, de zonas reservadas e das alternativas no topo (seção 16). Os frames do Figma ficam para quando houver cota.
 
 ---
 
@@ -53,8 +53,8 @@ Regra geral (GP-103, CT-SOBREP): cada zona tem dono único; nada desenha dentro 
 | Z0 Status bar / notch / Dynamic Island | sistema | Nada interativo acima de `insets.top`. O mapa pode aparecer ali (ícones do sistema seguem o tema). |
 | Z1 Topo (header) | busca + linha de status + chips | Começa em `insets.top + 8`. Gutter 16. Altura: 48 + 8 + 48 (+ 8 + 44 com filtros ativos). |
 | Z2 Coluna de controles | Camadas e Localização | Direita, 16 da borda, 2 botões 48 com 8 entre eles (104 de altura). Ancorada **16 acima do que estiver mais alto embaixo**: topo da tab bar, ou topo do sheet peek. |
-| Z3 Ornamentos do Mapbox | logo + botão "i" de atribuição | Canto inferior esquerdo, 8 da borda, 8 acima da tab bar ou do sheet. **Obrigatórios pelos termos do Mapbox** (hoje desligados no código: `logoEnabled={false}`, `attributionEnabled={false}`). |
-| Z4 Toast | toasts | **Embaixo**, à esquerda da coluna: da borda esquerda (16) até 8 antes da coluna (largura = tela - 16 - 16 - 48 - 8), base 8 acima do logo do Mapbox. Hoje o toast fica no topo (`insets.top + 8`) e **cobre a busca**: muda. |
+| Z3 Ornamentos do Mapbox | logo + botão "i" de atribuição | Canto inferior esquerdo, 8 da borda, 8 acima da tab bar ou do sheet. **Obrigatórios pelos termos do Mapbox** (hoje desligados no código: `logoEnabled={false}`, `attributionEnabled={false}`). Com sheet modal aberto (filtros, camadas, permissão) ficam ocultos sob o véu, porque o mapa não está em uso. |
+| Z4 Toast | toasts | **Embaixo**, à esquerda da coluna: da borda esquerda (16) até 8 antes da coluna (largura = tela - 16 - 16 - 48 - 8), base 8 acima do logo do Mapbox, até 3 linhas (96). Hoje o toast fica no topo (`insets.top + 8`) e **cobre a busca**: muda. Exceção: com sheet modal expandido (sem espaço acima dele), o toast aparece no topo da safe area, por cima do sheet, na largura toda. |
 | Z5 Sheet (resumo, vazio, filtros, camadas, permissão) | BottomSheet do DS | Sempre **acima da tab bar** (`bottomInset` = altura da tab bar). Topo máximo do sheet expandido: `insets.top + 8` (nunca sob a status bar). |
 | Z6 Tab bar | navegação | Base da tela, 64 + `insets.bottom`. Nada a cobre: o fundo escurecido dos sheets modais (filtros, camadas) cobre mapa e topo, **não** a tab bar. Tocar numa aba com sheet aberto fecha o sheet primeiro e então navega. |
 | Z7 Teclado | sistema | Com a busca focada: Z2, Z3, Z4 e Z6 somem (tab bar escondida pelo teclado), a lista de sugestões vai da busca até o topo do teclado. |
@@ -70,7 +70,7 @@ Regra geral (GP-103, CT-SOBREP): cada zona tem dono único; nada desenha dentro 
 | Tab bar | 603 a 667 | igual |
 | Coluna (Camadas / Localização) | 483 a 531 / 539 a 587 | 295 a 343 / 351 a 399 |
 | Logo Mapbox | 571 a 595 (esq.) | 383 a 407 |
-| Toast (até 2 linhas, 72) | 491 a 563, x 16 a 303 | 303 a 375 |
+| Toast (até 3 linhas, 96) | 467 a 563, x 16 a 303 | 279 a 375 |
 | Sheet peek | (fechado) | 415 a 603 |
 | Mapa livre (entre topo e tab bar/sheet) | 184 a 603 | 184 a 415 (231 de altura, a coluna cabe com 48 de folga em cima) |
 
@@ -96,7 +96,7 @@ Com navegação por gestos (inset ~24) tudo desce 24.
 
 - Ancorada, largura total, altura 64 + `insets.bottom`, fundo `surface`, borda superior 2 px `sticker-outline` (seção 11). Três alvos iguais (largura/3, altura 64).
 - **Mapa** e **Perfil**: ícone 24 (`MapPin`, `User`) + rótulo `caption` 12/600 (o DS libera 12 em legenda; aqui o rótulo acompanha o ícone, nunca está sozinho). Ativa: ícone preenchido, rótulo em `text` 700 e **traço de spray** `primary` de 24 x 6 sob o rótulo (asset `brand/spray-stroke.svg`). Inativa: ícone contorno, rótulo `text-muted`. Estado não depende só de cor: forma do ícone + traço + peso.
-- **Novo pico** (centro): **sticker** quadrado 44 x 44 dentro da barra (não ultrapassa a borda superior, para não invadir a Z2), fundo `primary`, borda 2 `ink`, sombra rígida `sticker-shadow`, giro -3 graus, ícone `+` 24 em `on-primary`; rótulo "Novo pico" abaixo. Pressed: escala 0,96 e sombra 1 px (o adesivo "afunda"). Alvo da aba inteira (largura/3 x 64).
+- **Novo pico** (centro): **sticker** 40 x 34 dentro da barra (não ultrapassa a borda superior, para não invadir a Z2), fundo `primary`, borda 2 `ink`, sombra rígida `sticker-shadow`, giro -3 graus, ícone `+` 24 em `on-primary`; rótulo "Novo pico" abaixo. Pressed: escala 0,96 e sombra 1 px (o adesivo "afunda"). Alvo da aba inteira (largura/3 x 64).
 - Acessibilidade: `accessibilityRole="tab"` em Mapa e Perfil com `selected`; Novo pico é `button` com rótulo "Cadastrar novo pico". Ordem: Mapa, Novo pico, Perfil.
 - Tema escuro: `surface` escuro, borda superior `sticker-outline` escuro, sombra do sticker em `brand-yellow` (DS 13.3).
 
@@ -154,7 +154,7 @@ Mesmo comportamento da `picos-fechamento.md` 7. Visual: campo do DS (48, `surfac
 
 ### 6.6 Pins, clusters e polígonos (estilo de rua, D41: só no que é do mapa)
 - **Pin** (`SpotPin`, atualiza a picos-fechamento 11): pílula sticker 26 de altura, fundo `surface`, **borda 1,5 `ink`** (escuro: `sticker-outline`), sombra rígida `2px 2px 0`, "★ 4,6" (estrela `star`) ou "Novo". Selecionado: 30 de altura, fundo `primary`, texto `on-primary`, borda 2, sombra 3 px e giro -3 graus (forma muda, não só cor).
-- **Cluster:** círculo com contagem (tamanhos da picos-fechamento 11), borda 2 `ink`, **contorno externo tracejado** de 2 px a 3 px de distância (lembra marca de spray); sem nota.
+- **Cluster:** círculo com contagem (tamanhos da picos-fechamento 11), borda 2 `ink`, **contorno externo tracejado** de 2 px a 3 px de distância (lembra marca de spray); sem nota. Se o filtro deixa só 1 pico num grupo, ele aparece como pin comum (não existe cluster de 1).
 - **Polígono:** preenchimento `primary` 22%, contorno 2 px `primary`; selecionado: contorno 3 px `primary-text` **tracejado 6/3** + preenchimento 38%. Nenhuma textura ou fonte de tag sobre o mapa.
 
 ### 6.7 Sheets da Home (peek e vazio)
@@ -177,7 +177,8 @@ Visual novo:
 - **Somente cobertos**: `SwitchRow` do DS (ligado `primary`, polegar com borda `ink`).
 - Rodapé fixo (acima da tab bar e do home indicator): botão primário "Aplicar filtros" (com contagem conhecida: "Ver 12 picos"), largura total, 48.
 - Alturas: snap 1 = conteúdo até 70% da área disponível; snap 2 (expandido) = do topo `insets.top + 8` até a tab bar. No SE o conteúdo (~590) não cabe no snap 1: rolagem interna com rodapé fixo. Fundo escurecido `rgba(0,0,0,.4)` sobre mapa e topo, não sobre a tab bar.
-- Estados: rascunho (o que foi tocado não vale até "Aplicar"); aplicando (botão `loading`); erro ao aplicar (toast existente, Z4); fechar sem aplicar descarta o rascunho (já é assim).
+- **Prévia ao vivo:** enquanto o sheet está aberto, cada toque num adesivo ou opção atualiza na hora a **fita do topo**, a linha de chips e os pins atrás do véu, e o botão vira "Ver N picos". É prévia: só "Aplicar" confirma; fechar sem aplicar volta ao filtro anterior. A contagem é feita no cliente (todos os picos já estão carregados), então a prévia não faz requisição; ao aplicar, a query com os filtros do backend roda como hoje.
+- Estados: rascunho/prévia; aplicando (botão `loading`); erro ao aplicar (toast existente, Z4); fechar sem aplicar descarta o rascunho (já é assim).
 
 ## 7. Teclado e safe area
 
@@ -218,6 +219,7 @@ A tab bar é só do mobile. No web, o equivalente mínimo, sem novas funcionalid
 - **Navegação:** a sidebar que já existe (`AppSidebar`, shadcn) fica com exatamente **3 itens na mesma ordem e com os mesmos ícones**: Mapa, Novo pico (abre `/spot/new-spot`), Perfil. Hoje ela tem "Pesquisar pico", "Lista de picos", "Cadastrar novo pico", "Ver meu perfil"; os dois primeiros saem (a busca já está no mapa). Em >= 1024 a sidebar fica como trilho de 72 com ícone + rótulo `caption`; abaixo de 1024 vira gaveta (já existe). Item ativo: fundo `primary-soft`, traço de spray e peso 700. "Novo pico" com o mesmo sticker laranja da tab bar.
 - **Topo do mapa:** busca (420) e, abaixo, a mesma linha Filtros + fita de placar + chips, a 24 do header.
 - **Controles:** coluna no canto **inferior direito**, 24 da borda: Camadas, Localização e, só no web, zoom + e - (o mobile usa gesto). Mesmo `MapControlButton`.
+- **Véu dos Dialogs:** cobre só a área do mapa, não o header nem a sidebar (mesma regra da tab bar no mobile); clicar na sidebar fecha o Dialog e navega.
 - **Camadas e filtros:** Dialog do Radix com a identidade (título em Permanent Marker, fita nas seções, adesivos), conforme a regra do dono. Filtros: o painel atual (`role="dialog"`) passa ao Dialog do DS (GP-117). Camadas: Dialog de 440 com os 3 cartões. Alternativa a avaliar: popover não modal ancorado ao botão (o mapa muda atrás sem véu); ver P7.
 - **Toasts** (sonner, hoje no topo direito): passam para o canto inferior esquerdo do mapa, para não cobrir header nem a coluna.
 - Abaixo de 640: layout mobile sem tab bar (a sidebar vira gaveta pelo header), como já está na picos-fechamento.
@@ -267,24 +269,27 @@ Por que não "Escuro/Noite" como terceira: o Standard já troca para noite no te
 **UX-H16. Ornamentos do Mapbox de volta.** Logo e atribuição são exigidos pelos termos do Mapbox; hoje estão desligados. Reservamos a zona para não virar sobreposição depois.
 **UX-H17. Pins e polígonos com borda e traço de rua, sem textura.** D41: no mapa só pins, polígonos e controles. Borda `ink`, sombra rígida e tracejado dão o ar de adesivo/spray e ainda melhoram a leitura no satélite.
 **UX-H18. Web só adapta a navegação existente.** A sidebar já existe; reduzi-la aos mesmos 3 itens dá paridade sem criar componente novo. Marcado para aprovação.
+**UX-H19. Prévia ao vivo dos filtros.** O dono pediu que marcar um adesivo atualize a contagem do topo. Como todos os picos já estão no cliente, a prévia é grátis e responde "quantos picos vou ver?" antes de aplicar; o "Aplicar" continua existindo para não recarregar a query do backend a cada toque (UX-P14).
 
 ## 14. Pendências para o dono
 
-1. **D41, D42, D43** (premissas do PO, ainda não aprovadas): fonte de tag só em títulos fixos; gíria curta e nunca em erro; Permanent Marker nos títulos e pichação só como arte.
-2. **P2. Títulos de seção do filtro:** fita com Inter (recomendado, UX-H8) ou Permanent Marker 24?
-3. **P3. Terceira camada:** Concreto (monocromático, recomendado) ou Noite?
-4. **P4. Lembrar a camada escolhida:** no aparelho, entre aberturas do app (recomendado) ou só na sessão, como os filtros?
-5. **P5. Rótulo da aba:** "Novo pico" (padrão de frase do DS) ou "Novo Pico" como no pedido?
-6. **P6. Contagem:** "picos na área" (visível no mapa, recomendado) ou "picos carregados" (total)?
-7. **P7. Web:** sidebar com os 3 itens (recomendado) ou navegação no topo? Camadas no web como Dialog (regra atual) ou popover não modal?
-8. **P8. Tokens novos** da seção 11 entram no DS v3 (GP-102)?
-9. **P9. Figma:** os frames desta spec não foram desenhados por limite do plano Starter do Figma MCP. Precisamos de cota (upgrade ou renovação) para desenhar; o dono decide o caminho.
+Decididas: D39 a D43 (E8, conforme a recomendação do PO). Restam as escolhas abaixo; **cada uma tem a recomendação como padrão no protótipo e a alternativa alternável no topo dele** (exceto P4, P7 e P8):
+1. **P2. Títulos de seção do filtro:** fita com Inter (recomendado, UX-H8) ou Permanent Marker 24? *Alternável no protótipo.*
+2. **P3. Terceira camada:** Concreto (monocromático, recomendado) ou Noite? *Alternável.*
+3. **P4. Lembrar a camada escolhida:** no aparelho, entre aberturas do app (recomendado) ou só na sessão, como os filtros?
+4. **P5. Rótulo da aba:** "Novo pico" (padrão de frase do DS, recomendado) ou "Novo Pico"? *Alternável.*
+5. **P6. Contagem:** "picos na área" (visível no mapa, recomendado) ou "picos carregados" (total)? *Alternável.*
+6. **P7. Web:** sidebar com os 3 itens (recomendado) ou navegação no topo? Camadas no web como Dialog (regra atual, no protótipo) ou popover não modal?
+7. **P8. Tokens novos** da seção 11 entram no DS v3 (GP-102)?
+8. **P9. Figma:** desenhar os frames a partir do protótipo quando houver cota (upgrade ou renovação do plano Starter).
 
 ## 15. Fora de escopo / pós-MVP
 Seguir a direção da bússola no botão de localização; camada de "picos com foto"; mapa 3D; lista de picos próximos; tablets e paisagem.
 
 ## 16. Protótipos e Figma
 
-- **Figma (DS):** https://www.figma.com/design/cFlDLcx1lxM6RouTMSrJQN , página "Telas" (`19:2`). **Frames não criados nesta rodada.** Sessão aberta (`create_session` ok) e a listagem das páginas funcionou; a chamada seguinte (`get_metadata` da página "Telas") retornou: *"You've reached the Figma MCP tool call limit on the Starter plan. Upgrade your plan for more tool calls"*. O modelo do dono (https://www.figma.com/design/3VexamkeziZHB1RPfTKedg/GO-picos?node-id=16-37) também não pôde ser lido.
-- **Frames a desenhar quando houver cota** (todos em claro e escuro, com as zonas Z0 a Z7 marcadas em camada de anotação): Home repouso (SE, Android 360x640, iPhone com notch); com filtros ativos; carregando; zero; zero por filtro; erro; resumo em peek e expandido (coluna subindo e sumindo); sheet de filtros aberto e expandido (SE); sheet de camadas (cada camada selecionada); localização (4 estados + sheet de permissão); busca com teclado; toast visível com resumo aberto; tab bar (estados das abas); web 1280 e 768 com sidebar, camadas e filtros em Dialog.
-- Nenhum protótipo HTML foi feito, por orientação do orquestrador.
+- **Protótipo HTML (referência visual desta spec):** `docs/design/prototipos/home.html`. Arquivo único, sem dependências além do Google Fonts (Inter e Permanent Marker); mapa simulado em SVG. Mostra a Home mobile em 3 aparelhos (iPhone SE 375 x 667, Android 360 x 640 com navegação de 3 botões, iPhone com Dynamic Island 393 x 852) e a adaptação web em 1280 x 800.
+  - **Topo do protótipo:** tema claro/escuro; seletor de estado (repouso, 2 filtros aplicados, resumo em peek, sheet de camadas, sheet de filtros e filtros expandido, carregando, zero picos, zero por filtro, erro, offline, localização buscando/localizado/permissão negada com sheet "Abrir ajustes", toast com resumo aberto, teclado na busca); "Mostrar zonas reservadas" (sobrepõe Z0 a Z7 em cada moldura e as zonas do web); e as alternativas P2, P3, P5 e P6.
+  - **Interativo:** pins abrem o resumo, toque no mapa fecha; Camadas e Filtros abrem e fecham os sheets (Dialogs no web); a camada troca o mapa simulado; adesivos marcam e desmarcam e atualizam a fita, os chips, os pins e o "Ver N picos"; "Aplicar", "Limpar", remover chip, a alça para expandir, localização (buscando e depois localizado), busca com teclado e as abas também funcionam.
+  - Link direto para um estado: `home.html#estado=peek&tema=escuro&zonas=1&camada=sat` (`estado` = valor do seletor; `camada` = `rua`, `sat` ou `third`).
+- **Figma (DS):** https://www.figma.com/design/cFlDLcx1lxM6RouTMSrJQN , página "Telas" (`19:2`). **Frames ainda não criados.** Na primeira tentativa, a sessão foi aberta e a listagem das páginas funcionou; a chamada seguinte (`get_metadata` da página "Telas") retornou: *"You've reached the Figma MCP tool call limit on the Starter plan. Upgrade your plan for more tool calls"*. O modelo do dono (https://www.figma.com/design/3VexamkeziZHB1RPfTKedg/GO-picos?node-id=16-37) também não pôde ser lido. Quando houver cota, desenhar a partir do protótipo: os mesmos estados, claro e escuro, com as zonas Z0 a Z7 em camada de anotação, e o web em 1280 e 768.
