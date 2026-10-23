@@ -4,7 +4,8 @@ import {
   listSpotReviewsService,
 } from '../../../services/spot/listSpotReviews/listSpotReviews.service';
 
-const toReview = (review: ReviewWithAuthor, userId: string) => ({
+/** Formato `Review` do schema (isMine relativo ao usuário logado). */
+export const toReview = (review: ReviewWithAuthor, userId: string) => ({
   id: review.id,
   rating: review.rating,
   description: review.description,

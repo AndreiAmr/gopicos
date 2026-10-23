@@ -2,6 +2,7 @@ import { Prisma } from '../../../prisma/generated';
 import { spotRepository } from '../../../database/repositories/Spot';
 import { spotReviewRepository } from '../../../database/repositories/SpotReview';
 import { AppError } from '../../../utils/AppError';
+import { validateReviewInput } from './validateReviewInput';
 
 type SpotReviewServiceProps = {
   rating: number;
@@ -9,8 +10,6 @@ type SpotReviewServiceProps = {
   authorId: string;
   spotId: string;
 };
-
-const MAX_DESCRIPTION = 500;
 
 const reviewAlreadyExists = () =>
   new AppError({
@@ -20,23 +19,7 @@ const reviewAlreadyExists = () =>
   });
 
 export const spotReviewService = async (data: SpotReviewServiceProps) => {
-  if (!Number.isInteger(data.rating) || data.rating < 1 || data.rating > 5) {
-    throw new AppError({
-      type: 'VALIDATION_ERROR',
-      message: 'A nota deve ser um número inteiro de 1 a 5.',
-      field: 'rating',
-    });
-  }
-
-  const description = data.description?.trim() || null;
-
-  if (description && description.length > MAX_DESCRIPTION) {
-    throw new AppError({
-      type: 'VALIDATION_ERROR',
-      message: 'O comentário deve ter no máximo 500 caracteres.',
-      field: 'description',
-    });
-  }
+  const { description } = validateReviewInput(data);
 
   const spot = await spotRepository.find(data.spotId);
 

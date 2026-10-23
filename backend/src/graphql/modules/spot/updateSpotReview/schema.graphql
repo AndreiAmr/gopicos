@@ -1,0 +1,11 @@
+input UpdateSpotReview {
+  "Inteiro de 1 a 5. Declarado Float para o service devolver VALIDATION_ERROR em pt-BR a valores como 4.5."
+  rating: Float!
+  "Substitui o comentário anterior; vazio ou ausente remove o comentário."
+  description: String
+}
+
+extend type Mutation {
+  "Só o autor edita (FORBIDDEN para os demais). A média do pico é recalculada."
+  updateSpotReview(id: String!, data: UpdateSpotReview!): Review! @Authenticated
+}
