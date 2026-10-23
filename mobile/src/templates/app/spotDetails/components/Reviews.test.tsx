@@ -88,6 +88,8 @@ describe('ReviewsSection', () => {
     expect(screen.getByText('Usuário Desativado')).toBeTruthy();
     expect(screen.getByText('?')).toBeTruthy();
     expect(screen.getAllByTestId('review-item')).toHaveLength(2);
+    // Com avaliações, "Sem avaliações" nunca aparece (GP-133).
+    expect(screen.queryByText(/Sem avaliações/)).toBeNull();
   });
 
   it('mostra carregando mais e erro ao paginar', async () => {
