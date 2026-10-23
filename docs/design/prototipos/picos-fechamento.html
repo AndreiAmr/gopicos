@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GoPicos - Picos, fechamento (DS v2)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+/* Tokens do DS v2.0 (docs/design/design-system.md). Protótipo estático, sem código de produção. */
+.light{--bg:#F0F3F5;--surface:#fff;--sunken:#E3E8EC;--text:#18181B;--muted:#565757;--subtle:#5C646A;--border:#7D858C;--divider:#D5DBE0;--primary:#F97316;--onp:#18181B;--soft:#FFEDD5;--ptext:#A84300;--star:#C77700;--error:#B3201F;--onerr:#fff;--info:#1D4ED8;--map:#E4EBE1;--road:#fff;--park:#CFE3C8}
+.dark{--bg:#0F1113;--surface:#181B1F;--sunken:#0A0B0D;--text:#F5F6F7;--muted:#B2B8BE;--subtle:#9AA1A8;--border:#838B93;--divider:#2C3138;--primary:#FB923C;--onp:#1A0B02;--soft:#3A2008;--ptext:#FDBA74;--star:#FBBF24;--error:#FF8A80;--onerr:#0F1113;--info:#7FA8FF;--map:#1B2229;--road:#2A323B;--park:#1F2E25}
+*{box-sizing:border-box}body{margin:0;background:#cfd4d8;font:16px/24px Inter,system-ui,sans-serif;color:#18181B;padding:24px}
+h1{font:28px 'Permanent Marker';margin:0 0 4px}h2{font:600 18px Inter;margin:36px 0 12px}p.n{margin:0 0 12px;color:#333;font-size:14px}
+.row{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.fr{position:relative;overflow:hidden;background:var(--bg);color:var(--text);border-radius:0;flex:none}
+.m{width:393px;height:852px}.w{width:1280px;height:800px}.tall{height:1180px}
+.cap{font:500 12px Inter;color:#444;margin:6px 0 0}
+.abs{position:absolute}.col{display:flex;flex-direction:column}.r{display:flex;align-items:center}
+.map{position:absolute;inset:0;background:var(--map)}.map i{position:absolute;background:var(--road);display:block}
+.map .pk{background:var(--park);border-radius:50%}
+svg.pl{position:absolute;inset:0;width:100%;height:100%}
+.sh{box-shadow:0 2px 10px rgba(0,0,0,.2)}
+.card{background:var(--surface);border-radius:12px;padding:16px}
+.btn{height:48px;border-radius:6px;background:var(--primary);color:var(--onp);font:600 16px Inter;display:flex;align-items:center;justify-content:center;width:100%;border:0}
+.btn.g{background:none;border:1.5px solid var(--border);color:var(--text)}.btn.d{background:none;border:1.5px solid var(--error);color:var(--error)}.btn.x{background:var(--error);color:var(--onerr)}.btn.dis{background:var(--divider);color:var(--subtle)}
+.chip{display:inline-flex;align-items:center;height:36px;padding:0 12px;border:1.5px solid var(--border);border-radius:4px;background:var(--surface);font:600 14px Inter;white-space:nowrap}
+.chip.on{background:#FACC15;border-color:#18181B;color:#18181B;box-shadow:2px 2px 0 #18181B}.chip.s{height:28px}
+.in{height:48px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);padding:0 14px;display:flex;align-items:center;width:100%}
+.in.e{border-color:var(--error)}.in.ta{height:96px;align-items:flex-start;padding-top:12px}
+label{font:500 14px/20px Inter;color:var(--muted);display:block;margin-bottom:6px}
+.err{color:var(--error);font:14px/20px Inter;margin-top:6px}.help{color:var(--muted);font:14px/20px Inter;margin-top:6px}
+.ph{color:var(--subtle)}.mu{color:var(--muted);font-size:14px;line-height:20px}.st{color:var(--star)}.stg{color:var(--divider)}
+.title{font:28px/32px 'Permanent Marker'}.spray{display:block;height:9px;width:190px;background:var(--primary);border-radius:99px;margin-top:2px;transform:rotate(-1.5deg)}
+.photo{background:var(--sunken);color:var(--subtle);display:flex;align-items:center;justify-content:center;font:500 14px Inter}
+.pin{position:absolute;height:26px;padding:0 8px;border-radius:99px;background:var(--surface);border:1.5px solid var(--border);font:600 12px Inter;display:flex;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.pin.on{background:var(--primary);color:var(--onp);border-color:#18181B;height:30px}
+.tab{position:absolute;left:0;right:0;bottom:0;height:84px;background:var(--surface);border-top:1px solid var(--divider);display:flex;justify-content:space-around;padding:8px 40px 24px;font:600 12px Inter;color:var(--muted)}
+.tab div{display:flex;flex-direction:column;align-items:center;gap:2px}.tab b{width:24px;height:24px;border-radius:50%;border:2px solid var(--muted)}.tab .a{color:var(--ptext)}.tab .a b{background:var(--primary);border-color:var(--primary)}
+.fab{position:absolute;width:56px;height:56px;border-radius:50%;background:var(--primary);color:var(--onp);font:500 32px Inter;display:flex;align-items:center;justify-content:center}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:20px 20px 0 0;padding:8px 16px 28px}
+.sheet:before{content:"";display:block;width:40px;height:4px;border-radius:2px;background:var(--divider);margin:0 auto 14px}
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+.hdr{position:absolute;left:0;right:0;top:0;height:64px;background:var(--surface);border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;padding:0 32px}
+.logo{font:28px 'Permanent Marker';color:var(--primary)}.dark .logo{color:var(--primary)}
+.back{position:absolute;width:44px;height:44px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:22px}
+.gap{gap:12px}.g8{gap:8px}.g16{gap:16px}.sk{background:var(--sunken);border-radius:6px}
+.row2{display:flex;justify-content:space-between;height:44px;align-items:center;border-bottom:1px solid var(--divider);font-size:14px}.row2:last-child{border:0}.row2 b{font-weight:600}
+.seg{display:flex;border:1.5px solid var(--border);border-radius:6px;overflow:hidden;height:44px}.seg div{flex:1;display:flex;align-items:center;justify-content:center;font:600 14px Inter}.seg .on{background:var(--primary);color:var(--onp)}
+.sw{width:48px;height:28px;border-radius:99px;background:var(--divider);position:relative}.sw.on{background:var(--primary)}.sw:after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff}.sw.on:after{left:23px}
+.cb{width:24px;height:24px;border:2px solid var(--border);border-radius:4px;flex:none;display:flex;align-items:center;justify-content:center;font-size:16px}.cb.on{background:var(--primary);border-color:var(--primary);color:var(--onp)}
+.ph3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.ph3 .photo{height:100px;border-radius:6px;position:relative}.ph3 .add{border:1.5px dashed var(--border);background:none}
+.x{position:absolute;top:4px;right:4px;width:28px;height:28px;border-radius:50%;background:var(--surface);color:var(--text);display:flex;align-items:center;justify-content:center;font-size:14px}
+.ban{display:flex;gap:8px;border:1.5px solid var(--error);border-left-width:4px;border-radius:6px;background:var(--sunken);padding:12px;font-size:14px;line-height:20px}
+.ctr{display:flex;align-items:center;justify-content:center}
+.dlg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:420px;background:var(--surface);border-radius:12px;padding:24px}
+.pop{position:absolute;width:360px;background:var(--surface);border-radius:12px;padding:16px}
+.sec{font:600 14px Inter;margin:16px 0 8px}
+</style>
+</head>
+<body>
+<h1>GoPicos - Picos, fechamento</h1>
+<p class="n">Protótipo estático (Figma indisponível por limite do plano). Tokens do DS v2.0. Fonte de verdade: <code>docs/design/specs/picos-fechamento.md</code>.</p>
+<div id="app"></div>
+<script>
+const A=document.getElementById('app');
+const map=(t=0)=>`<div class="map" style="top:${t}px"><i class="pk" style="left:50%;top:60%;width:30%;height:22%"></i><i style="left:0;top:35%;width:130%;height:14px;transform:rotate(8deg)"></i><i style="left:0;top:68%;width:130%;height:10px;transform:rotate(-6deg)"></i></div>`;
+const fr=(cls,th,inner,cap)=>`<div><div class="fr ${th} ${cls}">${inner}</div><div class="cap">${cap}</div></div>`;
+const sec=(t,n)=>`<h2>${t}</h2><p class="n">${n}</p>`;
+const R=(t,n,...x)=>`${sec(t,n)}<div class="row">${x.join('')}</div>`;
+const stars=(n,sz=16)=>`<span style="font-size:${sz}px">${[1,2,3,4,5].map(i=>`<span class="${i<=Math.round(n)?'st':'stg'}">★</span>`).join('')}</span>`;
+const hdr=`<div class="hdr"><span class="logo">GoPicos</span><div class="r g16"><div class="btn" style="width:130px;height:40px">Novo pico</div><div class="photo" style="width:32px;height:32px;border-radius:50%">AM</div></div></div>`;
+const search=(st)=>`<div class="in sh abs" style="${st};width:420px">🔍&nbsp; <span class="ph">Buscar cidade ou endereço</span></div>`;
+const poly=(p,w=1280,h=800)=>`<svg class="pl" viewBox="0 0 ${w} ${h}"><polygon points="${p}" fill="var(--primary)" fill-opacity=".3" stroke="var(--ptext)" stroke-width="3"/></svg>`;
+const homeW=(mode)=>fr('w','light',map(64)+hdr+poly('500,330 640,300 700,400 570,460')+search('left:24px;top:84px')+`<div class="abs r g8" style="left:24px;top:144px"><span class="chip">Filtros</span></div><span class="pin on" style="left:540px;top:372px">★ 4,6</span><span class="pin" style="left:240px;top:260px">Novo</span>`+(mode==='sel'?`<div class="card sh abs col g8" style="left:660px;top:300px;width:340px"><b>Pista da Vila</b><div class="r g8">${stars(4.6)}<b>4,6 (23)</b></div><div class="mu">A 1,2 km de você</div><div class="btn" style="height:40px">Ver detalhes</div></div>`:'')+(mode==='empty'?`<div class="card sh abs col g8 ctr" style="left:440px;bottom:40px;width:400px;text-align:center"><b style="font-size:20px">Nenhum pico por aqui ainda</b><div class="mu">Seja o primeiro a cadastrar um pico nesta região.</div><div class="btn">Cadastrar o primeiro pico</div></div>`:'')+(mode==='err'?`<div class="ban abs" style="left:400px;top:84px;width:480px"><b style="color:var(--error)">!</b><div style="flex:1">Não foi possível carregar os picos.</div><b>Tentar novamente</b></div>`:''),
+ {sel:'Home web: pico selecionado, popover com nota',empty:'Home web: vazio',err:'Home web: erro',n:'Home web: padrão'}[mode||'n']);
+const pins=(th)=>fr('m',th,map()+`<span class="pin" style="left:40px;top:120px">★ 4,6</span><span class="pin" style="left:150px;top:200px">★ 3,8</span><span class="pin" style="left:260px;top:140px">Novo</span><span class="pin on" style="left:120px;top:320px">★ 5,0</span><div class="card sh abs col g8" style="left:16px;right:16px;bottom:100px"><div class="r gap"><div class="photo" style="width:72px;height:72px;border-radius:6px">Foto</div><div class="col"><b>Bowl do Parque</b><span class="mu">Sem avaliações</span></div></div></div>`+`<div class="tab"><div class="a"><b></b>Mapa</div><div><b></b>Perfil</div></div>`,'Pins: com nota, "Novo", selecionado; resumo sem avaliações');
+const detailW=()=>fr('w','light',hdr+`<div class="abs col g8" style="left:80px;top:96px;width:680px"><div class="photo" style="width:680px;height:380px;border-radius:12px">Foto grande (clique abre lightbox)</div><div class="r g8">${[1,2,3,4].map(i=>`<div class="photo" style="width:88px;height:64px;border-radius:6px;${i==1?'border:2px solid var(--primary)':''}">${i}</div>`).join('')}</div><div class="mu">Descrição do pico...</div><b style="font-size:20px" id="avaliacoes">Avaliações</b><div class="r gap"><b style="font-size:36px">4,6</b>${stars(4.6,20)}<span class="mu">23 avaliações</span></div><div class="mu">(lista de avaliações, botão "Carregar mais")</div></div><div class="abs col gap" style="left:792px;top:96px;width:408px"><span class="mu">← Voltar ao mapa</span><div class="title">Pista da Vila</div><span class="spray"></span><div class="r g8"><span class="chip on">Street</span><span class="chip">Gratuito</span></div><div class="r g8">${stars(4.6)}<b>4,6</b><span class="mu">Ver avaliações</span></div><div class="card" style="padding:4px 16px"><div class="row2"><span class="mu">Entrada</span><b>Gratuita</b></div><div class="row2"><span class="mu">Horário</span><b>24 horas</b></div></div><div class="btn">Avaliar este pico</div><div class="r g8"><div class="btn g">Editar</div><div class="btn d">Excluir</div></div></div>`,'Detalhe web, duas colunas');
+const lightbox=()=>fr('w','dark',`<div class="dim" style="background:rgba(0,0,0,.9)"></div><div class="photo abs" style="left:240px;top:80px;width:800px;height:600px;border-radius:6px">Foto 2 / 4</div><div class="abs" style="right:32px;top:24px;font-size:28px;color:#fff">✕</div><div class="abs" style="left:96px;top:370px;font-size:36px;color:#fff">‹</div><div class="abs" style="right:96px;top:370px;font-size:36px;color:#fff">›</div>`,'Lightbox (Esc fecha, setas trocam)');
+const wiz1=()=>fr('w','light',map(64)+hdr+poly('500,330 640,300 700,400 570,460')+`<div class="card sh abs col g8" style="left:16px;top:80px;width:360px;height:700px"><span class="mu">Passo 1 de 2</span><b style="font-size:20px">Marque o local do pico</b><div class="mu">Clique no mapa para marcar os cantos. Arraste um ponto para ajustar.</div><b>4 pontos</b><div class="mu">R. Exemplo, Vila Madalena</div><div class="btn g">Adicionar ponto no centro do mapa</div><div class="r g8"><div class="btn g">Desfazer</div><div class="btn g">Limpar</div></div><div class="btn g">Usar minha posição</div><div style="flex:1"></div><div class="btn">Continuar</div></div>`,'Criar web, passo 1 (/spot/new-spot)');
+const form=(edit,err)=>`<div class="abs col g16" style="left:360px;top:88px;width:560px"><span class="mu">${edit?'':'Passo 2 de 2'}</span><div class="title">${edit?'Editar pico':'Detalhes do pico'}</div><span class="spray"></span><div class="r g8"><div class="photo" style="flex:1;height:60px;border-radius:6px">Local marcado, 4 pontos</div><b>Alterar</b></div><div class="photo" style="height:100px;border:1.5px dashed var(--border);background:none;border-radius:6px">${edit?'':'Arraste as fotos aqui ou escolha no computador'}</div><div class="ph3">${[1,2,3].map(i=>`<div class="photo">${i==1?'Capa':'Foto'}<div class="x">✕</div></div>`).join('')}</div><div><label>Nome</label><div class="in ${err?'e':''}">${err?'':'Pista da Vila'}</div>${err?'<div class="err">Informe o nome do pico.</div>':''}</div><div class="r g8"><span class="chip on">Street</span><span class="chip">Park</span><span class="chip">Bowl/Pool</span></div><div class="seg"><div class="on">Gratuito</div><div>Pago</div></div></div><div class="abs r g8" style="left:360px;top:740px;width:560px;justify-content:flex-end;background:var(--bg)"><div class="btn g" style="width:140px">${edit?'Cancelar':'Voltar'}</div><div class="btn" style="width:200px">${edit?'Salvar alterações':'Criar pico'}</div></div>`;
+const wiz2=()=>fr('w','light',hdr+form(0,1),'Criar web, passo 2 (/spot/new-spot/details), erro de campo');
+const editW=()=>fr('w','light',hdr+form(1,0),'Editar web (/spot/:id/edit), barra de ações fixa');
+const editM=()=>fr('m','light',`<div class="back sh" style="left:16px;top:58px">←</div><div class="abs col g16" style="left:20px;top:112px;width:353px"><div class="title">Editar pico</div><span class="spray"></span><div class="r g8"><div class="photo" style="flex:1;height:56px;border-radius:6px">Local marcado, 4 pontos</div><b>Alterar local</b></div><div class="ph3">${[1,2].map(i=>`<div class="photo">Foto<div class="x">✕</div></div>`).join('')}<div class="photo add">+</div></div><div class="in">Pista da Vila</div><div class="in ta">Descrição</div></div><div class="abs" style="left:0;right:0;bottom:0;padding:12px 20px 28px;background:var(--surface);border-top:1px solid var(--divider)"><div class="btn">Salvar alterações</div></div>`,'Editar mobile, botão fixo');
+const rateW=()=>fr('w','light',hdr+`<div class="dim"></div><div class="dlg col g16" style="width:480px"><b style="font-size:20px">Avaliar este pico</b><div class="r g8 ctr" style="font-size:32px">${[1,2,3,4].map(()=>'<span class="st">★</span>').join('')}<span class="stg">★</span></div><div class="ctr mu">Muito bom</div><div class="in ta"><span class="ph">Comentário (opcional)</span></div><div class="mu" style="text-align:right">0/500</div><div class="r g8"><div class="btn g">Cancelar</div><div class="btn">Enviar avaliação</div></div></div>`,'Avaliar web, dialog 480');
+const avM=(step)=>fr('m','light',step==0?`<div class="abs col g8" style="left:0;right:0;top:100px;align-items:center"><div style="position:relative"><div class="photo" style="width:96px;height:96px;border-radius:50%;background:var(--soft);color:var(--ptext);font-size:28px">AM</div><div class="fab" style="width:28px;height:28px;right:0;bottom:0;font-size:14px">📷</div></div><b>Andrei Amaral</b></div><div class="dim"></div><div class="sheet col g8"><div class="btn g">Tirar foto</div><div class="btn g">Escolher da galeria</div><div class="btn d">Remover foto</div><div class="btn g" style="border:0">Cancelar</div></div>`:`<div class="abs col g16 ctr" style="left:20px;right:20px;top:120px"><div class="photo" style="width:280px;height:280px;border-radius:50%;border:3px solid var(--primary)">Recorte 1:1</div><div class="r g8" style="width:100%">Zoom<div class="sk" style="flex:1;height:6px"></div></div><div class="btn">Usar esta foto</div><div class="btn g">Trocar imagem</div></div>`,step==0?'Avatar mobile: sheet de origem':'Avatar mobile: recorte');
+const avW=()=>fr('w','light',hdr+`<div class="dim"></div><div class="dlg col g16" style="width:440px"><b style="font-size:20px">Alterar foto de perfil</b><div class="photo ctr" style="height:120px;border:1.5px dashed var(--border);background:none;border-radius:6px">Arraste uma imagem ou escolha no computador</div><div class="photo" style="width:160px;height:160px;border-radius:50%;margin:0 auto">Prévia</div><div class="mu">JPG, PNG ou WebP, até 5 MB.</div><div class="r g8"><div class="btn g">Cancelar</div><div class="btn">Usar esta foto</div></div></div>`,'Avatar web: dialog com prévia');
+const avErr=()=>fr('m','light',`<div class="ban abs" style="left:16px;right:16px;top:120px"><b style="color:var(--error)">!</b><div style="flex:1">Não foi possível enviar a foto.</div><b>Tentar novamente</b></div><div class="abs ctr" style="left:0;right:0;top:220px"><div class="photo" style="width:96px;height:96px;border-radius:50%;background:var(--soft);color:var(--ptext);font-size:28px">AM</div></div>`,'Avatar: erro, foto anterior mantida');
+const filtW=()=>fr('w','light',map(64)+hdr+search('left:24px;top:84px')+`<div class="abs r g8" style="left:24px;top:144px"><span class="chip on">Filtros (3)</span><span class="chip">Street ✕</span><span class="chip">Coberto ✕</span></div><div class="pop sh col g8" style="left:24px;top:192px"><div class="r" style="justify-content:space-between"><b>Filtros</b><span style="color:var(--ptext);font-weight:600">Limpar filtros</span></div><div class="sec">Modalidade</div><div class="r g8"><span class="chip on s">Street</span><span class="chip s">Park</span><span class="chip s">Bowl/Pool</span></div><div class="sec">Entrada</div><div class="seg"><div>Todos</div><div class="on">Gratuito</div><div>Pago</div></div><div class="sec">Nota mínima</div><div class="seg"><div>Qualquer</div><div>3+</div><div class="on">4+</div><div>5</div></div><div class="btn" style="margin-top:8px">Aplicar filtros</div></div>`,'Filtros web, popover 360');
+A.innerHTML=R('1. Home web (#35)','Padrão, selecionado, vazio e erro.',homeW(),homeW('sel'),homeW('empty'),homeW('err'))
++R('2. Nota nos pins e resumo (#60)','Pin com nota, Novo, selecionado; resumo sem avaliações.',pins('light'),pins('dark'))
++R('3. Detalhe web (#38)','Duas colunas e lightbox.',detailW(),lightbox())
++R('4. Criar pico web (#40)','Passo 1 com painel lateral; passo 2 em coluna de 560.',wiz1(),wiz2())
++R('5. Editar pico (#44, #45)','Web com ações fixas; mobile com botão fixo.',editW(),editM())
++R('6. Avaliar web (#57, #59)','Dialog com estrelas, rótulo e contador.',rateW())
++R('7. Filtros web (#50)','Popover com nota mínima.',filtW())
++R('8. Foto de perfil (#72)','Sheet de origem, recorte, dialog web e erro.',avM(0),avM(1),avW(),avErr());
+</script>
+</body>
+</html>
