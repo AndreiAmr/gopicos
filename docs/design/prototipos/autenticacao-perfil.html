@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GoPicos - Autenticação e perfil - protótipo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Permanent+Marker&display=swap" rel="stylesheet">
+<!-- Protótipo HTML estático e autocontido (só Google Fonts de fora). Não é código de produção.
+     Feito em HTML porque o Figma MCP (plano Starter) bateu o limite de chamadas; fallback autorizado pelo dono. -->
+<style>
+:root{
+  --bg:#F0F3F5;--surface:#FFFFFF;--sunken:#E3E8EC;--text:#18181B;--muted:#565757;--subtle:#5C646A;
+  --border:#7D858C;--divider:#D5DBE0;--primary:#F97316;--primary-hover:#EA580C;--on-primary:#18181B;
+  --primary-soft:#FFEDD5;--primary-text:#A84300;--star:#C77700;--success:#146C35;--error:#B3201F;--on-error:#FFFFFF;
+  --error-soft:#FDECEC;--warning:#8F5200;--info:#1D4ED8;--focus:#1D4ED8;--yellow:#FACC15;--ink:#18181B;
+  --outline:#18181B;--stk:#18181B;--dim:rgba(0,0,0,.4);
+  --shadow2:0 4px 12px rgba(24,24,27,.14);--shadow3:0 12px 32px rgba(24,24,27,.22);
+  --page:#D9DFE4;--page-text:#18181B;--kb:#D1D4DA;--key:#FFFFFF;--key2:#ADB3BC;
+  --map-land:#F2EFE9;--map-bld:#E3DED4;--map-road:#FFFFFF;--map-case:#D6CFC3;--map-park:#CDE6C2;--map-water:#A9D3EE;--map-label:#4F555C;
+}
+[data-theme="dark"]{
+  --bg:#0F1113;--surface:#181B1F;--sunken:#0A0B0D;--text:#F5F6F7;--muted:#B2B8BE;--subtle:#9AA1A8;
+  --border:#838B93;--divider:#2C3138;--primary:#FB923C;--primary-hover:#FDBA74;--on-primary:#1A0B02;
+  --primary-soft:#3A2008;--primary-text:#FDBA74;--star:#FBBF24;--success:#4ADE80;--error:#FF8A80;--on-error:#0F1113;
+  --error-soft:#3A1414;--warning:#FBBF24;--info:#7FA8FF;--focus:#7FA8FF;
+  --outline:#F5F6F7;--stk:#FACC15;--dim:rgba(0,0,0,.55);
+  --shadow2:0 0 0 1px rgba(255,255,255,.08);--shadow3:0 0 0 1px rgba(255,255,255,.10),0 12px 32px rgba(0,0,0,.5);
+  --page:#050607;--page-text:#F5F6F7;--kb:#2B2B2E;--key:#6B6B70;--key2:#47474B;
+  --map-land:#1A2131;--map-bld:#232C3F;--map-road:#2E3950;--map-case:#141A26;--map-park:#1B332E;--map-water:#0B1727;--map-label:#AEB8CB;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:Inter,system-ui,sans-serif;background:var(--page);color:var(--page-text);-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer}
+.pm{font-family:'Permanent Marker','Inter',cursive;font-weight:400;letter-spacing:.2px}
+
+/* barra do protótipo */
+.proto-bar{position:sticky;top:0;z-index:1000;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end;padding:12px 24px;background:var(--surface);color:var(--text);border-bottom:1px solid var(--divider);box-shadow:var(--shadow2)}
+.proto-bar h1{margin:0 12px 0 0;font-size:20px;line-height:24px;display:flex;align-items:center;gap:10px}
+.proto-bar h1 small{font:500 12px Inter;color:var(--muted);display:block}
+.pb-group{display:flex;flex-direction:column;gap:4px}
+.pb-group>span{font:600 11px Inter;color:var(--muted)}
+.pb-seg{display:flex;border:1.5px solid var(--border);border-radius:6px;overflow:hidden}
+.pb-seg button{border:0;background:var(--surface);color:var(--text);font:600 13px Inter;padding:8px 12px;min-height:36px}
+.pb-seg button[aria-pressed="true"]{background:var(--primary);color:var(--on-primary)}
+.proto-bar select{min-height:36px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font:500 13px Inter;padding:0 8px;max-width:340px}
+.pb-check{display:flex;align-items:center;gap:8px;min-height:36px;font:600 13px Inter;border:1.5px solid var(--border);border-radius:6px;padding:0 12px;background:var(--surface);color:var(--text)}
+.pb-check input{width:18px;height:18px;accent-color:var(--primary)}
+.pb-nav{display:flex;gap:6px}
+.pb-nav button{min-height:36px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font:600 13px Inter;padding:0 10px}
+.proto-bar :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+main{padding:20px 24px 64px}
+.note{max-width:1240px;margin:0 auto 18px;display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.note-card{flex:1 1 560px;background:var(--surface);color:var(--text);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow2);font-size:14px;line-height:20px}
+.note-card b{font-weight:700}
+.note-card ul{margin:6px 0 0;padding-left:18px}
+.legend{flex:0 1 520px;display:flex;flex-wrap:wrap;gap:6px;background:var(--surface);color:var(--text);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow2);font:600 12px Inter}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-2px;border:2px dashed}
+.legend span{white-space:nowrap;margin-right:10px}
+.phones{display:flex;flex-wrap:wrap;gap:36px;justify-content:center;align-items:flex-start}
+.device{display:flex;flex-direction:column;align-items:center;gap:10px;margin:0}
+.device figcaption{font:600 13px Inter;color:var(--page-text);text-align:center}
+.device figcaption small{display:block;font-weight:500;opacity:.75}
+.bezel{background:#0B0B0C;box-shadow:0 30px 60px rgba(0,0,0,.35),inset 0 0 0 2px #2A2A2D}
+.bezel.se{padding:72px 12px;border-radius:50px;position:relative}
+.bezel.se::before{content:"";position:absolute;top:30px;left:50%;width:56px;height:6px;margin-left:-28px;border-radius:3px;background:#222}
+.bezel.se::after{content:"";position:absolute;bottom:13px;left:50%;width:46px;height:46px;margin-left:-23px;border-radius:50%;border:2px solid #333}
+.bezel.and{padding:10px;border-radius:30px}
+.bezel.notch{padding:12px;border-radius:60px}
+.screen{position:relative;overflow:hidden;background:var(--bg);isolation:isolate;color:var(--text)}
+.bezel.and .screen{border-radius:22px}
+.bezel.notch .screen{border-radius:48px}
+.a{position:absolute}
+h2.sec{max-width:1240px;margin:44px auto 14px;font-size:18px;color:var(--page-text);display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+h2.sec small{font:500 13px Inter;opacity:.75}
+.webs{display:flex;flex-direction:column;gap:28px;align-items:center}
+.webbox{display:flex;flex-direction:column;gap:8px;align-items:center}
+.webbox figcaption{font:600 13px Inter}
+.webclip{overflow:hidden;border-radius:12px;box-shadow:0 30px 60px rgba(0,0,0,.3)}
+.web{position:relative;overflow:hidden;background:var(--bg);transform-origin:top left;color:var(--text)}
+
+/* sistema */
+.statusbar{left:0;right:0;top:0;display:flex;align-items:center;justify-content:space-between;font:600 15px Inter;z-index:90;padding:0 22px;color:var(--text);pointer-events:none}
+.island{left:50%;top:11px;width:126px;height:37px;margin-left:-63px;border-radius:20px;background:#000;z-index:96}
+.punch{left:50%;top:8px;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:#000;z-index:96;box-shadow:0 0 0 2px #1b1b1b}
+.homeind{left:50%;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--text);z-index:95}
+.andnav{left:0;right:0;display:flex;justify-content:space-around;align-items:center;color:var(--muted);z-index:95;background:var(--surface)}
+.kb{left:0;right:0;background:var(--kb);z-index:70;padding:6px 3px 0}
+.kbrow{display:flex;justify-content:center;gap:5px;margin:0 0 10px}
+.key{height:40px;flex:1;max-width:34px;border-radius:5px;background:var(--key);box-shadow:0 1px 0 rgba(0,0,0,.3);display:grid;place-items:center;font:400 19px Inter;color:var(--text)}
+.key.w{max-width:none;flex:1.5;background:var(--key2);font-size:14px}
+.key.sp{max-width:none;flex:5;font-size:14px}
+.key.go{max-width:none;flex:2;background:var(--info);color:#fff;font-size:14px;font-weight:600}
+.kbpred{display:flex;justify-content:space-around;height:36px;align-items:center;font:500 15px Inter;color:var(--text);margin-bottom:6px}
+
+/* zonas */
+.zone{position:absolute;border:2px dashed;border-radius:4px;z-index:200;pointer-events:none!important;font:700 10px/12px Inter;padding:2px 4px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.zone em{font-style:normal;display:inline-block;padding:1px 4px;border-radius:3px;background:rgba(0,0,0,.6)}
+
+/* componentes base */
+.btn{height:48px;border-radius:6px;font:600 16px Inter;display:flex;align-items:center;justify-content:center;gap:8px;border:0;width:100%;padding:0 16px;white-space:nowrap}
+.btn.primary{background:var(--primary);color:var(--on-primary)}
+.btn.primary:active{background:var(--primary-hover)}
+.btn.primary[disabled]{background:var(--sunken);color:var(--subtle);cursor:not-allowed}
+.btn.secondary{background:var(--surface);border:1.5px solid var(--border);color:var(--text)}
+.btn.ghost{background:transparent;color:var(--text)}
+.btn.danger{background:var(--error);color:var(--on-error)}
+.btn.danger-ghost{background:transparent;color:var(--error)}
+.btn.loading{opacity:.85}
+.btn .spin,.spin{animation:spin 1s linear infinite;transform-origin:50% 50%}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+.xbtn{width:48px;height:48px;border:0;background:none;color:var(--text);display:grid;place-items:center;border-radius:6px;flex:none}
+.backbtn{width:48px;height:48px;border:0;background:none;color:var(--text);display:grid;place-items:center;border-radius:6px;flex:none}
+.lnk{color:var(--primary-text);font-weight:600;text-decoration:underline;white-space:nowrap;background:none;border:0;padding:0;font-size:14px;min-height:44px}
+.caption{font:500 12px/16px Inter;color:var(--muted)}
+.lbl{font:600 14px/20px Inter;color:var(--text);display:block;margin-bottom:6px}
+.help{font:500 12px/16px Inter;color:var(--muted);margin-top:4px}
+.err{font:600 12px/16px Inter;color:var(--error);margin-top:4px;display:flex;gap:4px;align-items:flex-start}
+.input{height:48px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);display:flex;align-items:center;padding:0 14px;font:400 16px Inter;color:var(--text);gap:8px}
+.input.ph{color:var(--subtle)}
+.input.focus{border:2px solid var(--focus);box-shadow:0 0 0 3px color-mix(in srgb,var(--focus) 18%,transparent)}
+.input.bad{border:2px solid var(--error)}
+.input.ta{height:auto;min-height:96px;align-items:flex-start;padding-top:12px;line-height:22px}
+.caret{display:inline-block;width:2px;height:20px;background:var(--focus);vertical-align:-4px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.field{margin-bottom:16px}
+.banner{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--error-soft);border:1.5px solid var(--error);border-radius:6px;font:500 14px/20px Inter;color:var(--text)}
+.banner .ico{color:var(--error);flex:none;margin-top:1px}
+.banner.info{background:var(--surface);border-color:var(--info)}
+.banner.info .ico{color:var(--info)}
+.toast{display:flex;gap:10px;align-items:flex-start;padding:12px;background:var(--surface);border-radius:12px;box-shadow:var(--shadow2);border:1px solid var(--divider);border-left:4px solid var(--error);font:500 14px/20px Inter;color:var(--text);z-index:60}
+.toast.info{border-left-color:var(--info)}
+.toast.success{border-left-color:var(--success)}
+
+/* marca */
+.tape-wrap{display:inline-block;filter:drop-shadow(1px 2px 0 rgba(0,0,0,.28))}
+.tape{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:4px 14px;background:var(--yellow);color:var(--ink);font:700 13px/16px Inter;transform:rotate(-3deg);
+  clip-path:polygon(0 14%,3% 0,6% 10%,9% 0,91% 0,94% 10%,97% 0,100% 16%,98% 50%,100% 84%,96% 100%,92% 90%,88% 100%,12% 100%,8% 90%,4% 100%,0 86%,2% 50%)}
+.caution{height:10px;background:repeating-linear-gradient(-45deg,var(--yellow) 0 10px,var(--ink) 10px 20px)}
+.halftone{background-image:radial-gradient(circle,var(--primary) 1.3px,transparent 1.7px);background-size:7px 7px;opacity:.38;pointer-events:none;
+  -webkit-mask-image:radial-gradient(circle at 100% 0,#000 20%,transparent 72%);mask-image:radial-gradient(circle at 100% 0,#000 20%,transparent 72%)}
+.stk{min-height:44px;padding:0 14px;display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--border);border-radius:4px;background:var(--surface);color:var(--text);font:600 14px Inter}
+.stk.on{background:var(--yellow);color:var(--ink);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--stk);transform:rotate(-2deg)}
+.stk.on:nth-child(even){transform:rotate(1.5deg)}
+.mchip{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 10px;background:var(--yellow);color:var(--ink);border:2px solid var(--ink);border-radius:4px;box-shadow:2px 2px 0 var(--stk);font:600 13px Inter;transform:rotate(-2deg)}
+.mchip.alt{background:var(--surface);color:var(--text);border-color:var(--outline);transform:rotate(1.5deg)}
+.seg{display:flex;border:2px solid var(--outline);border-radius:6px;background:var(--sunken);padding:2px;gap:2px;height:48px}
+.seg button{flex:1;border:0;border-radius:4px;background:transparent;color:var(--text);font:600 14px Inter;display:flex;align-items:center;justify-content:center;gap:4px}
+.seg button.on{background:var(--primary);color:var(--on-primary);box-shadow:inset 0 0 0 2px var(--ink)}
+.swrow{display:flex;align-items:center;justify-content:space-between;min-height:48px;font:500 16px Inter;color:var(--text)}
+.sw{width:48px;height:28px;border-radius:14px;background:var(--sunken);border:2px solid var(--border);position:relative;flex:none}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--surface);border:2px solid var(--border);box-sizing:border-box}
+.sw.on{background:var(--primary);border-color:var(--ink)}
+.sw.on::after{left:22px;border-color:var(--ink);background:#fff}
+.cbrow{display:flex;align-items:center;gap:12px;min-height:48px;font:500 16px Inter}
+.cb{width:24px;height:24px;border:2px solid var(--border);border-radius:4px;display:grid;place-items:center;flex:none;background:var(--surface)}
+.cb.on{background:var(--primary);border-color:var(--ink);color:var(--on-primary)}
+.ctl{width:48px;height:48px;border-radius:6px;background:var(--surface);border:2px solid var(--outline);box-shadow:3px 3px 0 var(--stk);display:grid;place-items:center;color:var(--text);position:relative;padding:0}
+.ctl[disabled]{color:var(--subtle);box-shadow:none;border-color:var(--border);cursor:not-allowed}
+.ctl:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--stk)}
+
+/* header de tela (mobile) */
+.hdr{left:0;right:0;top:0;background:var(--surface);border-bottom:2px solid var(--outline);z-index:30;overflow:hidden}
+.hdr-row{position:absolute;left:0;right:0;bottom:0;height:64px;display:flex;align-items:center;gap:4px;padding:0 12px 0 4px}
+.hdr .ttl{font-family:'Permanent Marker',cursive;font-size:24px;line-height:28px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr .sprayw{position:absolute;left:52px;bottom:6px}
+.hdr .halftone{position:absolute;right:0;top:0;width:110px;height:100%}
+
+/* sheet */
+.veil{left:0;right:0;background:var(--dim);z-index:35}
+.sheet{left:0;right:0;background:var(--surface);border-radius:20px 20px 0 0;box-shadow:var(--shadow3);overflow:hidden;z-index:40;color:var(--text);display:flex;flex-direction:column}
+[data-theme="dark"] .sheet{border-top:1px solid var(--divider)}
+.sheet.stk-edge{border-top:2px solid var(--outline)}
+.handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:8px auto 0;flex:none;border:0;padding:0}
+.sheet .caution{flex:none}
+.sheet-body{padding:12px 16px 16px;display:flex;flex-direction:column;gap:12px;position:relative}
+.sheet .halftone{position:absolute;right:0;top:0;width:120px;height:90px}
+.st-title{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.st-title .pmt{font-family:'Permanent Marker',cursive;font-size:26px;line-height:32px}
+.st-title h3{margin:0;font:700 20px/28px Inter}
+.optrow{display:flex;align-items:center;gap:14px;min-height:64px;padding:8px 12px;border:1.5px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text);text-align:left;width:100%}
+.optrow .oi{width:44px;height:44px;border-radius:6px;background:var(--yellow);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--stk);display:grid;place-items:center;color:var(--ink);flex:none;transform:rotate(-3deg)}
+.optrow b{display:block;font:600 16px/22px Inter}
+.optrow small{display:block;font:500 12px/16px Inter;color:var(--muted)}
+.optrow.danger{color:var(--error)}
+.optrow.danger .oi{background:var(--error-soft);border-color:var(--error);color:var(--error);box-shadow:none}
+
+/* dialog web */
+.wveil{background:var(--dim);z-index:35}
+.dlg{background:var(--surface);border-radius:12px;border:2px solid var(--outline);box-shadow:6px 6px 0 var(--stk);z-index:40;color:var(--text);display:flex;flex-direction:column;overflow:hidden}
+.dlg .halftone{position:absolute;right:0;top:0;width:140px;height:100px}
+.dlg-body{padding:20px 24px 24px;display:flex;flex-direction:column;gap:14px;position:relative}
+.dlg-foot{display:flex;justify-content:flex-end;gap:12px}
+.dlg-foot .btn{width:auto}
+
+/* web chrome */
+.wheader{left:0;right:0;top:0;height:64px;background:var(--surface);border-bottom:2px solid var(--outline);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:30;color:var(--text)}
+.wrail{left:0;top:64px;bottom:0;width:72px;background:var(--surface);border-right:2px solid var(--outline);z-index:30;display:flex;flex-direction:column;align-items:stretch;padding-top:8px;gap:4px}
+.witem{height:72px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font:600 12px/14px Inter;color:var(--muted);background:none;border:0;position:relative}
+.witem.on{color:var(--text);font-weight:700;background:var(--primary-soft)}
+.witem.on::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:4px;background:var(--primary);border-radius:0 2px 2px 0}
+.newstk{width:40px;height:34px;border-radius:4px;background:var(--primary);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--stk);display:grid;place-items:center;color:var(--on-primary);transform:rotate(-3deg);margin-bottom:3px}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--sunken);display:grid;place-items:center;font:700 15px Inter;color:var(--text);border:2px solid var(--outline);flex:none}
+.wpanel{background:var(--surface);border:2px solid var(--outline);border-radius:12px;box-shadow:4px 4px 0 var(--stk);z-index:20;color:var(--text)}
+
+/* tab bar (mobile) */
+.tabbar{left:0;right:0;background:var(--surface);border-top:2px solid var(--outline);z-index:30}
+.tabs{display:flex;height:64px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:600 12px/14px Inter;color:var(--muted);background:none;border:0;padding:0;position:relative}
+.tab.on{color:var(--text);font-weight:700}
+
+[data-go]{cursor:pointer}
+
+</style>
+</head>
+<body>
+<header class="proto-bar" id="bar" aria-label="Controles do protótipo"></header>
+<main>
+  <div class="note"><div class="note-card" id="note" aria-live="polite"></div><div class="legend" id="legend" aria-label="Legenda das zonas reservadas"></div></div>
+  <h2 class="sec">Mobile <small>toque nos elementos das telas para navegar entre os estados</small></h2>
+  <div class="phones" id="phones"></div>
+  <h2 class="sec">Web <small>o mesmo estado no navegador</small></h2>
+  <div class="webs" id="webs"></div>
+</main>
+<script>
+/* ===== Base comum dos protótipos (gerada; não é código de produção) ===== */
+var GP=(function(){
+'use strict';
+const DEV={
+  se:{id:'se',w:375,h:667,top:20,bot:0,kb:260,label:'iPhone SE 375 x 667',sub:'status 20, sem home indicator'},
+  and:{id:'and',w:360,h:640,top:24,bot:48,kb:256,label:'Android 360 x 640',sub:'status 24, navegação de 3 botões (48)'},
+  notch:{id:'notch',w:393,h:852,top:59,bot:34,kb:302,label:'iPhone com Dynamic Island 393 x 852',sub:'top 59, home indicator 34'}
+};
+const IP={
+ search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+ locate:'<line x1="2" x2="5" y1="12" y2="12"/><line x1="19" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="5"/><line x1="12" x2="12" y1="19" y2="22"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/>',
+ undo:'<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+ trash:'<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+ pin:'<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
+ user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+ plus:'<path d="M5 12h14"/><path d="M12 5v14"/>',
+ minus:'<path d="M5 12h14"/>',
+ x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+ check:'<path d="M20 6 9 17l-5-5"/>',
+ star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+ alert:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+ info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+ arrowL:'<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
+ chevR:'<path d="m9 18 6-6-6-6"/>',
+ chevL:'<path d="m15 18-6-6 6-6"/>',
+ camera:'<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',
+ image:'<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
+ upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/>',
+ edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+ more:'<circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/>',
+ logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>',
+ lock:'<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+ mail:'<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+ eye:'<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+ eyeOff:'<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/>',
+ map:'<polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/>',
+ msg:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+ shield:'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
+ key:'<circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/>',
+ doc:'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>',
+ wheel:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M12 3v3"/>',
+ loader:'<path d="M21 12a9 9 0 1 1-6.219-8.56"/>'
+};
+function ic(n,s,o){s=s||24;o=o||{};
+  return '<svg'+(o.cls?' class="'+o.cls+'"':'')+' width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="'+(o.fill||'none')+'" stroke="'+(o.stroke||'currentColor')+'" stroke-width="'+(o.sw||2)+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IP[n]+'</svg>';}
+function spray(w,h){w=w||90;h=h||10;
+  return '<svg width="'+w+'" height="'+h+'" viewBox="0 0 120 14" preserveAspectRatio="none" aria-hidden="true" style="display:block"><path d="M3 9 C 22 3, 42 12, 62 7 S 100 3, 117 8" stroke="var(--primary)" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M10 12 C 44 9, 80 13, 112 11" stroke="var(--primary)" stroke-width="2" opacity=".55" fill="none" stroke-linecap="round"/><circle cx="118" cy="4" r="1.6" fill="var(--primary)"/></svg>';}
+function stars(v,s,interactive){s=s||14;let o='<span style="display:inline-flex;gap:'+(interactive?8:1)+'px;vertical-align:-2px" aria-hidden="true">';const n=Math.round(v||0);
+  for(let i=1;i<=5;i++)o+=i<=n?ic('star',s,{fill:'var(--star)',stroke:'var(--star)',sw:1.5}):ic('star',s,{stroke:'var(--border)',sw:1.5});return o+'</span>';}
+function tape(t,rot){return '<span class="tape-wrap"><span class="tape" style="transform:rotate('+(rot==null?-3:rot)+'deg)">'+t+'</span></span>';}
+function btn(label,cls,o){o=o||{};return '<button class="btn '+(cls||'primary')+'"'+(o.go?' data-go="'+o.go+'"':'')+(o.act?' data-act="'+o.act+'"':'')+(o.disabled?' disabled':'')+(o.style?' style="'+o.style+'"':'')+'>'+(o.loading?ic('loader',20,{cls:'spin'}):'')+(o.icon?ic(o.icon,20):'')+label+'</button>';}
+function kb(d){const top=d.h-d.bot-d.kb;
+  const row=k=>'<div class="kbrow">'+k.split('').map(c=>'<span class="key">'+c+'</span>').join('')+'</div>';
+  return {top:top,html:'<div class="a kb" style="top:'+top+'px;height:'+d.kb+'px" aria-hidden="true"><div class="kbpred"><span>pico</span><span>praça</span><span>rolê</span></div>'+row('qwertyuiop')+row('asdfghjkl')+'<div class="kbrow"><span class="key w">⇧</span>'+'zxcvbnm'.split('').map(c=>'<span class="key">'+c+'</span>').join('')+'<span class="key w">⌫</span></div><div class="kbrow"><span class="key w">123</span><span class="key sp">espaço</span><span class="key go">seguinte</span></div></div>'};}
+function chrome(d,o){o=o||{};let h='';
+  h+='<div class="a statusbar" style="height:'+d.top+'px;'+(d.id==='notch'?'padding:0 34px;':'')+(o.statusOnDark?'color:#fff':'')+'"><span>9:41</span><span style="font-size:12px">5G ▮▮▮ 100%</span></div>';
+  if(d.id==='notch')h+='<div class="a island"></div>';
+  if(d.id==='and')h+='<div class="a punch"></div>';
+  if(d.id==='notch'&&!o.kb)h+='<div class="a homeind" style="bottom:8px"></div>';
+  if(d.id==='and')h+='<div class="a andnav" style="bottom:0;height:48px"><span>◁</span><span>○</span><span>□</span></div>';
+  return h;}
+function zoneHtml(z){const c=z.c||'#E11D48';const st='top:'+z.y0+'px;height:'+Math.max(4,z.y1-z.y0)+'px;left:'+(z.x0||0)+'px;'+(z.x1!=null?'width:'+(z.x1-(z.x0||0))+'px;':'right:0;')+'border-color:'+c+';background:'+c+'22';
+  return '<div class="zone" style="'+st+'"><em>'+z.n+'</em></div>';}
+/* mapa simulado */
+const mcache={};
+function map(w,h,o){o=o||{};const key=w+'x'+h+(o.seed||0);if(mcache[key])return mcache[key];
+  let s='<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" aria-hidden="true" style="display:block"><rect width="'+w+'" height="'+h+'" fill="var(--map-land)"/>';
+  const step=46,cx=w/2,cy=h/2;s+='<g transform="rotate(-14 '+cx+' '+cy+')">';
+  let seed=7+(o.seed||0);const rr=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
+  for(let x=-0.4*w;x<1.4*w;x+=step)for(let y=-0.3*h;y<1.3*h;y+=step){const bw=14+rr()*18,bh=12+rr()*18;s+='<rect x="'+(x+7).toFixed(1)+'" y="'+(y+7).toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+bh.toFixed(1)+'" rx="1.5" fill="var(--map-bld)"/>';}
+  s+='</g><path d="M'+(.04*w)+' '+(.62*h)+' L'+(.40*w)+' '+(.58*h)+' L'+(.44*w)+' '+(.72*h)+' L'+(.30*w)+' '+(.84*h)+' L'+(.02*w)+' '+(.82*h)+'Z" fill="var(--map-park)"/>';
+  s+='<path d="M-30 '+(.22*h)+' C '+(.30*w)+' '+(.15*h)+', '+(.62*w)+' '+(.31*h)+', '+(w+30)+' '+(.24*h)+'" stroke="var(--map-water)" stroke-width="22" fill="none"/>';
+  s+='<g transform="rotate(-14 '+cx+' '+cy+')">';let mn='';
+  for(let x=-0.4*w;x<1.4*w;x+=step)mn+='M'+x.toFixed(1)+' '+(-0.3*h)+' V'+(1.3*h)+' ';
+  for(let y=-0.3*h;y<1.3*h;y+=step)mn+='M'+(-0.4*w)+' '+y.toFixed(1)+' H'+(1.4*w)+' ';
+  s+='<path d="'+mn+'" stroke="var(--map-case)" stroke-width="9" fill="none"/><path d="'+mn+'" stroke="var(--map-road)" stroke-width="6" fill="none"/>';
+  const ay=Math.round((.40*h)/step)*step,ax=Math.round((.58*w)/step)*step;
+  s+='<path d="M'+(-0.4*w)+' '+ay+' H'+(1.4*w)+' M'+ax+' '+(-0.3*h)+' V'+(1.3*h)+'" stroke="var(--map-case)" stroke-width="15" fill="none"/><path d="M'+(-0.4*w)+' '+ay+' H'+(1.4*w)+' M'+ax+' '+(-0.3*h)+' V'+(1.3*h)+'" stroke="var(--map-road)" stroke-width="11" fill="none"/>';
+  s+='<text x="'+(w*.3)+'" y="'+(ay+4)+'" font-family="Inter" font-size="11" font-weight="600" fill="var(--map-label)" stroke="var(--map-land)" stroke-width="3" paint-order="stroke" text-anchor="middle">Av. Paulista</text>';
+  s+='<text x="'+(ax+4)+'" y="'+(h*.82)+'" transform="rotate(90 '+(ax+4)+' '+(h*.82)+')" font-family="Inter" font-size="11" font-weight="600" fill="var(--map-label)" stroke="var(--map-land)" stroke-width="3" paint-order="stroke" text-anchor="middle">R. da Consolação</text>';
+  s+='</g></svg>';mcache[key]=s;return s;}
+function mbx(x,y){return '<div class="a" style="left:'+x+'px;top:'+y+'px;display:flex;gap:6px;align-items:center;font:700 11px Inter;color:var(--map-label);z-index:9" aria-hidden="true"><span>◉ mapbox</span><span style="width:18px;height:18px;border-radius:50%;display:grid;place-items:center;border:1.5px solid currentColor;font:italic 700 11px Georgia">i</span></div>';}
+/* header de tela mobile */
+function header(d,o){const h=d.top+64;let x='<div class="a hdr" style="height:'+h+'px">'+(o.halftone===false?'':'<div class="halftone"></div>')+'<div class="hdr-row">';
+  x+=o.back===false?'<span style="width:12px"></span>':'<button class="backbtn" aria-label="Voltar" data-go="'+(o.backGo||'')+'">'+ic(o.close?'x':'arrowL',24)+'</button>';
+  x+='<div style="flex:1;min-width:0;position:relative;padding-bottom:6px"><div class="ttl">'+o.title+'</div><div style="position:absolute;left:0;bottom:0">'+spray(o.sprayW||70,8)+'</div></div>';
+  if(o.right)x+=o.right;x+='</div></div>';return {h:h,html:x};}
+/* sheet */
+function sheet(d,o){/* o: top (abs), bottom (abs, default h-bot... ), html, caution, veilTop */
+  const bottom=o.bottom!=null?o.bottom:d.h;let x='';
+  if(o.veil!==false)x+='<div class="a veil" style="top:'+(o.veilTop||0)+'px;height:'+((o.veilBottom!=null?o.veilBottom:d.h)-(o.veilTop||0))+'px" data-go="'+(o.closeGo||'')+'"></div>';
+  x+='<div class="a sheet'+(o.edge?' stk-edge':'')+'" role="dialog" aria-modal="'+(o.veil!==false)+'" style="top:'+o.top+'px;height:'+(bottom-o.top)+'px">'+(o.caution?'<div class="caution" aria-hidden="true"></div>':'')+'<div class="handle" aria-hidden="true"></div>'+o.html+'</div>';
+  return x;}
+function confirmSheet(o){/* título Inter (aviso), ilustração, botões */
+  return '<div class="sheet-body"><div style="display:flex;gap:12px;align-items:flex-start">'+(o.ill||cone(44))+'<div style="flex:1"><h3 style="margin:0;font:700 20px/28px Inter">'+o.title+'</h3><p style="margin:6px 0 0;font:400 16px/24px Inter;color:var(--muted)">'+o.body+'</p></div></div>'+(o.banner||'')+
+    '<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">'+btn(o.danger,'danger',{go:o.dangerGo,loading:o.loading})+btn(o.cancel||'Continuar editando','secondary',{go:o.cancelGo})+'</div></div>';}
+function confirmDialog(o){return '<div class="caution" aria-hidden="true"></div><div class="dlg-body"><div style="display:flex;gap:14px;align-items:flex-start">'+(o.ill||cone(48))+'<div style="flex:1"><h3 style="margin:0;font:700 20px/28px Inter">'+o.title+'</h3><p style="margin:6px 0 0;font:400 16px/24px Inter;color:var(--muted)">'+o.body+'</p></div></div>'+(o.banner||'')+
+  '<div class="dlg-foot">'+btn(o.cancel||'Continuar editando','secondary',{go:o.cancelGo})+btn(o.danger,'danger',{go:o.dangerGo})+'</div></div>';}
+/* ilustrações vetoriais (decorativas) */
+function cone(s){s=s||44;return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 48 48" aria-hidden="true" style="flex:none"><path d="M24 4 L36 40 H12 Z" fill="var(--primary)" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/><path d="M17.5 24 H30.5 M15 32 H33" stroke="#fff" stroke-width="4"/><rect x="6" y="40" width="36" height="5" rx="1.5" fill="var(--ink)"/></svg>';}
+function spraycan(s){s=s||44;return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 48 48" aria-hidden="true" style="flex:none"><rect x="14" y="14" width="18" height="30" rx="4" fill="var(--yellow)" stroke="var(--ink)" stroke-width="2.5"/><rect x="18" y="8" width="10" height="7" rx="2" fill="var(--ink)"/><path d="M14 24 H32" stroke="var(--ink)" stroke-width="2"/><circle cx="36" cy="8" r="1.8" fill="var(--primary)"/><circle cx="41" cy="5" r="1.4" fill="var(--primary)"/><circle cx="40" cy="12" r="1.2" fill="var(--primary)"/></svg>';}
+function deck(s){s=s||44;return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 48 48" aria-hidden="true" style="flex:none"><rect x="5" y="17" width="38" height="12" rx="6" fill="var(--yellow)" stroke="var(--ink)" stroke-width="2.5" transform="rotate(-12 24 23)"/><circle cx="14" cy="36" r="4" fill="var(--primary)" stroke="var(--ink)" stroke-width="2"/><circle cx="33" cy="32" r="4" fill="var(--primary)" stroke="var(--ink)" stroke-width="2"/></svg>';}
+return {DEV,ic,spray,stars,tape,btn,kb,chrome,zoneHtml,map,mbx,header,sheet,confirmSheet,confirmDialog,cone,spraycan,deck};
+})();
+
+
+/* ===== GP-105: autenticação e perfil ===== */
+var APP=(function(){
+'use strict';
+const {ic,spray,stars,tape,btn,kb,chrome,map,sheet,confirmSheet,confirmDialog,cone,spraycan,deck}=GP;
+const STATES=[
+ ['Autenticação',[
+  ['login','Login - repouso'],
+  ['loginKb','Login - teclado aberto (senha)'],
+  ['loginErro','Login - e-mail ou senha inválidos'],
+  ['loginAviso','Login - vindo de excluir conta (aviso)'],
+  ['cad1','Cadastro passo 1 - repouso'],
+  ['cad3Kb','Cadastro passo 3 - teclado aberto'],
+  ['cad3Erro','Cadastro passo 3 - erros e aceite'],
+  ['esqueciKb','Esqueci minha senha - teclado aberto'],
+  ['codigoKb','Redefinir senha - teclado no código'],
+  ['termos','Termos de uso']]],
+ ['Perfil',[
+  ['p1','Perfil (hub) - topo'],
+  ['p1Fim','Perfil (hub) - rolado até Sair e Excluir conta'],
+  ['p1Sair','Sair (sheet / Dialog)'],
+  ['p2','Editar dados - com alteração'],
+  ['p2Kb','Editar dados - teclado aberto'],
+  ['p2Desc','Editar dados - descartar alterações (sheet / Dialog)'],
+  ['p3Kb','Alterar senha - teclado aberto'],
+  ['p4','Excluir conta (sheet / Dialog)'],
+  ['p4Kb','Excluir conta - teclado aberto (sheet expandido)'],
+  ['p4Erro','Excluir conta - senha incorreta'],
+  ['p5','Meus picos'],
+  ['p6Vazio','Minhas avaliações - vazio'],
+  ['avatar','Foto de perfil - seletor (pós-MVP)'],
+  ['avatarRemover','Foto de perfil - remover (D40)']]]
+];
+const LEG=[['Z0','status bar / notch / base'],['Z1','header da tela'],['Z4','toast'],['Z5','sheet / Dialog'],['Z6','tab bar ou rodapé fixo'],['Z7','teclado']];
+
+/* ---------- peças ---------- */
+function field(label,val,o){o=o||{};return '<div class="field" style="margin-bottom:'+(o.mb==null?16:o.mb)+'px"><label class="lbl">'+label+'</label><div class="input'+(o.focus?' focus':'')+(o.bad?' bad':'')+(o.ro?'':'')+(val?'':' ph')+'" style="'+(o.ro?'background:var(--sunken);border-color:transparent;color:var(--muted);':'')+(o.mono?'letter-spacing:8px;font-weight:600;font-size:20px;':'')+'">'+(o.ro?ic('lock',18):'')+'<span style="flex:1;min-width:0;overflow:hidden;white-space:nowrap">'+(val||o.ph||'')+(o.focus?'<span class="caret"></span>':'')+'</span>'+(o.pw?ic('eye',20):'')+'</div>'+(o.err?'<div class="err">'+ic('alert',14)+o.err+'</div>':(o.help?'<div class="help">'+o.help+'</div>':''))+'</div>';}
+function banner(t,type){return '<div class="banner'+(type==='info'?' info':'')+'" role="alert" style="margin-bottom:16px;'+(type==='success'?'border-color:var(--success);background:var(--surface)':'')+'">'+ic(type==='info'?'info':(type==='success'?'check':'alert'),18,{cls:'ico',stroke:type==='success'?'var(--success)':undefined})+'<div>'+t+'</div></div>';}
+function deco(d,top){return '<div class="a" style="left:-14px;top:'+(top+10)+'px;z-index:2" aria-hidden="true">'+tape('GO SKATE',-7)+'</div><div class="halftone a" style="right:0;top:'+top+'px;width:140px;height:120px;z-index:1"></div>';}
+function wordmark(sz){return '<div style="display:flex;align-items:center;gap:10px">'+deck(sz+8)+'<div><div class="pm" style="font-size:'+sz+'px;line-height:'+(sz+6)+'px">GoPicos</div>'+spray(sz*4,sz/4)+'</div></div>';}
+function titleBrand(t,sz){sz=sz||30;return '<div style="margin-bottom:10px"><h1 class="pm" style="margin:0;font-size:'+sz+'px;line-height:'+(sz+6)+'px;font-weight:400">'+t+'</h1>'+spray(Math.min(200,t.length*sz*.45),sz/3.6)+'</div>';}
+function screenHeader(d,o){const H=d.top+64;return {H,html:'<div class="a hdr" style="height:'+H+'px"><div class="halftone"></div><div class="hdr-row">'+(o.back===false?'<span style="width:12px"></span>':'<button class="backbtn" aria-label="Voltar" data-go="'+(o.backGo||'')+'">'+ic('arrowL',24)+'</button>')+'<div style="flex:1;min-width:0;position:relative;padding-bottom:6px"><div class="ttl">'+o.title+'</div><div style="position:absolute;left:0;bottom:0">'+spray(70,8)+'</div></div>'+(o.right||'')+'</div></div>'};}
+function footer(top,hgt,inner){return '<div class="a" style="left:0;right:0;top:'+top+'px;height:'+hgt+'px;background:var(--surface);border-top:2px solid var(--outline);padding:12px 16px;z-index:28">'+inner+'</div>';}
+function tabbar(d){const h=64+d.bot;return {h,html:'<div class="a tabbar" style="top:'+(d.h-h)+'px;height:'+h+'px"><div class="tabs"><button class="tab">'+ic('map',24)+'Mapa</button><button class="tab"><span class="newstk">'+ic('plus',22)+'</span>Novo pico</button><button class="tab on">'+ic('user',24,{fill:'currentColor'})+'Perfil<span style="display:block;margin-top:1px">'+spray(26,6)+'</span></button></div></div>'};}
+
+/* ---------- autenticação (mobile e web estreito) ---------- */
+function auth(d,st){const k=/Kb$/.test(st)&&!d.web?kb(d):null;const bottom=k?k.top:d.h-d.bot;const zones=[];let h='';
+  const pad=d.w>=400?32:(d.w<=360?24:32);const fixedFoot=/^(cad|esqueci|codigo)/.test(st);const footH=72;
+  let c='',top0=d.top,scroll=0,center=0;
+  if(st.startsWith('login')){
+    const kbm=!!k;
+    c+='<div style="padding:0 '+pad+'px">'+(st==='loginAviso'?'':'')+'<div style="margin-bottom:'+(kbm?16:8)+'px">'+wordmark(kbm?28:40)+'</div>'+(kbm?'':'<p style="margin:0 0 28px;font:400 14px/20px Inter;color:var(--muted)">Localize o pico perfeito para andar de skate</p>');
+    if(st==='loginAviso')c+=banner('Conta excluída. Se quiser voltar, entre com seu e-mail e senha e ela será reativada.','info');
+    c+=field('E-mail',(st==='login'?'':'marina@exemplo.com'),{ph:'voce@exemplo.com'});
+    c+=field('Senha',(st==='login'?'':'••••••••'),{pw:true,focus:kbm,mb:4});
+    c+='<div style="text-align:right"><button class="lnk" style="font-size:14px">Esqueci minha senha</button></div>';
+    if(st==='loginErro')c+=banner('E-mail ou senha inválidos');
+    c+=btn('Entrar','primary',{style:'margin-top:8px'})+'<div style="border-top:1px solid var(--divider);margin-top:24px;padding-top:14px;text-align:center;font:400 14px Inter;color:var(--muted)">Não tem conta? <button class="lnk" data-go="cad1">Cadastre-se</button></div></div>';
+    center=kbm?0:Math.max(16,((bottom-d.top)-(st==='loginAviso'?540:470))/2);scroll=kbm?(d.h<700?40:0):0;}
+  else if(st.startsWith('cad')){
+    const n=st==='cad1'?1:3;
+    c+='<div style="padding:16px '+pad+'px 0">'+(n>1?'<button class="lnk" style="display:flex;gap:6px;align-items:center;margin-bottom:6px">'+ic('arrowL',18)+'Voltar</button>':'<div style="height:24px"></div>')+'<div style="display:flex;justify-content:space-between;align-items:flex-start">'+titleBrand('Criar conta',30)+tape(n+' de 3')+'</div><h2 style="margin:6px 0 16px;font:600 20px/26px Inter">'+(n===1?'Seus dados':'Crie sua senha')+'</h2>';
+    if(n===1)c+=field('Nome','',{ph:'Marina'})+field('Sobrenome','',{ph:'Souza'})+'<p style="text-align:center;font:400 14px Inter;color:var(--muted);margin-top:24px">Já tem conta? <button class="lnk" data-go="login">Entrar</button></p>';
+    else {const er=st==='cad3Erro';c+=field('Senha','••••••••••',{pw:true,help:'Mínimo de 8 caracteres.'})+field('Confirmar senha',er?'•••••••':'••••••',{pw:true,focus:!er,err:er?'As senhas não coincidem.':''})+'<div class="cbrow" style="align-items:flex-start;gap:12px"><span class="cb'+(er?'':' on')+'" style="margin-top:2px;'+(er?'border-color:var(--error);border-width:2px':'')+'">'+(er?'':ic('check',16))+'</span><span style="font:400 15px/22px Inter">Li e aceito os <u style="color:var(--primary-text);font-weight:600">Termos de uso</u> e a <u style="color:var(--primary-text);font-weight:600">Política de privacidade</u>.</span></div>'+(er?'<div class="err" style="margin-left:36px">'+ic('alert',14)+'Aceite os termos para continuar.</div>':'');}
+    c+='</div>';scroll=(k&&n===3)?(d.h<700?150:60):0;}
+  else if(st==='esqueciKb'){c+='<div style="padding:16px '+pad+'px 0">'+titleBrand('Esqueceu a senha?',28)+'<p style="margin:4px 0 18px;font:400 16px/24px Inter;color:var(--muted)">Informe o e-mail da sua conta. Se ele estiver cadastrado, enviamos um código de 6 dígitos.</p>'+field('E-mail','marina@exemplo.com',{focus:true})+'</div>';}
+  else if(st==='codigoKb'){c+='<div style="padding:16px '+pad+'px 0">'+titleBrand('Digite o código',28)+'<p style="margin:4px 0 18px;font:400 15px/22px Inter;color:var(--muted)">Se o e-mail estiver cadastrado, enviamos um código de 6 dígitos para <b style="color:var(--text)">marina@exemplo.com</b>. Ele vale por 15 minutos.</p>'+field('Código','4 8 1',{focus:true,mono:true,help:'Reenviar código em 0:42'})+field('Nova senha','',{pw:true,help:'Mínimo de 8 caracteres.'})+field('Confirmar nova senha','',{pw:true})+'</div>';scroll=0;}
+  else if(st==='termos'){c+='<div style="padding:16px '+pad+'px 24px">'+banner('Texto provisório. O conteúdo definitivo será publicado antes do lançamento.','info')+'<div class="caption" style="margin-bottom:12px">Versão 1.0 - atualizado em 23/10/2026</div>'+['Quem somos','Dados que coletamos','Como usamos seus dados'].map(t=>'<h2 style="font:700 18px/26px Inter;margin:18px 0 6px">'+t+'</h2><p style="margin:0;font:400 16px/24px Inter">[Texto provisório] Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante venenatis dapibus.</p>').join('')+'</div>';}
+  // header de stack nas telas que têm voltar
+  let H=d.top;
+  if(st==='esqueciKb'||st==='codigoKb'||st==='termos'){const sh=screenHeader(d,{title:st==='termos'?'Termos de uso':'',backGo:'login'});
+    if(st!=='termos')sh.html=sh.html.replace(/<div class="ttl">[^<]*<\/div><div style="position:absolute;left:0;bottom:0">.*?<\/svg><\/div>/,'');
+    h+=sh.html;H=sh.H;zones.push({n:'Z1 header',y0:d.top,y1:H});}
+  const fTop=fixedFoot?bottom-footH-(k?0:0):bottom;
+  h='<div class="a" style="left:0;right:0;top:'+H+'px;height:'+((fixedFoot?fTop:bottom)-H)+'px;overflow:hidden"><div style="padding-top:'+center+'px;transform:translateY(-'+scroll+'px)">'+c+'</div></div>'+h;
+  if(!k&&st!=='termos'&&!d.nodeco)h+=deco(d,d.top);
+  if(fixedFoot){const label=st==='cad1'?'Continuar':(st.startsWith('cad')?'Criar conta':(st==='esqueciKb'?'Enviar código':'Redefinir senha'));h+=footer(fTop,footH+(k?0:d.bot),btn(label,'primary'));zones.push({n:'Z6 rodapé',y0:fTop,y1:fTop+footH});}
+  if(k){h+=k.html;zones.push({n:'Z7 teclado',y0:k.top,y1:d.h-d.bot});}
+  zones.push({n:'Z0',y0:0,y1:d.top});if(d.bot&&!(k&&d.id==='notch'))zones.push({n:'Z0 base',y0:d.h-d.bot,y1:d.h});
+  if(!d.web)h+=chrome(d,{kb:!!k});
+  return {html:h,zones};}
+
+/* ---------- perfil ---------- */
+function hubContent(w,o){const pad=16;let c='<div style="padding:16px '+pad+'px 24px">';
+  c+='<div style="display:flex;flex-direction:column;align-items:center;text-align:center;position:relative"><div style="position:relative"><span class="avatar" style="width:96px;height:96px;font-size:34px;background:var(--primary-soft);color:var(--primary-text);box-shadow:4px 4px 0 var(--stk);border-width:2.5px">MS</span>'+(o.avatarEdit?'<span class="a" style="right:-4px;bottom:-4px;width:32px;height:32px;border-radius:50%;background:var(--primary);border:2px solid var(--ink);display:grid;place-items:center;color:var(--on-primary)">'+ic('camera',16)+'</span>':'')+'</div><h2 style="margin:14px 0 2px;font:800 24px/30px Inter">Marina Souza</h2><div style="font:400 15px Inter;color:var(--muted)">marina@exemplo.com</div><div style="margin-top:8px">'+tape('Membro desde out. 2026',-2)+'</div></div>';
+  c+='<div style="display:flex;gap:12px;margin-top:22px">'+[['12','Picos'],['34','Avaliações']].map((t,i)=>'<button style="flex:1;min-height:72px;border:2px solid var(--outline);border-radius:12px;background:'+(i===0?'var(--yellow)':'var(--surface)')+';color:'+(i===0?'var(--ink)':'var(--text)')+';box-shadow:3px 3px 0 var(--stk);transform:rotate('+(i===0?-1.5:1)+'deg);text-align:left;padding:10px 14px"><b style="display:block;font:800 26px/30px Inter">'+t[0]+'</b><span style="font:600 14px Inter">'+t[1]+'</span></button>').join('')+'</div>';
+  const row=(icn,t,v,danger)=>'<div style="display:flex;align-items:center;gap:14px;min-height:56px;padding:0 14px;border-top:1px solid var(--divider);color:'+(danger?'var(--error)':'var(--text)')+'">'+ic(icn,22)+'<div style="flex:1"><b style="font:600 16px Inter;display:block">'+t+'</b>'+(v?'<span class="caption">'+v+'</span>':'')+'</div>'+ic('chevR',20)+'</div>';
+  const grp=rows=>'<div style="border:1.5px solid var(--border);border-radius:12px;background:var(--surface);overflow:hidden;margin-top:8px">'+rows.replace('border-top:1px solid var(--divider);','')+'</div>';
+  c+='<div style="margin-top:26px">'+tape('Conta',-2)+'</div>'+grp(row('edit','Editar dados','Marina Souza')+row('lock','Alterar senha'));
+  c+='<div style="margin-top:22px">'+tape('Atividade',1.5)+'</div>'+grp(row('pin','Meus picos')+row('star','Minhas avaliações'));
+  c+=grp(row('logout','Sair')).replace('margin-top:8px','margin-top:22px');
+  c+='<div style="margin-top:28px">'+grp(row('trash','Excluir conta','',true))+'</div><div class="caption" style="text-align:center;margin-top:16px">GoPicos 1.0.0</div></div>';return c;}
+function hub(d,o){const zones=[];let h='';const tb=d.web?{h:0,html:''}:tabbar(d);const k=o.kb&&!d.web?kb(d):null;
+  const sh=d.web?{H:56,html:webTop(d.w)}:screenHeader(d,{back:false,title:'Perfil'});
+  h+='<div class="a" style="left:0;right:0;top:'+sh.H+'px;bottom:'+tb.h+'px;overflow:hidden"><div style="transform:translateY(-'+(o.scroll||0)+'px)">'+hubContent(d.w,o)+'</div></div>'+sh.html;
+  if(!k)h+=tb.html;
+  const barTop=d.h-tb.h;
+  zones.push({n:'Z0',y0:0,y1:d.top});zones.push({n:'Z1 header',y0:d.top,y1:sh.H});if(!k&&!d.web)zones.push({n:'Z6 tab bar',y0:barTop,y1:barTop+64});
+  const veilTop=sh.H, sBottom=k?k.top:barTop;
+  if(o.overlay==='sair'){const sht=262;h+=sheet(d,{top:sBottom-sht,bottom:sBottom,veilTop,veilBottom:sBottom,closeGo:'p1',html:'<div class="sheet-body"><div class="halftone"></div><div style="display:flex;gap:12px">'+deck(44)+'<div><h3 style="margin:0;font:700 20px/28px Inter">Sair do GoPicos?</h3><p style="margin:6px 0 0;font:400 16px/24px Inter;color:var(--muted)">Você precisará entrar de novo com seu e-mail e senha.</p></div></div><div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">'+btn('Sair','primary',{icon:'logout',go:'login'})+btn('Cancelar','secondary',{go:'p1Fim'})+'</div></div>'});zones.push({n:'Z5 sheet',y0:sBottom-sht,y1:sBottom});}
+  if(o.overlay==='excluir'){const r=deleteSheet(d,o,veilTop,sBottom,k);h+=r.html;r.zones.forEach(z=>zones.push(z));}
+  if(o.overlay==='avatar'||o.overlay==='avatarRemover'){const rem=o.overlay==='avatarRemover';const sht=rem?262:386;
+    const body=rem?confirmSheet({title:'Remover foto de perfil?',body:'Você voltará a ver suas iniciais.',danger:'Remover foto',cancel:'Cancelar',cancelGo:'avatar',dangerGo:'p1'}):'<div class="sheet-body"><div class="halftone"></div><div class="st-title"><div><div class="pmt">Foto de perfil</div>'+spray(110,9)+'</div><button class="xbtn" aria-label="Fechar" data-go="p1">'+ic('x',24)+'</button></div><div class="caption">JPG, PNG ou WebP, até 5 MB</div><button class="optrow"><span class="oi">'+ic('camera',22)+'</span><span style="flex:1"><b>Tirar foto</b><small>Abre a câmera do aparelho</small></span>'+ic('chevR',20)+'</button><button class="optrow"><span class="oi" style="transform:rotate(2deg)">'+ic('image',22)+'</span><span style="flex:1"><b>Escolher da galeria</b><small>Depois você ajusta o recorte</small></span>'+ic('chevR',20)+'</button><button class="optrow danger" data-go="avatarRemover"><span class="oi">'+ic('trash',22)+'</span><span style="flex:1"><b>Remover foto</b><small style="color:var(--muted)">Volta para as iniciais</small></span>'+ic('chevR',20)+'</button>'+btn('Cancelar','secondary',{go:'p1'})+'</div>';
+    h+=sheet(d,{top:sBottom-sht,bottom:sBottom,veilTop,veilBottom:sBottom,caution:rem,edge:!rem,closeGo:'p1',html:body});zones.push({n:'Z5 sheet',y0:sBottom-sht,y1:sBottom});}
+  if(o.toast){const tb2=barTop-8;h+='<div class="a toast success" style="left:16px;right:16px;top:'+(tb2-52)+'px">'+ic('check',20,{stroke:'var(--success)'})+'<div>Perfil atualizado.</div></div>';zones.push({n:'Z4 toast',y0:tb2-96,y1:tb2,x0:16,x1:d.w-16});}
+  if(k){h+=k.html;zones.push({n:'Z7 teclado',y0:k.top,y1:d.h-d.bot});}
+  if(d.bot&&!d.web&&!(k&&d.id==='notch'))zones.push({n:'Z0 base',y0:d.h-d.bot,y1:d.h});
+  if(!d.web)h+=chrome(d,{kb:!!k});
+  return {html:h,zones};}
+function deleteList(n){const it=['Seu perfil deixa de aparecer. Seu nome e e-mail ficam ocultos para outras pessoas.','Seus 12 picos e 34 avaliações continuam no GoPicos, com o autor mostrado como "Usuário Desativado".','As notas das suas avaliações continuam contando na média dos picos.','Você pode reativar a conta quando quiser: é só entrar de novo com seu e-mail e senha.'];
+  return '<b style="font:600 16px/24px Inter;display:block;margin-bottom:6px">Sua conta será desativada.</b>'+it.slice(0,n).map((t,i)=>'<div style="display:flex;gap:10px;margin:8px 0;font:400 15px/22px Inter">'+ic(i===3?'info':'check',18,{stroke:'var(--muted)'})+'<span>'+t+'</span></div>').join('');}
+function deleteSheet(d,o,veilTop,sBottom,k){const zones=[];const maxTop=veilTop+8;const footH=k?64:72;
+  const top=maxTop;const err=o.err;
+  let body='<div class="sheet-body" style="flex:1;min-height:0;overflow:hidden;padding-bottom:0;gap:8px"><div class="st-title" style="flex:none"><h3 style="margin:0;font:700 20px/28px Inter;display:flex;gap:10px;align-items:center">'+cone(32)+'Excluir conta</h3><button class="xbtn" aria-label="Fechar" data-go="p1Fim">'+ic('x',24)+'</button></div><div style="flex:1;min-height:0;overflow:hidden"><div style="transform:translateY(-'+(k?({se:236,and:318,notch:150}[d.id]||150):0)+'px)">'+deleteList(4)+field('Senha',err||k?'••••••••':'',{pw:true,focus:!!k,err:err?'Senha incorreta.':'',help:'Digite sua senha para confirmar.'})+'</div></div></div>';
+  body+='<div style="flex:none;padding:'+(k?8:12)+'px 16px;border-top:2px solid var(--outline);background:var(--surface)">'+btn('Excluir conta','danger',{go:'loginAviso'})+'</div>';
+  const html=sheet(d,{top,bottom:sBottom,veilTop,veilBottom:sBottom,caution:true,closeGo:'p1Fim',html:body});
+  zones.push({n:'Z5 sheet',y0:top,y1:sBottom-footH});zones.push({n:'Z6 rodapé do sheet',y0:sBottom-footH,y1:sBottom});return {html,zones};}
+function formScreen(d,o){const zones=[];let h='';const k=o.kb&&!d.web?kb(d):null;
+  const sh=d.web?{H:56,html:webTop(d.w)}:screenHeader(d,{title:o.title,backGo:o.backGo});const footH=72;const bottom=k?k.top:d.h-d.bot;const fTop=bottom-footH;
+  h+='<div class="a" style="left:0;right:0;top:'+sh.H+'px;height:'+(fTop-sh.H)+'px;overflow:hidden"><div style="padding:20px 16px;transform:translateY(-'+(o.scroll||0)+'px)">'+(d.web?titleBrand(o.title,28):'')+o.body+'</div></div>'+sh.html;
+  h+=footer(fTop,footH+(k||d.web?0:d.bot),btn(o.btn,'primary',{disabled:o.disabled}));
+  zones.push({n:'Z0',y0:0,y1:d.top},{n:'Z1 header',y0:d.top,y1:sh.H},{n:'Z6 rodapé',y0:fTop,y1:fTop+footH});
+  if(o.overlay==='desc'){const sht=270;h+=sheet(d,{top:d.h-d.bot-sht,bottom:d.h,veilTop:sh.H,caution:true,closeGo:'p2',html:confirmSheet({title:'Descartar alterações?',body:'Você alterou seus dados e ainda não salvou.',danger:'Descartar',cancelGo:'p2',dangerGo:'p1'})});zones.push({n:'Z5 sheet',y0:d.h-d.bot-sht,y1:d.h-d.bot});}
+  if(k){h+=k.html;zones.push({n:'Z7 teclado',y0:k.top,y1:d.h-d.bot});}
+  if(d.bot&&!d.web&&!(k&&d.id==='notch'))zones.push({n:'Z0 base',y0:d.h-d.bot,y1:d.h});
+  if(!d.web)h+=chrome(d,{kb:!!k});return {html:h,zones};}
+function listScreen(d,o){const zones=[];let h='';const tb=d.web?{h:0,html:''}:tabbar(d);
+  const sh=d.web?{H:56,html:webTop(d.w)}:screenHeader(d,{title:o.title,backGo:'p1'});
+  let c='<div style="padding:16px">'+(d.web?titleBrand(o.title,28):'');
+  if(o.empty)c+='<div style="text-align:center;padding:40px 12px;border:2px dashed var(--outline);border-radius:12px;margin-top:12px"><div style="display:flex;justify-content:center;gap:4px">'+GP.cone(56)+deck(56)+'</div><h2 style="font:700 18px/26px Inter;margin:14px 0 4px">Nenhuma avaliação ainda</h2><p style="margin:0 0 18px;font:400 15px/22px Inter;color:var(--muted)">Colou em algum pico? Conta pra galera como foi.</p>'+btn('Explorar o mapa','primary',{icon:'map',style:'width:auto;display:inline-flex'})+'</div>';
+  else ['Praça Roosevelt','Bowl da Vila','Escadaria do Bixiga','Pista do Centro'].forEach((n,i)=>c+='<div style="display:flex;gap:12px;align-items:center;padding:12px;border:1.5px solid var(--border);border-radius:12px;background:var(--surface);margin-bottom:10px;min-height:96px"><div style="width:72px;height:72px;border-radius:6px;overflow:hidden;flex:none;background:var(--sunken)">'+map(72,72,{seed:i+5})+'</div><div style="flex:1;min-width:0"><b style="font:700 17px/22px Inter;display:block">'+n+'</b><div style="margin:6px 0"><span class="mchip" style="height:24px;font-size:12px">'+['Street','Bowl/Pool','Street','Park'][i]+'</span></div><div>'+stars([4.6,4.8,4.2,0][i],14)+' <span class="caption">'+(['4,6 (23)','4,8 (31)','4,2 (11)','Sem avaliações'][i])+'</span></div></div></div>');
+  c+='</div>';
+  h+='<div class="a" style="left:0;right:0;top:'+sh.H+'px;bottom:'+tb.h+'px;overflow:hidden">'+c+'</div>'+sh.html+tb.html;
+  zones.push({n:'Z0',y0:0,y1:d.top},{n:'Z1 header',y0:d.top,y1:sh.H});if(!d.web)zones.push({n:'Z6 tab bar',y0:d.h-tb.h,y1:d.h-tb.h+64});
+  if(!d.web)h+=chrome(d);return {html:h,zones};}
+function webTop(w){return '<div class="a" style="left:0;right:0;top:0;height:56px;background:var(--surface);border-bottom:2px solid var(--outline);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:30"><span class="pm" style="font-size:22px">GoPicos</span><span style="display:flex;gap:8px;align-items:center">'+ic('map',22)+'<span class="avatar" style="width:36px;height:36px;font-size:13px">MS</span></span></div>';}
+const P2BODY=(foc)=>field('Nome','Marina',{})+field('Sobrenome','Souza Lima',{focus:foc})+field('E-mail','marina@exemplo.com',{ro:true,help:'O e-mail é o seu login e não pode ser alterado.'});
+const P3BODY=field('Senha atual','••••••••',{pw:true})+field('Nova senha','••••••',{pw:true,focus:true,help:'Mínimo de 8 caracteres.'})+field('Confirmar nova senha','',{pw:true});
+function mobile(st,d){
+  if(/^(login|cad|esqueci|codigo|termos)/.test(st))return auth(d,st);
+  switch(st){
+    case 'p1':return hub(d,{});
+    case 'p1Fim':return hub(d,{scroll:d.h<700?400:200});
+    case 'p1Sair':return hub(d,{scroll:d.h<700?400:200,overlay:'sair'});
+    case 'p2':return formScreen(d,{title:'Editar dados',backGo:'p2Desc',body:P2BODY(false),btn:'Salvar alterações'});
+    case 'p2Kb':return formScreen(d,{title:'Editar dados',backGo:'p2Desc',body:P2BODY(true),btn:'Salvar alterações',kb:true,scroll:d.h<700?60:0});
+    case 'p2Desc':return formScreen(d,{title:'Editar dados',body:P2BODY(false),btn:'Salvar alterações',overlay:'desc'});
+    case 'p3Kb':return formScreen(d,{title:'Alterar senha',body:P3BODY,btn:'Alterar senha',kb:true,scroll:d.h<700?70:0});
+    case 'p4':return hub(d,{scroll:d.h<700?400:200,overlay:'excluir'});
+    case 'p4Kb':return hub(d,{scroll:d.h<700?400:200,overlay:'excluir',kb:true});
+    case 'p4Erro':return hub(d,{scroll:d.h<700?400:200,overlay:'excluir',err:true});
+    case 'p5':return listScreen(d,{title:'Meus picos'});
+    case 'p6Vazio':return listScreen(d,{title:'Minhas avaliações',empty:true});
+    case 'avatar':return hub(d,{overlay:'avatar',avatarEdit:true});
+    case 'avatarRemover':return hub(d,{overlay:'avatarRemover',avatarEdit:true});
+  }}
+/* ---------- web ---------- */
+function webAuth(w,H,st){if(w<640){return auth({w,h:H,top:0,bot:0,kb:0,id:'web',web:true},st.replace(/Kb$/,'')==='login'?st:st);}
+  // coluna de 400 centralizada
+  const r=auth({w:400,h:H,top:0,bot:0,kb:0,id:'web',web:true,nodeco:true},st);
+  let h='<div class="halftone a" style="right:0;top:0;width:260px;height:220px"></div>'+(w>=1024?'<div class="halftone a" style="left:0;bottom:0;width:260px;height:220px;transform:rotate(180deg)"></div>':'')+'<div class="a" style="left:-10px;top:24px">'+tape('GO SKATE',-7)+'</div>';
+  h+='<div class="a" style="left:'+((w-400)/2)+'px;top:0;width:400px;height:'+H+'px;overflow:hidden">'+r.html+'</div>';
+  return {html:h,zones:[]};}
+function webProfile(w,H,st){
+  if(w<768){const d={w,h:H,top:56,bot:0,kb:0,id:'web',web:true};
+    if(/^p1|^p4|^avatar/.test(st)){const r=hub(d,{scroll:/Fim|Sair|^p4/.test(st)?380:0,avatarEdit:/^avatar/.test(st)});
+      let x=r.html;if(st==='p1Sair')x+=dialogSheet360(w,H,confirmSheet({title:'Sair do GoPicos?',body:'Você precisará entrar de novo com seu e-mail e senha.',danger:'Sair'}).replace('btn danger','btn primary'),262);
+      if(/^p4/.test(st))x+=dialogSheet360(w,H,'<div class="sheet-body"><h3 style="margin:0;font:700 20px/28px Inter">Excluir conta</h3>'+deleteList(4)+field('Senha',st==='p4Erro'?'••••••••':'',{pw:true,err:st==='p4Erro'?'Senha incorreta.':'',help:'Digite sua senha para confirmar.'})+btn('Excluir conta','danger')+'</div>',H-64,true);
+      if(st==='avatar')x+=dialogSheet360(w,H,avatarDialogBody(),420);
+      if(st==='avatarRemover')x+=dialogSheet360(w,H,confirmSheet({title:'Remover foto de perfil?',body:'Você voltará a ver suas iniciais.',danger:'Remover foto',cancel:'Cancelar'}),262,true);
+      return {html:x,zones:r.zones};}
+    if(/^p2/.test(st)){const r=formScreen(d,{title:'Editar dados',body:P2BODY(st==='p2Kb'),btn:'Salvar alterações'});let x=r.html;if(st==='p2Desc')x+=dialogSheet360(w,H,confirmSheet({title:'Descartar alterações?',body:'Você alterou seus dados e ainda não salvou.',danger:'Descartar'}),270,true);return {html:x,zones:r.zones};}
+    if(st==='p3Kb')return formScreen(d,{title:'Alterar senha',body:P3BODY,btn:'Alterar senha'});
+    if(st==='p5')return listScreen(d,{title:'Meus picos'});
+    return listScreen(d,{title:'Minhas avaliações',empty:true});}
+  // md+: header 64, menu lateral 240, conteúdo 640
+  const cw=Math.min(1120,w-48),x0=(w-cw)/2;const active=/^p3/.test(st)?1:(st==='p5'?2:(st==='p6Vazio'?3:0));
+  let h='<div class="a wheader"><span class="pm" style="font-size:26px">GoPicos</span><div style="display:flex;gap:12px;align-items:center"><span class="caption">Marina S.</span><span class="avatar">MS</span></div></div>';
+  h+='<div class="a" style="left:'+x0+'px;top:88px;width:240px">'+['Meus dados','Alterar senha','Meus picos','Minhas avaliações'].map((t,i)=>'<div style="height:48px;display:flex;align-items:center;padding:0 14px;border-radius:6px;font:'+(i===active?700:500)+' 15px Inter;position:relative;'+(i===active?'background:var(--primary-soft);color:var(--text)':'color:var(--text)')+'">'+(i===active?'<span class="a" style="left:0;top:10px;bottom:10px;width:4px;background:var(--primary)"></span>':'')+t+'</div>').join('')+'<div style="border-top:1px solid var(--divider);margin:10px 0"></div><div style="height:48px;display:flex;align-items:center;gap:10px;padding:0 14px;font:500 15px Inter">'+ic('logout',18)+'Sair</div><div style="height:48px;display:flex;align-items:center;gap:10px;padding:0 14px;font:600 15px Inter;color:var(--error)">'+ic('trash',18)+'Excluir conta</div></div>';
+  let c='<div class="halftone a" style="right:0;top:0;width:220px;height:160px"></div>';
+  if(active===0){c+=titleBrand('Meus dados',32)+'<div style="display:flex;gap:18px;align-items:center;margin:8px 0 22px"><div style="position:relative"><span class="avatar" style="width:80px;height:80px;font-size:28px;background:var(--primary-soft);color:var(--primary-text);box-shadow:3px 3px 0 var(--stk)">MS</span>'+(/^avatar/.test(st)?'<span class="a" style="right:-4px;bottom:-4px;width:30px;height:30px;border-radius:50%;background:var(--primary);border:2px solid var(--ink);display:grid;place-items:center">'+ic('camera',15)+'</span>':'')+'</div><div><b style="font:800 22px Inter;display:block">Marina Souza</b><span class="caption" style="font-size:14px">marina@exemplo.com</span><div style="margin-top:6px">'+tape('Membro desde out. 2026',-2)+'</div></div></div>'+P2BODY(false)+btn('Salvar alterações','primary',{style:'width:auto;margin-top:4px'});
+    c+='<div style="margin-top:28px;border:2px solid var(--error);border-radius:12px;overflow:hidden"><div class="caution"></div><div style="padding:16px"><b style="font:700 18px Inter;color:var(--error)">Excluir conta</b><p style="margin:6px 0 12px;font:400 15px/22px Inter;color:var(--muted)">Sua conta é desativada; seus picos e avaliações continuam. Dá para reativar entrando de novo.</p>'+btn('Excluir conta','danger-ghost',{style:'width:auto;border:1.5px solid var(--error)'})+'</div></div>';}
+  else if(active===1)c+=titleBrand('Alterar senha',32)+P3BODY+btn('Alterar senha','primary',{style:'width:auto'});
+  else {const r=listScreen({w:640,h:H,top:0,bot:0,id:'web',web:true},{title:active===2?'Meus picos':'Minhas avaliações',empty:active===3});c+=titleBrand(active===2?'Meus picos':'Minhas avaliações',32)+r.html.replace(/^<div class="a"[^>]*>/,'<div>').replace(/<div class="a" style="left:0;right:0;top:0;height:56px[^]*$/,'');}
+  h+='<div class="a" style="left:'+(x0+272)+'px;top:88px;width:'+Math.min(640,cw-272)+'px;bottom:0;overflow:hidden">'+c+'</div>';
+  const zones=[{n:'Z1 header',y0:0,y1:64}];
+  const dlg=(width,inner,hh)=>{const top=64+Math.max(24,((H-64)-hh)/2);zones.push({n:'Z5 Dialog',y0:top,y1:top+hh,x0:(w-width)/2,x1:(w+width)/2});return '<div class="a wveil" style="left:0;right:0;top:64px;bottom:0"></div><div class="a dlg" role="dialog" style="left:'+(w-width)/2+'px;top:'+top+'px;width:'+width+'px">'+inner+'</div>';};
+  if(st==='p1Sair')h+=dlg(440,'<div class="halftone"></div><div class="dlg-body"><div style="display:flex;gap:14px">'+deck(48)+'<div><h3 style="margin:0;font:700 20px/28px Inter">Sair do GoPicos?</h3><p style="margin:6px 0 0;font:400 16px/24px Inter;color:var(--muted)">Você precisará entrar de novo com seu e-mail e senha.</p></div></div><div class="dlg-foot">'+btn('Cancelar','secondary')+btn('Sair','primary',{icon:'logout'})+'</div></div>',220);
+  if(st==='p2Desc')h+=dlg(440,confirmDialog({title:'Descartar alterações?',body:'Você alterou seus dados e ainda não salvou.',danger:'Descartar'}),240);
+  if(/^p4/.test(st))h+=dlg(480,'<div class="caution"></div><div class="dlg-body"><h3 style="margin:0;font:700 22px/28px Inter;display:flex;gap:10px;align-items:center">'+cone(32)+'Excluir conta</h3>'+deleteList(4)+field('Senha',st==='p4'?'':'••••••••',{pw:true,focus:st==='p4Kb',err:st==='p4Erro'?'Senha incorreta.':'',help:'Digite sua senha para confirmar.'})+'<div class="dlg-foot">'+btn('Cancelar','secondary')+btn('Excluir conta','danger')+'</div></div>',st==='p4Erro'?640:615);
+  if(st==='avatar')h+=dlg(440,'<div class="halftone"></div><div class="dlg-body">'+avatarDialogBody(true)+'</div>',400);
+  if(st==='avatarRemover')h+=dlg(440,confirmDialog({title:'Remover foto de perfil?',body:'Você voltará a ver suas iniciais.',danger:'Remover foto',cancel:'Cancelar'}),220);
+  return {html:h,zones};}
+function avatarDialogBody(web){return '<div class="st-title"><div><div class="pmt pm" style="font-size:28px;line-height:34px">Foto de perfil</div>'+spray(110,9)+'</div><button class="xbtn" aria-label="Fechar">'+ic('x',22)+'</button></div><div style="height:150px;border:2px dashed var(--outline);border-radius:12px;background:var(--sunken);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font:500 15px Inter;margin-top:8px">'+ic('upload',26)+'<span>Arraste uma imagem ou</span>'+btn('Escolher imagem','secondary',{style:'width:auto'})+'</div><div class="caption" style="margin-top:8px">JPG, PNG ou WebP, até 5 MB.</div><div style="display:flex;justify-content:space-between;margin-top:12px">'+btn('Remover foto','danger-ghost',{style:'width:auto',go:'avatarRemover'})+btn('Cancelar','secondary',{style:'width:auto'})+'</div>';}
+function dialogSheet360(w,H,inner,hh,caution){return '<div class="a" style="left:0;right:0;top:56px;bottom:0;background:var(--dim);z-index:35"></div><div class="a sheet" style="top:'+(H-hh)+'px;height:'+hh+'px;overflow:hidden">'+(caution?'<div class="caution"></div>':'')+'<div class="handle"></div>'+inner+'</div>';}
+function web(st,w,H){if(/^(login|cad|esqueci|codigo|termos)/.test(st))return webAuth(w,H,st);return webProfile(w,H,st);}
+/* ---------- notas ---------- */
+const N={
+ login:'<b>Login.</b> Identidade de entrada (DS 13): fita "GO SKATE" no canto, meio-tom, wordmark com shape-adesivo e spray. Campos, botões e erros em Inter (CT-ID). Botão "Entrar" flui logo após os campos (cabe com teclado em todos os aparelhos-alvo, ver o estado com teclado).',
+ loginKb:'<b>Login com teclado.</b> Fita e meio-tom somem (decoração não pode competir com o formulário nem entrar sob o teclado); o wordmark encolhe para 28; a rolagem deixa Senha, "Esqueci minha senha" e Entrar acima do teclado. Sem header, sem tab bar.',
+ loginErro:'<b>E-mail ou senha inválidos.</b> Banner acima do botão, sem marcar os campos (não revela qual falhou), sem gíria (D42).',
+ loginAviso:'<b>Vindo de excluir conta.</b> Banner info acima dos campos; e-mail preenchido.',
+ cad1:'<b>Cadastro, passo 1.</b> Título de marca "Criar conta" + fita "1 de 3" (o Stepper vira fita, igual ao criar pico). <b>"Continuar" vira rodapé fixo</b> nos 3 passos: fica no mesmo lugar em todos e acima do teclado.',
+ cad3Kb:'<b>Passo 3 com teclado.</b> Campo focado e "Criar conta" visíveis; o aceite fica logo abaixo e aparece ao rolar. SE: área 20 a 335, rodapé 335 a 407, teclado 407 a 667.',
+ cad3Erro:'<b>Passo 3 com erros.</b> "As senhas não coincidem." e "Aceite os termos para continuar." com ícone e borda (não só cor).',
+ esqueciKb:'<b>Esqueci minha senha com teclado.</b> Header de stack com Voltar (sem título no header: o título de marca está no conteúdo, para não repetir). Rodapé "Enviar código" acima do teclado.',
+ codigoKb:'<b>Redefinir senha, teclado no código.</b> Campo do código com espaçamento largo e teclado numérico; "Redefinir senha" acima do teclado; "Reenviar código" com contagem.',
+ termos:'<b>Termos de uso.</b> Título de marca no header (título fixo de tela); texto legal sempre em Inter, sem gíria (D42). Sem fita decorativa.',
+ p1:'<b>Perfil (hub).</b> Título de tela "Perfil" em Permanent Marker no header (UX-P2 revista pela D41). Nome em Inter (conteúdo do usuário). Avatar com borda e sombra de adesivo; "Membro desde" em fita; contagens como adesivos; títulos "Conta" e "Atividade" em fita. Tab bar ancorada (Home).',
+ p1Fim:'<b>Hub rolado.</b> "Sair" separado e "Excluir conta" por último, em vermelho, longe do polegar no topo da lista. O último item termina 24 acima da tab bar.',
+ p1Sair:'<b>Sair (sheet de confirmação).</b> Substitui o Alert.alert. Não é destrutivo: sem fita zebrada; ilustração do shape, "Sair" primário em cima e "Cancelar" embaixo. <b>O sheet fica acima da tab bar e o véu não a cobre</b> (regra da Home); tocar numa aba fecha o sheet. No web: Dialog 440.',
+ p2:'<b>Editar dados.</b> ScreenHeader v3 com Voltar + título de marca; e-mail somente leitura com cadeado. "Salvar alterações" em rodapé fixo (já era assim).',
+ p2Kb:'<b>Editar dados com teclado.</b> Rodapé colado no teclado; campo focado visível. Tab bar escondida (tela de formulário).',
+ p2Desc:'<b>Descartar alterações.</b> Sheet de confirmação com fita zebrada (substitui o Alert.alert de useEditProfile). Véu a partir do header; Voltar fecha o sheet. Web: Dialog 440 com a mesma fita.',
+ p3Kb:'<b>Alterar senha com teclado.</b> Mesmo padrão do Editar dados; "Alterar senha" no rodapé acima do teclado.',
+ p4:'<b>Excluir conta vira sheet</b> (critério da issue; hoje é tela cheia). Sheet de formulário com fita zebrada e título Inter "Excluir conta" (sem gíria, D42), a lista do que acontece e a senha. "Excluir conta" no rodapé fixo do sheet; fechar pelo X, arraste ou véu. Abre no topo máximo (base do header + 8) porque o conteúdo é longo; rola por dentro.',
+ p4Kb:'<b>Excluir conta com teclado (expandido).</b> A tab bar some com o teclado e o sheet passa a terminar no teclado; o conteúdo rola até a senha; o rodapé (64) com "Excluir conta" fica visível. SE: sheet 92 a 407, rodapé 343 a 407.',
+ p4Erro:'<b>Senha incorreta.</b> Erro no campo; o sheet continua aberto e nada muda na conta.',
+ p5:'<b>Meus picos.</b> Header com título de marca; SpotCard com chip-adesivo. Tab bar visível (tela de navegação).',
+ p6Vazio:'<b>Minhas avaliações vazio.</b> Ilustração (cone + shape), título Inter e convite com gíria do glossário (D42).',
+ avatar:'<b>Foto de perfil (pós-MVP, para quando existir).</b> Sheet seletor igual ao "Adicionar foto" do criar pico: Tirar foto, Escolher da galeria, Remover foto (vermelho). No web: Dialog com arrastar e soltar.',
+ avatarRemover:'<b>Remover foto (D40).</b> O mesmo sheet troca o conteúdo pela confirmação com fita zebrada.'
+};
+function note(st){return (N[st]||'')+'<div class="caption" style="margin-top:8px">Spec: docs/design/specs/autenticacao-perfil-identidade.md. Web em 360, 768 e 1280 abaixo dos aparelhos.</div>';}
+return {title:'Autenticação e perfil',subtitle:'Protótipo da spec autenticacao-perfil-identidade.md. #182 (GP-105)',states:STATES,legend:LEG,mobile,web,note,webWidths:[360,768,1280],devices:['se','notch','and']};
+})();
+
+/* ===== motor do protótipo ===== */
+(function(){
+'use strict';
+const ZC={Z0:'#7C3AED',Z1:'#DB2777',Z2:'#0891B2',Z3:'#65A30D',Z4:'#EA580C',Z5:'#2563EB',Z6:'#9333EA',Z7:'#DC2626',Z8:'#0D9488'};
+const S=window.S=Object.assign({theme:'light',state:APP.states[0][1][0][0],zones:false},APP.initial||{});
+function allStates(){const a=[];APP.states.forEach(g=>g[1].forEach(s=>a.push(s)));return a;}
+function readHash(){const p=new URLSearchParams(location.hash.slice(1));if(p.get('estado'))S.state=p.get('estado');if(p.get('tema'))S.theme=p.get('tema')==='escuro'?'dark':'light';if(p.get('zonas'))S.zones=p.get('zonas')==='1';}
+function writeHash(){history.replaceState(null,'','#estado='+S.state+'&tema='+(S.theme==='dark'?'escuro':'claro')+(S.zones?'&zonas=1':''));}
+function bar(){let h='<h1><span class="pm" style="font-size:26px">GoPicos</span><span>'+APP.title+'<small>'+APP.subtitle+'</small></span></h1>';
+  h+='<div class="pb-group"><span>Tema</span><div class="pb-seg" id="pb-theme"><button data-v="light">Claro</button><button data-v="dark">Escuro</button></div></div>';
+  h+='<div class="pb-group"><span>Estado exibido</span><div class="pb-nav"><button id="pb-prev" aria-label="Estado anterior">◀</button><select id="pb-state" aria-label="Estado exibido">';
+  APP.states.forEach(g=>{h+='<optgroup label="'+g[0]+'">';g[1].forEach(s=>h+='<option value="'+s[0]+'">'+s[1]+'</option>');h+='</optgroup>';});
+  h+='</select><button id="pb-next" aria-label="Próximo estado">▶</button></div></div>';
+  h+='<label class="pb-check"><input type="checkbox" id="pb-zones"> Mostrar zonas reservadas</label>';
+  document.getElementById('bar').innerHTML=h;
+  document.querySelectorAll('#pb-theme button').forEach(b=>b.onclick=()=>{S.theme=b.dataset.v;render();});
+  document.getElementById('pb-state').onchange=e=>{S.state=e.target.value;render();};
+  document.getElementById('pb-zones').onchange=e=>{S.zones=e.target.checked;render();};
+  const step=k=>{const a=allStates().map(s=>s[0]);let i=a.indexOf(S.state)+k;if(i<0)i=a.length-1;if(i>=a.length)i=0;S.state=a[i];render();};
+  document.getElementById('pb-prev').onclick=()=>step(-1);document.getElementById('pb-next').onclick=()=>step(1);}
+function render(){
+  document.documentElement.dataset.theme=S.theme;
+  document.querySelectorAll('#pb-theme button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===S.theme)));
+  document.getElementById('pb-state').value=S.state;document.getElementById('pb-zones').checked=S.zones;
+  const n=APP.note(S.state,S);document.getElementById('note').innerHTML=n;
+  let lg='';(APP.legend||[]).forEach(z=>lg+='<span><i style="border-color:'+ZC[z[0]]+';background:'+ZC[z[0]]+'22"></i>'+z[0]+' '+z[1]+'</span>');
+  document.getElementById('legend').innerHTML=lg;document.getElementById('legend').style.display=S.zones?'flex':'none';
+  let ph='';(APP.devices||['se','and','notch']).forEach(id=>{const d=GP.DEV[id];const r=APP.mobile(S.state,d,S);
+    let inner=r.html;if(S.zones)(r.zones||[]).forEach(z=>{z.c=z.c||ZC[z.n.split(' ')[0]];inner+=GP.zoneHtml(z);});
+    ph+='<figure class="device"><div class="bezel '+id+'"><div class="screen" style="width:'+d.w+'px;height:'+d.h+'px">'+inner+'</div></div><figcaption>'+d.label+'<small>'+d.sub+'</small></figcaption></figure>';});
+  document.getElementById('phones').innerHTML=ph;
+  let wb='';(APP.webWidths||[1280]).forEach(w=>{const H=w<640?740:(w<1024?900:800);const r=APP.web(S.state,w,H,S);if(!r)return;
+    let inner=r.html;if(S.zones)(r.zones||[]).forEach(z=>{z.c=z.c||ZC[z.n.split(' ')[0]];inner+=GP.zoneHtml(z);});
+    const maxW=Math.min(1200,document.body.clientWidth-48);const sc=Math.min(1,maxW/w);
+    wb+='<figure class="webbox" style="margin:0"><div class="webclip" style="width:'+(w*sc)+'px;height:'+(H*sc)+'px"><div class="web" style="width:'+w+'px;height:'+H+'px;transform:scale('+sc+')">'+inner+'</div></div><figcaption>Web '+w+' x '+H+(sc<1?' (exibido a '+Math.round(sc*100)+'%)':'')+'</figcaption></figure>';});
+  document.getElementById('webs').innerHTML=wb||'<p class="caption">Sem frame web neste estado.</p>';
+  writeHash();}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-go],[data-act]');if(!t||t.closest('.proto-bar'))return;
+  if(t.dataset.act&&APP.act){APP.act(t.dataset.act,S);render();return;}
+  if(t.dataset.go){S.state=t.dataset.go;render();window.scrollTo({top:0,behavior:'smooth'});}});
+window.addEventListener('resize',()=>render());
+readHash();bar();render();
+})();
+
+</script>
+</body>
+</html>
