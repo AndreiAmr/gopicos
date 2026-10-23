@@ -17,7 +17,11 @@ import {
 type StarRatingProps = {
   /** Nota atual (1-5) no modo entrada, ou média (0-5) no modo leitura. */
   value: number;
-  /** Quantidade de avaliações; exibida ao lado da média no modo leitura. */
+  /**
+   * Quantidade de avaliações; exibida ao lado da média no modo leitura
+   * ("4,3 (12)", ou "Sem avaliações" com 0). Sem `count`, só as estrelas
+   * (ex.: a nota de uma avaliação individual).
+   */
   count?: number;
   /** Se informado, o componente vira entrada (5 estrelas de 32 px, alvo 48). */
   onChange?: (value: number) => void;
@@ -97,7 +101,11 @@ export const StarRating = ({
   }
 
   if (!isInput) {
-    const text = formatAverage(rating, count ?? 0, dsStrings.starRatingNone);
+    // Sem `count` não há média/contagem a mostrar: nada de "Sem avaliações" (GP-133).
+    const text =
+      count === undefined
+        ? ''
+        : formatAverage(rating, count, dsStrings.starRatingNone);
     return (
       <View
         flexDirection="row"

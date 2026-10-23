@@ -45,6 +45,8 @@ describe('SpotDetailsContent', () => {
     expect(screen.getAllByText('Coberto').length).toBeGreaterThan(0);
     expect(screen.getByText('4,6')).toBeTruthy();
     expect(screen.getByText('23 avaliações')).toBeTruthy();
+    // Com avaliações, "Sem avaliações" nunca aparece (GP-133).
+    expect(screen.queryByText(/Sem avaliações/)).toBeNull();
     expect(screen.getByText('Corrimão e escadas.')).toBeTruthy();
     expect(screen.getByLabelText('Horário: 8h às 22h')).toBeTruthy();
     expect(screen.getByLabelText('Equipamento: Exige proteção')).toBeTruthy();
