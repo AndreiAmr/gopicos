@@ -1,7 +1,9 @@
 import { Button } from '@/atomic/atoms/button';
 import type { SpotDetails } from '@/domain/spot/details';
 import { reviewStrings } from '@/domain/spot/reviews';
+import { DeleteSpotDialog } from './DeleteSpotDialog';
 import { ReviewDialog } from './ReviewDialog';
+import { useDeleteSpotFlow } from './useDeleteSpotFlow';
 import { ReviewsSection } from './ReviewsSection';
 import { SpotDetailsContent } from './SpotDetailsContent';
 import { useReviewsFlow } from './useReviewsFlow';
@@ -9,7 +11,6 @@ import { useReviewsFlow } from './useReviewsFlow';
 type ReadySpotDetailsProps = {
   spot: SpotDetails;
   onEdit: () => void;
-  onDelete: () => void;
   refreshSpot: () => void;
 };
 
@@ -23,10 +24,10 @@ const scrollToReviews = () => {
 export const ReadySpotDetails = ({
   spot,
   onEdit,
-  onDelete,
   refreshSpot,
 }: ReadySpotDetailsProps) => {
   const flow = useReviewsFlow({ spotId: spot.id, refreshSpot });
+  const deleteFlow = useDeleteSpotFlow(spot.id);
   const { reviews } = flow;
   const hasMine = Boolean(reviews.myReview);
 
@@ -45,7 +46,7 @@ export const ReadySpotDetails = ({
       <SpotDetailsContent
         spot={spot}
         onEdit={onEdit}
-        onDelete={onDelete}
+        onDelete={deleteFlow.openConfirm}
         reviewAction={reviewAction}
         reviewsSection={
           <ReviewsSection
@@ -64,7 +65,15 @@ export const ReadySpotDetails = ({
           />
         }
       />
-      {spot.isOwner ? null : (
+      {spot.isOwner ? (
+        <DeleteSpotDialog
+          open={deleteFlow.open}
+          deleting={deleteFlow.deleting}
+          error={deleteFlow.error}
+          onConfirm={() => void deleteFlow.confirm()}
+          onClose={deleteFlow.close}
+        />
+      ) : (
         <ReviewDialog
           open={flow.open}
           submitting={flow.submitting}
