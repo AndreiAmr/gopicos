@@ -31,8 +31,6 @@ export const Map = ({
     handleDrawDelete,
   });
 
-  console.log('env =>', import.meta.env.VITE_MAPBOX_ACCESS_TOKEN);
-
   return (
     <Mapbox
       ref={mapRef}

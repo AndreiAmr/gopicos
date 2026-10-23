@@ -1,0 +1,22 @@
+"Pico resumido de uma avaliação do próprio usuário."
+type MyReviewSpot {
+  id: String
+  name: String
+  modality: String
+}
+
+"Avaliação feita pelo usuário logado."
+type MyReview {
+  id: String
+  rating: Int
+  description: String
+  createdAt: String
+  spot: MyReviewSpot
+}
+
+extend type Query {
+  "Picos cadastrados pelo usuário logado, mais recentes primeiro (D31: sem paginação)."
+  mySpots: [Spot!]! @Authenticated
+  "Avaliações feitas pelo usuário logado, mais recentes primeiro (D31: sem paginação)."
+  myReviews: [MyReview!]! @Authenticated
+}

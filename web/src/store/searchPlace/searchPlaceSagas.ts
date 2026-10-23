@@ -9,7 +9,6 @@ import {
 } from './searchPlaceTypes';
 
 export function* getSearchPlaceAsync({ payload }: ISearchPlaceAction) {
-  console.log('🚀 ~ getSearchPlaceAsync ~ payload:', payload);
   try {
     if (!payload || !payload.searchValue) return;
 
@@ -19,7 +18,6 @@ export function* getSearchPlaceAsync({ payload }: ISearchPlaceAction) {
       searchPlaceRepository.getSearchPlace,
       payload.searchValue
     );
-    console.log('🚀 ~ getSearchPlaceAsync ~ searchPlace:', searchPlace);
 
     yield put(searchPlaceActions.setSearchPlace(searchPlace));
   } catch {

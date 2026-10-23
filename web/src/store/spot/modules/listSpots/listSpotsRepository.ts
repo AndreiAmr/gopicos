@@ -9,7 +9,6 @@ const getListSpots = async (): Promise<IListSpots | null> => {
     fetchPolicy: 'no-cache',
     query: getListSpotsQuery,
   });
-  console.log('🚀 ~ getListSpots ~ data:', data);
 
   return data.getAllSpots;
 };

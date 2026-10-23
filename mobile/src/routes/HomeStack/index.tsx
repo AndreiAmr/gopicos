@@ -4,6 +4,7 @@ import {
   createBottomTabScreen,
 } from '@react-navigation/bottom-tabs';
 import { TabBar } from './TabBar';
+import { ProfileStack } from '../ProfileStack';
 import { HomeIcon } from 'lucide-react-native';
 
 export const HomeStack = createBottomTabNavigator({
@@ -26,7 +27,7 @@ export const HomeStack = createBottomTabNavigator({
       },
     }),
     Profile: createBottomTabScreen({
-      screen: HomeTemplate,
+      screen: ProfileStack,
       options: {
         tabBarIcon: () => <HomeIcon />,
       },

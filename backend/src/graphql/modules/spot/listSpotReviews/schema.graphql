@@ -1,0 +1,27 @@
+type Review {
+  id: String
+  rating: Int
+  description: String
+  createdAt: String
+  author: SpotAuthor
+  "true quando a avaliação é do usuário logado"
+  isMine: Boolean
+}
+
+type SpotReviewsPage {
+  "Avaliações da mais recente para a mais antiga, sem a do usuário logado"
+  items: [Review!]!
+  "Cursor para a próxima página (null quando não há mais)"
+  nextCursor: String
+  hasMore: Boolean!
+  "Total de avaliações do pico (inclui a do usuário logado)"
+  totalCount: Int!
+  ratingAverage: Float
+  "Avaliação do usuário logado, fixada no topo pelos clientes"
+  myReview: Review
+}
+
+extend type Query {
+  getSpotReviews(spotId: String!, first: Int, after: String): SpotReviewsPage!
+    @Authenticated
+}
