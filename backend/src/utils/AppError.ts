@@ -7,6 +7,7 @@ export type AppErrorType =
   | 'UNAUTHORIZED'
   | 'UNAUTHENTICATED'
   | 'NOT_FOUND'
+  | 'FORBIDDEN'
   | 'REVIEW_ALREADY_EXISTS'
   | 'OWN_SPOT_REVIEW'
   | 'INTERNAL_ERROR';
