@@ -21,7 +21,7 @@ export interface IListSpotsState {
 }
 
 export interface IListSpotsPayload {
-  listSpots?: IListSpots;
+  listSpots?: IListSpots[];
   isLoading?: boolean;
   isError?: boolean;
   filter?: SpotsQueryFilter | null;
