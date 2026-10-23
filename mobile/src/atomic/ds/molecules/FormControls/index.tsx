@@ -68,6 +68,8 @@ type ChoiceChipsProps = {
   options: Option[];
   value: string;
   onChange: (value: string) => void;
+  /** Multisseleção: valores marcados (sobrepõe `value`); `onChange` alterna cada opção. */
+  multiple?: string[];
   error?: string;
   disabled?: boolean;
   testID?: string;
@@ -79,6 +81,7 @@ export const ChoiceChips = ({
   options,
   value,
   onChange,
+  multiple,
   error,
   disabled = false,
   testID,
@@ -91,12 +94,14 @@ export const ChoiceChips = ({
         flexDirection="row"
         flexWrap="wrap"
         gap={space[2]}
-        accessibilityRole="radiogroup"
+        accessibilityRole={multiple ? 'none' : 'radiogroup'}
         accessibilityLabel={label}
         testID={testID}
       >
         {options.map(option => {
-          const selected = option.value === value;
+          const selected = multiple
+            ? multiple.includes(option.value)
+            : option.value === value;
           return (
             <View
               key={option.value}
@@ -104,7 +109,7 @@ export const ChoiceChips = ({
               justifyContent="center"
               onPress={disabled ? undefined : () => onChange(option.value)}
               accessible
-              accessibilityRole="radio"
+              accessibilityRole={multiple ? 'checkbox' : 'radio'}
               accessibilityLabel={option.label}
               accessibilityState={{ checked: selected, disabled }}
               testID={testID ? `${testID}-${option.value}` : undefined}

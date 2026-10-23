@@ -1,10 +1,12 @@
+import type { SpotsQueryFilter } from '@/domain/spot/filters';
 import {
   IListSpots,
   ListSpotsActionTypes,
   IListSpotsAction,
 } from './listSpotsTypes';
 
-const getListSpotsAsync = (): IListSpotsAction => ({
+const getListSpotsAsync = (filter?: SpotsQueryFilter | null): IListSpotsAction => ({
+  payload: { filter: filter ?? null },
   type: ListSpotsActionTypes.GET_LIST_SPOTS_ASYNC,
 });
 

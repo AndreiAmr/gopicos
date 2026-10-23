@@ -9,6 +9,7 @@ import { EmptyState } from '@/atomic/molecules/emptyState';
 import { SpotPreview } from '@/atomic/molecules/spotPreview';
 import { Button } from '@/atomic/atoms/button';
 import { Text } from '@/atomic/atoms/text';
+import { FilterBar } from './FilterBar';
 import { homeStrings } from './logic';
 import { useHome } from './useHome';
 
@@ -74,6 +75,11 @@ export const HomePage = () => {
       </p>
 
       <div className="pointer-events-none absolute inset-x-0 top-0 flex flex-col items-start gap-2 p-4">
+        <FilterBar
+          filters={home.filters}
+          applying={home.applying}
+          onApply={home.applyFilters}
+        />
         {home.isLoading ? (
           <div
             role="status"
@@ -117,10 +123,22 @@ export const HomePage = () => {
           className="absolute inset-x-4 bottom-4 mx-auto w-full max-w-100 rounded-xl bg-gp-surface shadow-3"
         >
           <EmptyState
-            title={homeStrings.emptyTitle}
-            description={homeStrings.emptyDescription}
-            actionLabel={homeStrings.emptyAction}
-            onAction={home.createSpot}
+            title={
+              home.filtersActive
+                ? homeStrings.filteredEmptyTitle
+                : homeStrings.emptyTitle
+            }
+            description={
+              home.filtersActive
+                ? homeStrings.filteredEmptyDescription
+                : homeStrings.emptyDescription
+            }
+            actionLabel={
+              home.filtersActive
+                ? homeStrings.filteredEmptyAction
+                : homeStrings.emptyAction
+            }
+            onAction={home.filtersActive ? home.clearFilters : home.createSpot}
           />
         </div>
       ) : null}

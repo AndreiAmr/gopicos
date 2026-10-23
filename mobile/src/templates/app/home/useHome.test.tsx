@@ -99,4 +99,91 @@ describe('useHome', () => {
     await waitFor(() => expect(result.current.hasError).toBe(true));
     expect(result.current.isEmpty).toBe(false);
   });
+
+  describe('filtros', () => {
+    const park = { ...spot, id: 's2', modality: 'park' };
+    const bowl = { ...spot, id: 's3', modality: 'bowl_pool' };
+
+    it('aplica entrada e cobertura no backend e a modalidade (OU) no cliente', async () => {
+      const { result } = await render([
+        {
+          request: { query: spotsQuery },
+          result: { data: { getAllSpots: [spot, park, bowl] } },
+        },
+        {
+          request: {
+            query: spotsQuery,
+            variables: { filter: { isPaid: false, hasCoverage: true } },
+          },
+          result: { data: { getAllSpots: [spot, park, bowl] } },
+        },
+      ]);
+      await waitFor(() => expect(result.current.spots).toHaveLength(3));
+
+      await act(async () =>
+        result.current.applyFilters({
+          modalities: ['street', 'park'],
+          entry: 'free',
+          coveredOnly: true,
+          minRating: 0,
+        }),
+      );
+
+      expect(result.current.applying).toBe(true);
+      await waitFor(() => expect(result.current.applying).toBe(false));
+      expect(result.current.spots.map(item => item.id)).toEqual(['s1', 's2']);
+      expect(result.current.filtersActive).toBe(true);
+    });
+
+    it('limpar filtros volta à listagem completa', async () => {
+      const { result } = await render([
+        { request: { query: spotsQuery }, result: { data: { getAllSpots: [spot, park] } } },
+        {
+          request: { query: spotsQuery, variables: { filter: { minRating: 4 } } },
+          result: { data: { getAllSpots: [] } },
+        },
+        { request: { query: spotsQuery }, result: { data: { getAllSpots: [spot, park] } } },
+      ]);
+      await waitFor(() => expect(result.current.spots).toHaveLength(2));
+
+      await act(async () =>
+        result.current.applyFilters({
+          modalities: [],
+          entry: 'all',
+          coveredOnly: false,
+          minRating: 4,
+        }),
+      );
+      await waitFor(() => expect(result.current.isEmpty).toBe(true));
+      expect(result.current.filtersActive).toBe(true);
+
+      await act(async () => result.current.clearFilters());
+      await waitFor(() => expect(result.current.spots).toHaveLength(2));
+      expect(result.current.filtersActive).toBe(false);
+    });
+
+    it('falha ao aplicar mantém o filtro anterior e sinaliza o erro', async () => {
+      const { result } = await render([
+        { request: { query: spotsQuery }, result: { data: { getAllSpots: [spot] } } },
+        {
+          request: { query: spotsQuery, variables: { filter: { isPaid: true } } },
+          error: new Error('rede'),
+        },
+      ]);
+      await waitFor(() => expect(result.current.spots).toHaveLength(1));
+
+      await act(async () =>
+        result.current.applyFilters({
+          modalities: [],
+          entry: 'paid',
+          coveredOnly: false,
+          minRating: 0,
+        }),
+      );
+
+      await waitFor(() => expect(result.current.applyFailed).toBe(true));
+      expect(result.current.filters.entry).toBe('all');
+      expect(result.current.applying).toBe(false);
+    });
+  });
 });

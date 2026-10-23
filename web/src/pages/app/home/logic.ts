@@ -8,6 +8,9 @@ export const homeStrings = {
   emptyDescription: 'Seja o primeiro a cadastrar um pico nesta região.',
   emptyAction: 'Cadastrar o primeiro pico',
   newSpot: 'Novo pico',
+  filteredEmptyTitle: 'Nenhum pico com esses filtros.',
+  filteredEmptyDescription: 'Tente mudar ou limpar os filtros.',
+  filteredEmptyAction: 'Limpar filtros',
   mapLabel: 'Mapa de picos',
   mapHint: 'Use ] e [ para percorrer os picos e Enter para abrir o detalhe.',
 } as const;
