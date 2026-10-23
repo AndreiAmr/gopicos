@@ -14,7 +14,6 @@ const getSearchPlace = async (
       search,
     },
   });
-  console.log('🚀 ~ getSearchPlace ~ data:', data);
 
   return data.getFowardGeocoding;
 };
