@@ -91,7 +91,11 @@ export const LoginTemplate = () => {
           <View marginTop={space[8]} gap={space[4]}>
             {notice ? (
               <AlertBanner
-                type={notice === 'sessionExpired' ? 'info' : 'success'}
+                type={
+                  notice === 'sessionExpired' || notice === 'accountDeleted'
+                    ? 'info'
+                    : 'success'
+                }
                 message={loginStrings.notices[notice]}
               />
             ) : null}

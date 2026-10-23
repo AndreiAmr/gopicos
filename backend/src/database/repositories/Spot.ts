@@ -1,15 +1,23 @@
 import { IRepository } from '../..';
 import { Modality, Spot } from '../../prisma/generated';
 import { prisma } from '../../prisma/prisma';
-import { NewSpotInput } from '../../controllers/spot/newSpot/newSpot.controller';
+import { ValidSpotFields } from '../../services/spot/newSpot/validateSpotInput';
 
 type CreateSpotProps = {
-  data: NewSpotInput;
+  /** Id gerado antes do envio das fotos (pasta no Cloudinary). */
+  id?: string;
+  data: ValidSpotFields;
+  images: string[];
   authorId: string;
 };
 
 export type SpotDetailsData = Spot & {
-  author: { id: string; firstName: string; lastName: string };
+  author: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    deactivatedAt: Date | null;
+  };
   ratingAverage: number | null;
   reviewsCount: number;
 };
@@ -59,7 +67,16 @@ export class SpotRepository implements ISpotRepository {
     const [spot, stats] = await Promise.all([
       prisma.spot.findUnique({
         where: { id },
-        include: { author: { select: { id: true, firstName: true, lastName: true } } },
+        include: {
+          author: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              deactivatedAt: true,
+            },
+          },
+        },
       }),
       prisma.spotReview.aggregate({
         where: { spotId: id },
@@ -85,37 +102,24 @@ export class SpotRepository implements ISpotRepository {
     throw new Error('Method not implemented.');
   }
 
-  async create(props: CreateSpotProps): Promise<Spot> {
-    const { data, authorId } = props;
-
-    const spotData = {
-      name: data.name,
-      description: data.description,
-      modality: data.modality as Modality,
-      equipmentRequired: data.equipmentRequired || false,
-      isPaid: data.isPaid,
-      alwaysOpen: data.alwaysOpen,
-      entryAmount: data.entryAmount || '',
-      hasCoverage: data.hasCoverage || false,
-      coordinates: data.coordinates,
-      openingHours: data.openingHours,
-
-      // markingType: data.markingType,
-    };
-
-    const result = await prisma.spot.create({
+  async create({ id, data, images, authorId }: CreateSpotProps): Promise<Spot> {
+    return prisma.spot.create({
       data: {
-        ...spotData,
-
-        author: {
-          connect: {
-            id: authorId,
-          },
-        },
+        ...(id ? { id } : {}),
+        name: data.name,
+        description: data.description,
+        modality: data.modality as Modality,
+        equipmentRequired: data.equipmentRequired,
+        isPaid: data.isPaid,
+        alwaysOpen: data.alwaysOpen,
+        entryAmount: data.entryAmount,
+        hasCoverage: data.hasCoverage,
+        coordinates: data.coordinates,
+        openingHours: data.openingHours,
+        images,
+        author: { connect: { id: authorId } },
       },
     });
-
-    return result;
   }
 
   async insertImage(spotId: string, url: string): Promise<Spot> {

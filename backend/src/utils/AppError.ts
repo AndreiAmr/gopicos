@@ -7,6 +7,8 @@ export type AppErrorType =
   | 'UNAUTHORIZED'
   | 'UNAUTHENTICATED'
   | 'NOT_FOUND'
+  | 'REVIEW_ALREADY_EXISTS'
+  | 'OWN_SPOT_REVIEW'
   | 'INTERNAL_ERROR';
 
 type AppErrorProps = {

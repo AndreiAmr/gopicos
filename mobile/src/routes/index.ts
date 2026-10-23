@@ -4,6 +4,9 @@ import { SignupTemplate } from '../templates/auth/signup';
 import { createStaticNavigation } from '@react-navigation/native';
 
 import { HomeStack } from './HomeStack';
+import { SpotDetailsTemplate } from '../templates/app/spotDetails';
+import { NewSpotLocationTemplate } from '../templates/app/newSpot/location';
+import { NewSpotDetailsTemplate } from '../templates/app/newSpot/details';
 
 const RootStack = createNativeStackNavigator({
   screenOptions: {
@@ -19,6 +22,15 @@ const RootStack = createNativeStackNavigator({
     },
     Home: {
       screen: HomeStack,
+    },
+    SpotDetails: {
+      screen: SpotDetailsTemplate,
+    },
+    NewSpotLocation: {
+      screen: NewSpotLocationTemplate,
+    },
+    NewSpotDetails: {
+      screen: NewSpotDetailsTemplate,
     },
   },
 });

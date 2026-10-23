@@ -46,6 +46,14 @@ export const useLogin = () => {
     }
   }, [expired]);
 
+  // Vindo de "Excluir conta": e-mail já preenchido, foco direto na senha.
+  const accountDeleted = params?.notice === 'accountDeleted';
+  useEffect(() => {
+    if (accountDeleted && params?.email) {
+      passwordRef.current?.focus();
+    }
+  }, [accountDeleted, params?.email]);
+
   const fail = useCallback((reason: LoginFailure) => {
     setFailure(reason);
     setSubmitting(false);

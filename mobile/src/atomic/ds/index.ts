@@ -18,8 +18,14 @@ export {
   SheetHandle,
 } from './molecules/Sheet';
 export { BottomSheet } from './molecules/BottomSheet';
+export { SpotCard, SpotCardSkeleton } from './molecules/SpotCard';
+export { SpotPin } from './molecules/SpotPin';
+export { SpotPreview } from './molecules/SpotPreview';
+export { InfoRow } from './molecules/InfoRow';
 export { Toast, ToastProvider, useToast } from './molecules/Toast';
 export { AlertBanner } from './auth/AlertBanner';
 export { TextLink } from './auth/TextLink';
 export { PasswordInput } from './auth/PasswordInput';
 export { Tape, Halftone, Wordmark } from './auth/BrandDecor';
+export { Avatar, initialsOf } from './atoms/Avatar';
+export { SettingsRow, SettingsGroup } from './molecules/SettingsRow';

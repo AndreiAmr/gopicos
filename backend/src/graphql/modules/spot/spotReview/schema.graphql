@@ -1,6 +1,7 @@
 input SpotReview {
   spotId: String!
-  rating: Int!
+  "Inteiro de 1 a 5. Declarado Float para o service devolver VALIDATION_ERROR em pt-BR a valores como 4.5."
+  rating: Float!
   description: String
 }
 
