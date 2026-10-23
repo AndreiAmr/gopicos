@@ -13,6 +13,10 @@ export type SpotSummary = {
   } | null;
   ratingAverage: number | null;
   reviewsCount: number;
+  /** Usados pela prévia dos filtros no cliente (spec home.md 6.9). */
+  isPaid?: boolean | null;
+  hasCoverage?: boolean | null;
+  description?: string | null;
 };
 
 export const MODALITY_LABELS: Record<string, string> = {

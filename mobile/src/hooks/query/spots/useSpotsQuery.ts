@@ -21,6 +21,8 @@ export const useSpotsQuery = (filter: SpotsQueryFilter | null = null) => {
     spots: data?.getAllSpots ?? [],
     loading,
     error: Boolean(error),
+    /** Falha de rede (sem resposta da API): a Home mostra "Sem conexão". */
+    offline: Boolean(error) && apiError === null,
     unauthenticated: apiError?.type === 'UNAUTHENTICATED',
     refetch: () => {
       refetch().catch(() => undefined);

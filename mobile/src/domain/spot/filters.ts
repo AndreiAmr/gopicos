@@ -40,11 +40,13 @@ export const RATING_OPTIONS: Array<{ value: MinRating; label: string }> = [
 export const filterStrings = {
   button: 'Filtros',
   title: 'Filtros',
-  clear: 'Limpar filtros',
+  clear: 'Limpar',
+  clearAll: 'Limpar filtros',
   apply: 'Aplicar filtros',
   modality: 'Modalidade',
   entry: 'Entrada',
   covered: 'Somente cobertos',
+  coverage: 'Cobertura',
   minRating: 'Nota mínima',
   applyError: 'Não foi possível aplicar os filtros.',
   retry: 'Tentar novamente',
@@ -63,11 +65,112 @@ export const activeFilterCount = (filters: SpotFilters): number =>
 export const hasActiveFilters = (filters: SpotFilters): boolean =>
   activeFilterCount(filters) > 0;
 
-/** "Filtros" ou "Filtros (2)". */
+/** Rótulo de acessibilidade do botão: "Filtros" ou "Filtros, 2 aplicados". */
 export const filterButtonLabel = (filters: SpotFilters): string => {
   const count = activeFilterCount(filters);
-  return count > 0 ? `${filterStrings.button} (${count})` : filterStrings.button;
+  return count > 0
+    ? `${filterStrings.button}, ${count} ${count === 1 ? 'aplicado' : 'aplicados'}`
+    : filterStrings.button;
 };
+
+/** Campos do pico usados pelos filtros no cliente (prévia ao vivo, UX-H19). */
+export type FilterableSpot = Pick<
+  SpotSummary,
+  'modality' | 'ratingAverage' | 'isPaid' | 'hasCoverage'
+>;
+
+/**
+ * Mesmo critério do backend (`getAllSpots(filter)`): entrada e cobertura
+ * comparam o valor exato e a nota mínima exclui picos sem avaliação.
+ */
+export const matchesFilters = (
+  spot: FilterableSpot,
+  filters: SpotFilters,
+): boolean => {
+  if (filters.modalities.length > 0 && !filters.modalities.includes(spot.modality)) {
+    return false;
+  }
+  if (filters.entry === 'free' && spot.isPaid !== false) return false;
+  if (filters.entry === 'paid' && spot.isPaid !== true) return false;
+  if (filters.coveredOnly && spot.hasCoverage !== true) return false;
+  if (
+    filters.minRating > 0 &&
+    !(spot.ratingAverage != null && spot.ratingAverage >= filters.minRating)
+  ) {
+    return false;
+  }
+  return true;
+};
+
+export const applyFilters = <T extends FilterableSpot>(
+  spots: T[],
+  filters: SpotFilters,
+): T[] => spots.filter(spot => matchesFilters(spot, filters));
+
+const plural = (count: number, one: string, many: string) =>
+  count === 1 ? one : many;
+
+/** "1 filtro" / "2 filtros". */
+export const filtersCountText = (count: number): string =>
+  `${count} ${plural(count, 'filtro', 'filtros')}`;
+
+/** "Ver 12 picos" (botão do sheet com prévia) ou "Aplicar filtros". */
+export const applyButtonLabel = (previewCount: number | null): string =>
+  previewCount === null
+    ? filterStrings.apply
+    : `Ver ${previewCount} ${plural(previewCount, 'pico', 'picos')}`;
+
+export type ScoreTapeState =
+  | { kind: 'loading'; text: string }
+  | { kind: 'updating'; text: string }
+  | { kind: 'count'; text: string; filtersText?: string };
+
+export const scoreTapeStrings = {
+  loading: 'Carregando picos...',
+  updating: 'Atualizando...',
+  none: 'Nenhum pico na área',
+} as const;
+
+/**
+ * Texto da fita de placar (spec home.md 6.1): "32 picos na área · 2 filtros",
+ * "Nenhum pico na área", "0 picos com 2 filtros", "999+ picos na área".
+ * `count` null = área do mapa ainda desconhecida.
+ */
+export const scoreTape = ({
+  loading,
+  updating,
+  count,
+  filterCount,
+}: {
+  loading: boolean;
+  updating: boolean;
+  count: number | null;
+  filterCount: number;
+}): ScoreTapeState => {
+  if (loading || count === null) {
+    return { kind: 'loading', text: scoreTapeStrings.loading };
+  }
+  if (updating) {
+    return { kind: 'updating', text: scoreTapeStrings.updating };
+  }
+  if (count === 0) {
+    return filterCount > 0
+      ? { kind: 'count', text: `0 picos com ${filtersCountText(filterCount)}` }
+      : { kind: 'count', text: scoreTapeStrings.none };
+  }
+  const shown = count > 999 ? '999+' : String(count);
+  return {
+    kind: 'count',
+    text: `${shown} ${plural(count, 'pico', 'picos')} na área`,
+    filtersText: filterCount > 0 ? filtersCountText(filterCount) : undefined,
+  };
+};
+
+/** Texto único da fita (leitor de tela e testes). */
+export const scoreTapeText = (state: ScoreTapeState): string =>
+  state.kind === 'count' && state.filtersText
+    ? `${state.text} · ${state.filtersText}`
+    : state.text;
 
 /** Variáveis do backend. A modalidade é tratada no cliente (o backend aceita uma só). */
 export type SpotsQueryFilter = {

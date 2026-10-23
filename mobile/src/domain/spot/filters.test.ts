@@ -24,7 +24,8 @@ describe('domain/spot/filters', () => {
     expect(activeFilterCount({ ...NO_FILTERS, modalities: ['street', 'park'] })).toBe(1);
     expect(activeFilterCount(all)).toBe(4);
     expect(filterButtonLabel(NO_FILTERS)).toBe('Filtros');
-    expect(filterButtonLabel(all)).toBe('Filtros (4)');
+    expect(filterButtonLabel(all)).toBe('Filtros, 4 aplicados');
+    expect(filterButtonLabel({ ...NO_FILTERS, coveredOnly: true })).toBe('Filtros, 1 aplicado');
   });
 
   it('converte para as variáveis do backend (E entre seções)', () => {
