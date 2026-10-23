@@ -25,8 +25,8 @@ export class SpotReviewRepository implements ISpotReviewRepository {
     return this.instance;
   }
 
-  async find(id: string): Promise<any | null> {
-    throw new Error('Method not implemented.');
+  async find(id: string): Promise<SpotReview | null> {
+    return prisma.spotReview.findUnique({ where: { id } });
   }
 
   async findByAuthorAndSpot(authorId: string, spotId: string) {
@@ -41,6 +41,22 @@ export class SpotReviewRepository implements ISpotReviewRepository {
 
   delete(prop: any): Promise<void> {
     throw new Error('Method not implemented.');
+  }
+
+  /** Atualiza nota e comentário; devolve a avaliação com o autor. */
+  async updateById(
+    id: string,
+    data: { rating: number; description: string | null },
+  ): Promise<ReviewWithAuthor> {
+    return prisma.spotReview.update({
+      where: { id },
+      data: { rating: data.rating, description: data.description },
+      include: { author: { select: reviewAuthorSelect } },
+    });
+  }
+
+  async deleteById(id: string): Promise<void> {
+    await prisma.spotReview.delete({ where: { id } });
   }
 
   async create(props: AddReviewProps) {

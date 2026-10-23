@@ -1,0 +1,9 @@
+type DeleteSpotReviewResult {
+  id: String!
+  spotId: String!
+}
+
+extend type Mutation {
+  "Só o autor exclui (FORBIDDEN para os demais). Depois ele pode avaliar o pico de novo."
+  deleteSpotReview(id: String!): DeleteSpotReviewResult! @Authenticated
+}
