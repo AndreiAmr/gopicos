@@ -3,7 +3,8 @@ import { MapPinOff } from 'lucide-react-native';
 import { View, useTheme } from 'tamagui';
 import { space } from '../../../config/tamagui/tokens';
 import { AlertBanner, EmptyState, Skeleton } from '../../../atomic/ds';
-import { BackButton, SpotDetailsContent } from './components/SpotDetailsContent';
+import { BackButton } from './components/SpotDetailsContent';
+import { ReadySpotDetails } from './components/ReadySpotDetails';
 import { GALLERY_HEIGHT } from './components/Gallery';
 import { spotDetailsStrings, useSpotDetails } from './useSpotDetails';
 
@@ -25,11 +26,12 @@ export const SpotDetailsTemplate = () => {
 
   if (details.status === 'ready' && details.spot) {
     return (
-      <SpotDetailsContent
+      <ReadySpotDetails
         spot={details.spot}
         onBack={details.goBack}
         onEdit={details.onEdit}
         onDelete={details.onDelete}
+        refreshSpot={details.retry}
       />
     );
   }
