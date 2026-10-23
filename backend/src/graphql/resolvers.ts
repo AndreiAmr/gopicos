@@ -8,6 +8,7 @@ import { reverseGeocodingResolvers } from './modules/geocoding/reverse/resolver'
 import { deleteAccountResolvers } from './modules/user/deleteAccount/resolver';
 import { changePasswordResolvers } from './modules/user/changePassword/resolver';
 import { updateProfileResolvers } from './modules/user/updateProfile/resolver';
+import { myActivityResolvers } from './modules/user/myActivity/resolver';
 import { profileResolvers } from './modules/user/profile/resolver';
 import { spotResolvers } from './modules/spot/resolver';
 import { spotDetailsResolver } from './modules/spot/spotDetails/resolver';
@@ -21,6 +22,7 @@ export const resolvers = {
     ...listSpotReviewsResolver.Query,
     ...reverseGeocodingResolvers.Query,
     ...profileResolvers.Query,
+    ...myActivityResolvers.Query,
   },
   Mutation: {
     ...loginResolvers.Mutation,
