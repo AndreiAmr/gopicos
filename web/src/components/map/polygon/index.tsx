@@ -1,4 +1,5 @@
 import { ISpot } from '@/store/spot/spotTypes';
+import { polygonRing } from '@/domain/spot/spot';
 import React from 'react';
 import { Layer, Source } from 'react-map-gl/mapbox';
 
@@ -7,14 +8,14 @@ type MapPolygonProps = {
 };
 
 export const MapPolygon = ({ spot }: MapPolygonProps) => {
-  const feature = {
+  const feature: GeoJSON.Feature<GeoJSON.Polygon> = {
     type: 'Feature',
     properties: {},
     geometry: {
       type: 'Polygon',
-      coordinates: spot.coordinates,
+      coordinates: [polygonRing(spot.coordinates) ?? []],
     },
-  } as const;
+  };
 
   return (
     <React.Fragment key={spot.name + Date.now()}>
