@@ -1,5 +1,5 @@
 import { IRepository } from '../..';
-import { User } from '@prisma/client';
+import { User } from '../../prisma/generated';
 import { prisma } from '../../prisma/prisma';
 import { normalizeEmail } from '../../utils/email';
 
