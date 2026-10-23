@@ -70,6 +70,10 @@ export const BottomSheet = forwardRef<BottomSheetModal, BottomSheetProps>(
         snapPoints={snapPoints}
         enableDynamicSizing={!snapPoints}
         enablePanDownToClose
+        // O sheet sobe com o teclado e o campo focado continua visível.
+        keyboardBehavior="interactive"
+        keyboardBlurBehavior="restore"
+        android_keyboardInputMode="adjustResize"
         onDismiss={onClose}
         backdropComponent={withBackdrop ? renderBackdrop : undefined}
         backgroundStyle={{
