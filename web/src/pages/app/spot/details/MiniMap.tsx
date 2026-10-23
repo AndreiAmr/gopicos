@@ -1,5 +1,5 @@
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import bbox from '@turf/bbox';
 import Mapbox, { Layer, Source } from 'react-map-gl/mapbox';
 import type { LngLatBoundsLike } from 'react-map-gl/mapbox';
@@ -17,6 +17,8 @@ type MiniMapProps = {
 
 /** Mini-mapa estático (408x180 por padrão) com o polígono do pico enquadrado. */
 export const MiniMap = ({ coordinates, name, className }: MiniMapProps) => {
+  // Só adiciona a Source depois do estilo carregar ("Style is not done loading").
+  const [styleLoaded, setStyleLoaded] = useState(false);
   const data = useMemo(
     () =>
       polygonRing(coordinates)
@@ -58,19 +60,25 @@ export const MiniMap = ({ coordinates, name, className }: MiniMapProps) => {
         interactive={false}
         attributionControl={false}
         style={{ width: '100%', height: '100%' }}
+        onLoad={() => setStyleLoaded(true)}
       >
-        <Source id="mini-spot" type="geojson" data={data}>
-          <Layer
-            id="mini-spot-fill"
-            type="fill"
-            paint={{ 'fill-color': mapColors.spotStroke, 'fill-opacity': 0.3 }}
-          />
-          <Layer
-            id="mini-spot-line"
-            type="line"
-            paint={{ 'line-color': mapColors.spotStroke, 'line-width': 3 }}
-          />
-        </Source>
+        {styleLoaded ? (
+          <Source id="mini-spot" type="geojson" data={data}>
+            <Layer
+              id="mini-spot-fill"
+              type="fill"
+              paint={{
+                'fill-color': mapColors.spotStroke,
+                'fill-opacity': 0.3,
+              }}
+            />
+            <Layer
+              id="mini-spot-line"
+              type="line"
+              paint={{ 'line-color': mapColors.spotStroke, 'line-width': 3 }}
+            />
+          </Source>
+        ) : null}
       </Mapbox>
     </div>
   );
