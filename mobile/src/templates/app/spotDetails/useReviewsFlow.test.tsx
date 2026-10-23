@@ -18,6 +18,15 @@ jest.mock('@apollo/client/react', () => ({
 }));
 jest.mock('../../../atomic/ds', () => ({ useToast: () => ({ show: mockShow }) }));
 
+const mockReset = jest.fn();
+const mockClearSession = jest.fn(() => Promise.resolve());
+jest.mock('@react-navigation/native', () => ({
+  useNavigation: () => ({ reset: mockReset }),
+}));
+jest.mock('../../../services/session', () => ({
+  clearSession: () => mockClearSession(),
+}));
+
 const refreshSpot = jest.fn();
 
 const setup = async () => {
@@ -101,5 +110,19 @@ describe('useReviewsFlow.submit', () => {
       'Não foi possível enviar sua avaliação. Tente novamente.',
     );
     expect(mockReload).not.toHaveBeenCalled();
+  });
+
+  it('UNAUTHENTICATED: limpa a sessão e volta ao Login com o aviso', async () => {
+    mockMutate.mockRejectedValue(apiError('UNAUTHENTICATED'));
+    const { result } = await setup();
+
+    await act(async () => result.current.submit(5, 'x'));
+
+    expect(mockClearSession).toHaveBeenCalled();
+    expect(mockReset).toHaveBeenCalledWith({
+      index: 0,
+      routes: [{ name: 'Login', params: { notice: 'sessionExpired' } }],
+    });
+    expect(result.current.error).toBeNull();
   });
 });

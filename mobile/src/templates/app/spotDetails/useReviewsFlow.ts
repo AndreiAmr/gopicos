@@ -4,12 +4,16 @@ import type {
   NativeSyntheticEvent,
   ScrollView,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { useApolloClient } from '@apollo/client/react';
 import { normalizeApolloError } from '../../../config/apollo';
 import { useCreateReviewMutation } from '../../../hooks/mutation/spotReview/useCreateReviewMutation';
 import { useSpotReviews } from '../../../hooks/query/spotReviews/useSpotReviews';
 import { useToast } from '../../../atomic/ds';
+import { clearSession } from '../../../services/session';
+import type { RootStackParamList } from '../../../routes/types';
 import { isNearEnd, reviewStrings } from '../../../domain/spot/reviews';
 
 type Options = {
@@ -27,6 +31,8 @@ export const useReviewsFlow = ({ spotId, refreshSpot }: Options) => {
   const { mutate, loading: submitting } = useCreateReviewMutation();
   const apollo = useApolloClient();
   const toast = useToast();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const sheetRef = useRef<BottomSheetModal>(null);
   const scrollRef = useRef<ScrollView>(null);
@@ -66,7 +72,15 @@ export const useReviewsFlow = ({ spotId, refreshSpot }: Options) => {
       } catch (caught) {
         const api = normalizeApolloError(caught);
 
-        if (api?.type === 'REVIEW_ALREADY_EXISTS') {
+        if (api?.type === 'UNAUTHENTICATED') {
+          // Sessão expirada: limpa o token e volta ao Login, como nas outras telas.
+          sheetRef.current?.dismiss();
+          await clearSession().catch(() => undefined);
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Login', params: { notice: 'sessionExpired' } }],
+          });
+        } else if (api?.type === 'REVIEW_ALREADY_EXISTS') {
           sheetRef.current?.dismiss();
           toast.show({ type: 'info', message: reviewStrings.alreadyReviewed });
           propagate();
@@ -77,7 +91,7 @@ export const useReviewsFlow = ({ spotId, refreshSpot }: Options) => {
         }
       }
     },
-    [clearErrors, mutate, propagate, spotId, toast],
+    [clearErrors, mutate, navigation, propagate, spotId, toast],
   );
 
   const onScroll = useCallback(
