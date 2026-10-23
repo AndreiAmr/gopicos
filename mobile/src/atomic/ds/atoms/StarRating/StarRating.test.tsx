@@ -17,6 +17,12 @@ describe('StarRating (DS)', () => {
     expect(screen.getByText('Sem avaliações')).toBeTruthy();
   });
 
+  it('modo leitura sem count: só as estrelas, sem "Sem avaliações" (GP-133)', async () => {
+    await renderWithTheme(<StarRating value={4} />);
+    expect(screen.queryByText('Sem avaliações')).toBeNull();
+    expect(screen.getByLabelText('4 de 5 estrelas')).toBeTruthy();
+  });
+
   it('modo entrada: toque na estrela chama onChange com a nota', async () => {
     const onChange = jest.fn();
     await renderWithTheme(<StarRating value={0} onChange={onChange} />);
