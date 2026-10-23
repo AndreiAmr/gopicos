@@ -12,6 +12,7 @@ export const USER_PROFILE_INITIAL_STATE: IUserProfileState = {
   me: { data: null, isLoading: false, error: null },
   update: { isLoading: false, error: null },
   changePassword: { isLoading: false, error: null, success: false },
+  deleteAccount: { isLoading: false, error: null },
 };
 
 const setMe: IUserProfileReducer = (state, payload?: IUserProfilePayload) =>
@@ -54,6 +55,16 @@ const setSuccessPassword: IUserProfileReducer = (state, payload) =>
     draft.changePassword.success = payload?.success ?? false;
   });
 
+const setIsLoadingDelete: IUserProfileReducer = (state, payload) =>
+  produce(state, (draft) => {
+    draft.deleteAccount.isLoading = payload?.isLoading ?? false;
+  });
+
+const setErrorDelete: IUserProfileReducer = (state, payload) =>
+  produce(state, (draft) => {
+    draft.deleteAccount.error = payload?.operationError ?? null;
+  });
+
 const reducerMap = new Map<UserProfileActionTypes, IUserProfileReducer>([
   [UserProfileActionTypes.SET_ME, setMe],
   [UserProfileActionTypes.SET_IS_LOADING_ME, setIsLoadingMe],
@@ -63,6 +74,8 @@ const reducerMap = new Map<UserProfileActionTypes, IUserProfileReducer>([
   [UserProfileActionTypes.SET_IS_LOADING_PASSWORD, setIsLoadingPassword],
   [UserProfileActionTypes.SET_ERROR_PASSWORD, setErrorPassword],
   [UserProfileActionTypes.SET_SUCCESS_PASSWORD, setSuccessPassword],
+  [UserProfileActionTypes.SET_IS_LOADING_DELETE, setIsLoadingDelete],
+  [UserProfileActionTypes.SET_ERROR_DELETE, setErrorDelete],
 ]);
 
 const userProfileReducer = (

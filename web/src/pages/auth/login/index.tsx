@@ -4,6 +4,7 @@ import { AlertCircleIcon, CheckCircle2Icon, EyeIcon, EyeOffIcon } from 'lucide-r
 
 import { Button } from '@/atomic/atoms/button';
 import { Input } from '@/atomic/atoms/input';
+import { AlertBanner } from '@/atomic/molecules/alertBanner';
 import { SIGN_IN_ERROR_MESSAGES } from '@/store/authentication/signIn/signInErrors';
 
 import { useLogin } from './useLogin';
@@ -15,6 +16,8 @@ export const LoginPage = () => {
     isLoading,
     error,
     accountCreated,
+    sessionExpired,
+    accountDeleted,
     email,
     password,
     showPassword,
@@ -105,6 +108,14 @@ export const LoginPage = () => {
               />
               <span>Conta criada! Entre com seu e-mail e senha.</span>
             </div>
+          )}
+
+          {(sessionExpired || accountDeleted) && !error && (
+            <AlertBanner variant="info">
+              {accountDeleted
+                ? 'Conta excluída. Se quiser voltar, entre com seu e-mail e senha e ela será reativada.'
+                : 'Sua sessão expirou. Entre de novo para continuar.'}
+            </AlertBanner>
           )}
 
           {error && (

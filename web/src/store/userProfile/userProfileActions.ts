@@ -68,6 +68,23 @@ const setSuccessPassword = (success: boolean): IUserProfileAction => ({
   payload: { success },
 });
 
+const deleteAccountAsync = (password: string): IUserProfileAction => ({
+  type: UserProfileActionTypes.DELETE_ACCOUNT_ASYNC,
+  payload: { password },
+});
+
+const setIsLoadingDelete = (isLoading: boolean): IUserProfileAction => ({
+  type: UserProfileActionTypes.SET_IS_LOADING_DELETE,
+  payload: { isLoading },
+});
+
+const setErrorDelete = (
+  operationError: UserProfileOperationError | null,
+): IUserProfileAction => ({
+  type: UserProfileActionTypes.SET_ERROR_DELETE,
+  payload: { operationError },
+});
+
 export const userProfileActions = {
   getMeAsync,
   setMe,
@@ -80,4 +97,7 @@ export const userProfileActions = {
   setIsLoadingPassword,
   setErrorPassword,
   setSuccessPassword,
+  deleteAccountAsync,
+  setIsLoadingDelete,
+  setErrorDelete,
 };

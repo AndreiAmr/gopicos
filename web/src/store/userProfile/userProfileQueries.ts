@@ -27,6 +27,14 @@ export const changePasswordMutation = gql`
   }
 `;
 
+export const deleteAccountMutation = gql`
+  mutation DeleteAccount($props: DeleteAccountInput!) {
+    deleteAccount(props: $props) {
+      message
+    }
+  }
+`;
+
 export const updateProfileMutation = gql`
   mutation UpdateProfile($props: UpdateProfileInput!) {
     updateProfile(props: $props) {
