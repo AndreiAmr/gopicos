@@ -17,6 +17,8 @@ import {
   space,
   zIndex,
 } from '../../../config/tamagui/tokens';
+import { isMapboxConfigured } from '../../../config/mapbox';
+import { PlaceSearch } from './components/PlaceSearch';
 import { homeStrings, useHome } from './useHome';
 
 export const HomeTemplate = () => {
@@ -42,18 +44,24 @@ export const HomeTemplate = () => {
 
   return (
     <S.Container>
-      <Map
-        spots={home.spots}
-        selectedId={home.selectedId}
-        onSelectSpot={home.select}
-        onMapPress={home.clearSelection}
-        onUserLocation={home.setUserPosition}
-      />
+      {isMapboxConfigured ? (
+        <Map
+          spots={home.spots}
+          selectedId={home.selectedId}
+          onSelectSpot={home.select}
+          onMapPress={home.clearSelection}
+          onUserLocation={home.setUserPosition}
+          placeTarget={home.placeTarget}
+          placeAnimationMs={home.placeAnimationMs}
+        />
+      ) : null}
+
+      <PlaceSearch onSelectPlace={home.selectPlace} />
 
       <SafeAreaView edges={['top']} pointerEvents="box-none">
         <View
           paddingHorizontal={space[4]}
-          paddingTop={space[2]}
+          paddingTop={space[2] + 64}
           gap={space[2]}
           zIndex={zIndex.header}
           pointerEvents="box-none"
@@ -71,6 +79,13 @@ export const HomeTemplate = () => {
             >
               <Text variant="caption">{homeStrings.loading}</Text>
             </View>
+          ) : null}
+          {!isMapboxConfigured ? (
+            <AlertBanner
+              type="error"
+              message={homeStrings.mapError}
+              testID="home-map-error"
+            />
           ) : null}
           {home.hasError ? (
             <AlertBanner

@@ -32,6 +32,8 @@ type ReadProps = CommonProps & {
   /** Media (0 a 5, aceita decimais). */
   value: number;
   count?: number;
+  /** Texto ao lado das estrelas, quando diferente do padrão ("4,6 (23)"). */
+  text?: string;
 };
 
 type StarRatingProps = InputProps | ReadProps;
@@ -86,7 +88,7 @@ function StarRating(props: StarRatingProps) {
           })}
         </span>
         <span className="text-caption font-medium text-gp-text-muted">
-          {summaryText(average, props.count)}
+          {props.text ?? summaryText(average, props.count)}
         </span>
       </span>
     );

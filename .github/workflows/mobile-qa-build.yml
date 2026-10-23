@@ -74,6 +74,7 @@ jobs:
       - name: Configurar Variáveis de Ambiente de QA
         run: |
           echo "API_URL=${{ secrets.API_QA_URL }}" > .env
+          echo "MAPBOX_ACCESS_TOKEN=${{ secrets.MAPBOX_ACCESS_TOKEN }}" >> .env
           echo "Arquivo .env gerado com sucesso!"
 
       - name: Configurar JDK 17
