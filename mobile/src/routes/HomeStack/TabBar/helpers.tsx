@@ -4,8 +4,9 @@ import { Route } from '../../routeTypes';
 type TabInfoProps = {
   label: string;
   Icon: LucideIcon;
+  /** Rótulo de acessibilidade quando difere do visível. */
+  a11yLabel?: string;
 };
-
 
 const HomeTabInfo: TabInfoProps = {
   label: 'Mapa',
@@ -18,8 +19,9 @@ const ProfileTabInfo: TabInfoProps = {
 };
 
 const NewSpotTabInfo: TabInfoProps = {
-  label: 'Novo Pico',
+  label: 'Novo pico',
   Icon: Plus,
+  a11yLabel: 'Cadastrar novo pico',
 };
 
 export const tabInfoMapper = new Map<string, TabInfoProps>([

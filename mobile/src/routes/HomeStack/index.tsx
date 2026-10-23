@@ -5,32 +5,34 @@ import {
 } from '@react-navigation/bottom-tabs';
 import { TabBar } from './TabBar';
 import { ProfileStack } from '../ProfileStack';
-import { HomeIcon } from 'lucide-react-native';
+
+/** A aba "Novo pico" não tem tela própria: abre o fluxo de criar (UX-H2). */
+const NewSpotAction = () => null;
 
 export const HomeStack = createBottomTabNavigator({
   tabBar: props => <TabBar {...props} />,
   screenOptions: {
     headerShown: false,
+    // A busca abre o teclado: a tab bar some para a lista ir até ele (spec 7).
+    tabBarHideOnKeyboard: true,
   },
 
   screens: {
     Home: createBottomTabScreen({
       screen: HomeTemplate,
-      options: {
-        tabBarIcon: () => <HomeIcon />,
-      },
     }),
     NewSpot: createBottomTabScreen({
-      screen: HomeTemplate,
-      options: {
-        tabBarIcon: () => <HomeIcon />,
-      },
+      screen: NewSpotAction,
+      listeners: ({ navigation }) => ({
+        tabPress: event => {
+          // Aba de ação: nunca fica selecionada; ao voltar, a aba anterior segue ativa.
+          event.preventDefault();
+          navigation.getParent()?.navigate('NewSpotLocation');
+        },
+      }),
     }),
     Profile: createBottomTabScreen({
       screen: ProfileStack,
-      options: {
-        tabBarIcon: () => <HomeIcon />,
-      },
     }),
   },
 });
