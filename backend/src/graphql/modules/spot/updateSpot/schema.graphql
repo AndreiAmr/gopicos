@@ -1,0 +1,20 @@
+input UpdateSpotInput {
+  name: String
+  description: String
+  modality: String
+  isPaid: Boolean
+  alwaysOpen: Boolean
+  hasCoverage: Boolean
+  equipmentRequired: Boolean
+  entryAmount: String
+  coordinates: JSON
+  openingHours: String
+  "URLs das fotos atuais que devem permanecer. Omitido = mantém todas."
+  keepImages: [String!]
+  "Fotos novas a enviar. Total (mantidas + novas) deve ficar entre 1 e 5."
+  newImages: [Upload!]
+}
+
+extend type Mutation {
+  updateSpot(id: String!, input: UpdateSpotInput!): Spot! @Authenticated
+}

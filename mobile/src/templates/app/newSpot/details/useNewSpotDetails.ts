@@ -6,12 +6,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useApolloClient } from '@apollo/client/react';
-import {
-  Asset,
-  ImagePickerResponse,
-  launchCamera,
-  launchImageLibrary,
-} from 'react-native-image-picker';
+import type { ImagePickerResponse } from 'react-native-image-picker';
 import { useToast } from '../../../../atomic/ds/molecules/Toast';
 import {
   FIELD_ORDER,
@@ -30,6 +25,7 @@ import {
   createSpotRequest,
 } from '../../../../services/spot/createSpot';
 import { clearSession } from '../../../../services/session';
+import { askForPhoto, toPicked } from './pickPhoto';
 import type { RootStackParamList } from '../../../../routes/types';
 
 export const newSpotDetailsStrings = {
@@ -67,16 +63,6 @@ export const newSpotDetailsStrings = {
 } as const;
 
 const FORM_FIELDS = new Set<string>(FIELD_ORDER);
-
-const toPicked = (assets: Asset[] = []): PickedPhoto[] =>
-  assets
-    .filter(asset => asset.uri)
-    .map((asset, index) => ({
-      uri: asset.uri as string,
-      name: asset.fileName ?? `foto-${Date.now()}-${index}.jpg`,
-      type: asset.type ?? 'image/jpeg',
-      size: asset.fileSize,
-    }));
 
 export const useNewSpotDetails = () => {
   const navigation =
@@ -119,22 +105,7 @@ export const useNewSpotDetails = () => {
     const remaining = PHOTO_LIMITS.max - photos.length;
     if (remaining <= 0) return;
 
-    Alert.alert(newSpotDetailsStrings.addPhotoTitle, undefined, [
-      {
-        text: newSpotDetailsStrings.takePhoto,
-        onPress: () =>
-          launchCamera({ mediaType: 'photo', quality: 0.8 }, handlePicked),
-      },
-      {
-        text: newSpotDetailsStrings.pickFromGallery,
-        onPress: () =>
-          launchImageLibrary(
-            { mediaType: 'photo', quality: 0.8, selectionLimit: remaining },
-            handlePicked,
-          ),
-      },
-      { text: newSpotDetailsStrings.cancel, style: 'cancel' },
-    ]);
+    askForPhoto(remaining, handlePicked);
   }, [handlePicked, photos.length]);
 
   const removePhoto = useCallback((index: number) => {

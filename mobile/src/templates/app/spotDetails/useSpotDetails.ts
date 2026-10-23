@@ -39,7 +39,12 @@ export const useSpotDetails = () => {
     }
   }, [navigation]);
 
-  // Editar (#45) e Excluir (#48) entram nas próximas issues.
+  const onEdit = useCallback(
+    () => navigation.navigate('EditSpot', { id: params.id }),
+    [navigation, params.id],
+  );
+
+  // Excluir (#48) entra na próxima issue.
   const notYet = useCallback(
     () => toast.show({ type: 'info', message: spotDetailsStrings.comingSoon }),
     [toast],
@@ -50,7 +55,7 @@ export const useSpotDetails = () => {
     status,
     retry: refetch,
     goBack,
-    onEdit: notYet,
+    onEdit,
     onDelete: notYet,
   };
 };
