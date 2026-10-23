@@ -68,10 +68,12 @@ export const useNewSpotLocation = () => {
     setPoints(current => movePoint(current, index, point));
   }, []);
 
-  // Sair com pontos marcados pede confirmação (voltar, gesto).
+  // Sair com pontos marcados pede confirmação (voltar, gesto). Um RESET (o
+  // envio do passo 2 com sucesso, ou a sessão expirada) sai direto: o local já
+  // foi usado, não há o que descartar.
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', event => {
-      if (points.length === 0) return;
+      if (points.length === 0 || event.data.action.type === 'RESET') return;
 
       event.preventDefault();
       Alert.alert(newSpotLocationStrings.discardTitle, undefined, [

@@ -114,4 +114,17 @@ describe('useNewSpotLocation', () => {
     );
     alert.mockRestore();
   });
+
+  it('um reset de navegação (envio concluído no passo 2) não pede confirmação', async () => {
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    const { result } = await renderHook(() => useNewSpotLocation());
+
+    await act(async () => result.current.add([-46.65, -23.55]));
+    const reset = { preventDefault: jest.fn(), data: { action: { type: 'RESET' } } };
+    beforeRemove?.(reset);
+
+    expect(reset.preventDefault).not.toHaveBeenCalled();
+    expect(alert).not.toHaveBeenCalled();
+    alert.mockRestore();
+  });
 });
