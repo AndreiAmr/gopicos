@@ -1,3 +1,4 @@
+import type { SpotsQueryFilter } from '@/domain/spot/filters';
 import { ISpot } from '../../spotTypes';
 
 export enum ListSpotsActionTypes {
@@ -23,6 +24,7 @@ export interface IListSpotsPayload {
   listSpots?: IListSpots;
   isLoading?: boolean;
   isError?: boolean;
+  filter?: SpotsQueryFilter | null;
 }
 
 export type IListSpotsAction = {

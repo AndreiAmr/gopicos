@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
 const getListSpotsQuery = gql`
-  query getAllSpots {
-    getAllSpots {
+  query getAllSpots($filter: SpotsFilter) {
+    getAllSpots(filter: $filter) {
       id
       name
       description
