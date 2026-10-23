@@ -5,6 +5,7 @@ import { radius, space } from '../../../../config/tamagui/tokens';
 import { Skeleton } from '../../../../atomic/ds/atoms/Skeleton';
 import { StarRating } from '../../../../atomic/ds/atoms/StarRating';
 import { Text } from '../../../../atomic/ds/atoms/Text';
+import { Button } from '../../../../atomic/ds/atoms/Button';
 import { AlertBanner } from '../../../../atomic/ds/auth/AlertBanner';
 import { TextLink } from '../../../../atomic/ds/auth/TextLink';
 import { reviewsCountText } from '../../../../domain/spot/details';
@@ -19,17 +20,25 @@ import { relativeDate } from '../../profile/activity/logic';
 
 const COMMENT_LINES = 3;
 
-/** Item de avaliação: avatar de iniciais, nome, data relativa, nota e comentário. */
+/**
+ * Item de avaliação: avatar de iniciais, nome, data relativa, nota e
+ * comentário. A minha traz selo e as ações "Editar" e "Excluir".
+ */
 export const ReviewItem = ({
   review,
   mine = false,
+  onEdit,
+  onDelete,
 }: {
   review: Review;
   mine?: boolean;
+  onEdit?: (review: Review) => void;
+  onDelete?: (review: Review) => void;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const [truncated, setTruncated] = useState(false);
   const relative = relativeDate(review.createdAt);
+  const hasActions = mine && Boolean(onEdit || onDelete);
 
   return (
     <View
@@ -37,7 +46,8 @@ export const ReviewItem = ({
       gap={space[2]}
       borderBottomWidth={1}
       borderBottomColor="$divider"
-      accessible={!truncated}
+      // Com ações, cada botão precisa de foco próprio no leitor de tela.
+      accessible={!truncated && !hasActions}
       accessibilityLabel={reviewA11yLabel(review, relative)}
       testID={mine ? 'my-review' : 'review-item'}
     >
@@ -97,6 +107,36 @@ export const ReviewItem = ({
           ) : null}
         </View>
       ) : null}
+      {hasActions ? (
+        <View flexDirection="row" gap={space[3]} testID="my-review-actions">
+          {onEdit ? (
+            <View flex={1}>
+              <Button
+                label={reviewStrings.edit}
+                variant="ghost"
+                size="md"
+                fullWidth
+                onPress={() => onEdit(review)}
+                accessibilityLabel={reviewStrings.editA11y}
+                testID="my-review-edit"
+              />
+            </View>
+          ) : null}
+          {onDelete ? (
+            <View flex={1}>
+              <Button
+                label={reviewStrings.remove}
+                variant="ghost"
+                size="md"
+                fullWidth
+                onPress={() => onDelete(review)}
+                accessibilityLabel={reviewStrings.removeA11y}
+                testID="my-review-delete"
+              />
+            </View>
+          ) : null}
+        </View>
+      ) : null}
     </View>
   );
 };
@@ -123,6 +163,8 @@ type ReviewsSectionProps = {
   moreError: boolean;
   onRetry: () => void;
   onRetryMore: () => void;
+  onEditMine?: (review: Review) => void;
+  onDeleteMine?: (review: Review) => void;
 };
 
 /** Seção "Avaliações": resumo, minha avaliação fixada no topo e a lista paginada. */
@@ -137,6 +179,8 @@ export const ReviewsSection = ({
   moreError,
   onRetry,
   onRetryMore,
+  onEditMine,
+  onDeleteMine,
 }: ReviewsSectionProps) => {
   const theme = useTheme();
   const hasAny = totalCount > 0;
@@ -203,7 +247,14 @@ export const ReviewsSection = ({
         </Text>
       ) : null}
 
-      {status === 'ready' && myReview ? <ReviewItem review={myReview} mine /> : null}
+      {status === 'ready' && myReview ? (
+        <ReviewItem
+          review={myReview}
+          mine
+          onEdit={onEditMine}
+          onDelete={onDeleteMine}
+        />
+      ) : null}
       {status === 'ready'
         ? items.map(review => <ReviewItem key={review.id} review={review} />)
         : null}

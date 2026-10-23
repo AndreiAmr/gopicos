@@ -4,6 +4,7 @@ import { useReviewsFlow } from './useReviewsFlow';
 const mockReload = jest.fn();
 const mockLoadMore = jest.fn();
 const mockMutate = jest.fn();
+const mockUpdate = jest.fn();
 const mockShow = jest.fn();
 const mockRefetch = jest.fn(() => Promise.resolve());
 
@@ -12,6 +13,9 @@ jest.mock('../../../hooks/query/spotReviews/useSpotReviews', () => ({
 }));
 jest.mock('../../../hooks/mutation/spotReview/useCreateReviewMutation', () => ({
   useCreateReviewMutation: () => ({ mutate: mockMutate, loading: false }),
+}));
+jest.mock('../../../hooks/mutation/spotReview/useUpdateReviewMutation', () => ({
+  useUpdateReviewMutation: () => ({ mutate: mockUpdate, loading: false }),
 }));
 jest.mock('@apollo/client/react', () => ({
   useApolloClient: () => ({ refetchQueries: mockRefetch }),
@@ -96,6 +100,79 @@ describe('useReviewsFlow.submit', () => {
     const { result } = await setup();
 
     await act(async () => result.current.submit(5, 'x'));
+
+    expect(result.current.error).toBe(
+      'Não foi possível enviar sua avaliação. Tente novamente.',
+    );
+    expect(mockReload).not.toHaveBeenCalled();
+  });
+});
+
+const mine = {
+  id: 'r1',
+  rating: 2,
+  description: 'Antes',
+  createdAt: '2026-01-01T00:00:00.000Z',
+  author: { id: 'u1', displayName: 'Eu' },
+  isMine: true,
+};
+
+describe('useReviewsFlow edição', () => {
+  it('Editar abre o sheet preenchido e Salvar chama updateSpotReview', async () => {
+    mockUpdate.mockResolvedValue({});
+    const { result } = await setup();
+
+    await act(async () => result.current.openEdit(mine));
+    expect(result.current.editing).toMatchObject({ id: 'r1', rating: 2 });
+
+    await act(async () => result.current.submit(4, ''));
+
+    expect(mockUpdate).toHaveBeenCalledWith({
+      variables: { id: 'r1', data: { rating: 4, description: null } },
+    });
+    expect(mockMutate).not.toHaveBeenCalled();
+    expect(mockShow).toHaveBeenCalledWith({
+      type: 'success',
+      message: 'Avaliação atualizada.',
+    });
+    expect(mockReload).toHaveBeenCalledWith(true);
+    expect(refreshSpot).toHaveBeenCalled();
+    expect(mockRefetch).toHaveBeenCalledWith({ include: ['GetAllSpots'] });
+  });
+
+  it('nova avaliação depois de editar volta ao modo criar', async () => {
+    mockMutate.mockResolvedValue({});
+    const { result } = await setup();
+
+    await act(async () => result.current.openEdit(mine));
+    await act(async () => result.current.openForm());
+    expect(result.current.editing).toBeNull();
+
+    await act(async () => result.current.submit(5, 'x'));
+    expect(mockMutate).toHaveBeenCalled();
+    expect(mockUpdate).not.toHaveBeenCalled();
+  });
+
+  it('avaliação já excluída: fecha, avisa e recarrega', async () => {
+    mockUpdate.mockRejectedValue(apiError('NOT_FOUND'));
+    const { result } = await setup();
+
+    await act(async () => result.current.openEdit(mine));
+    await act(async () => result.current.submit(4, ''));
+
+    expect(mockShow).toHaveBeenCalledWith({
+      type: 'info',
+      message: 'Esta avaliação já não existe.',
+    });
+    expect(mockReload).toHaveBeenCalledWith(true);
+  });
+
+  it('erro de rede na edição: banner e nada recarregado', async () => {
+    mockUpdate.mockRejectedValue(new Error('rede'));
+    const { result } = await setup();
+
+    await act(async () => result.current.openEdit(mine));
+    await act(async () => result.current.submit(4, ''));
 
     expect(result.current.error).toBe(
       'Não foi possível enviar sua avaliação. Tente novamente.',
