@@ -1,5 +1,6 @@
 import { useQuery } from '@apollo/client/react';
 import { normalizeApolloError } from '../../../config/apollo';
+import type { SpotsQueryFilter } from '../../../domain/spot/filters';
 import { spotsQuery } from './spotsQuery';
 
 /**
@@ -7,8 +8,9 @@ import { spotsQuery } from './spotsQuery';
  * (a tela leva ao Login); `error` cobre falhas de rede/servidor, e os dados
  * anteriores são mantidos enquanto recarrega.
  */
-export const useSpotsQuery = () => {
+export const useSpotsQuery = (filter: SpotsQueryFilter | null = null) => {
   const { data, loading, error, refetch } = useQuery(spotsQuery, {
+    variables: filter ? { filter } : {},
     fetchPolicy: 'cache-and-network',
     notifyOnNetworkStatusChange: true,
   });

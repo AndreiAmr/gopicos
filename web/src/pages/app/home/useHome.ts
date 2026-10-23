@@ -17,6 +17,16 @@ import {
 import { URL } from '@/routes/url';
 import { loadViewport, saveViewport } from '@/utils/mapViewport';
 import type { ViewStateChangeEvent } from 'react-map-gl/mapbox';
+import {
+  NO_FILTERS,
+  filterByModalities,
+  hasActiveFilters,
+  sameFilters,
+  toQueryFilter,
+  filterStrings,
+  type SpotFilters,
+} from '@/domain/spot/filters';
+import { notify } from '@/lib/notify';
 import { announceSpot, cycleSpot } from './logic';
 
 export const useHome = () => {
@@ -36,9 +46,15 @@ export const useHome = () => {
   const [announcement, setAnnouncement] = useState('');
   const isWide = useMediaQuery('(min-width: 1024px)');
 
+  const [filters, setFilters] = useState<SpotFilters>(NO_FILTERS);
+  const previousFilters = useRef<SpotFilters>(NO_FILTERS);
+  const [applying, setApplying] = useState(false);
+  const sawLoading = useRef(false);
+
   const spots = useMemo<SpotSummary[]>(
     () =>
-      (rawSpots ?? []).map((spot) => ({
+      // O backend filtra uma modalidade; o OU entre várias é feito aqui.
+      filterByModalities(rawSpots ?? [], filters.modalities).map((spot) => ({
         id: spot.id,
         name: spot.name,
         modality: spot.modality,
@@ -47,16 +63,52 @@ export const useHome = () => {
         ratingAverage: spot.ratingAverage ?? null,
         reviewsCount: spot.reviewsCount ?? 0,
       })),
-    [rawSpots],
+    [rawSpots, filters.modalities],
   );
 
-  const fetchSpots = useCallback(() => {
-    dispatch(listSpotsActions.getListSpotsAsync());
-  }, [dispatch]);
+  const fetchSpots = useCallback(
+    (next: SpotFilters = filters) => {
+      dispatch(listSpotsActions.getListSpotsAsync(toQueryFilter(next)));
+    },
+    [dispatch, filters],
+  );
 
   useEffect(() => {
-    fetchSpots();
-  }, [fetchSpots]);
+    dispatch(listSpotsActions.getListSpotsAsync());
+    // Só na entrada: as próximas buscas vêm de applyFilters/retry.
+  }, [dispatch]);
+
+  const applyFilters = useCallback(
+    (next: SpotFilters) => {
+      if (sameFilters(next, filters)) return;
+      previousFilters.current = filters;
+      sawLoading.current = false;
+      setApplying(true);
+      setSelectedId(null);
+      setFilters(next);
+      fetchSpots(next);
+    },
+    [fetchSpots, filters],
+  );
+
+  // Fim da aplicação: em erro volta ao filtro anterior (os dados anteriores
+  // continuam no store) e avisa com "Tentar novamente".
+  useEffect(() => {
+    if (!applying) return;
+    if (isLoading) {
+      sawLoading.current = true;
+      return;
+    }
+    if (!sawLoading.current) return;
+    setApplying(false);
+    if (isError) {
+      const failed = filters;
+      setFilters(previousFilters.current);
+      notify.error(filterStrings.applyError, {
+        action: { label: filterStrings.retry, onClick: () => applyFilters(failed) },
+      });
+    }
+  }, [applying, isLoading, isError, filters, applyFilters]);
 
   const selected = useMemo(
     () => spots.find((spot) => spot.id === selectedId) ?? null,
@@ -167,6 +219,11 @@ export const useHome = () => {
     initialViewState,
     handleMoveEnd,
     createSpot,
-    retry: fetchSpots,
+    retry: () => fetchSpots(),
+    filters,
+    filtersActive: hasActiveFilters(filters),
+    applying,
+    applyFilters,
+    clearFilters: () => applyFilters(NO_FILTERS),
   };
 };

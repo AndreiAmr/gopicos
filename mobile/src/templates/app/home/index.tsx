@@ -10,6 +10,7 @@ import {
   BottomSheet,
   SpotPreview,
   Text,
+  useToast,
 } from '../../../atomic/ds';
 import {
   elevation,
@@ -18,6 +19,9 @@ import {
   zIndex,
 } from '../../../config/tamagui/tokens';
 import { isMapboxConfigured } from '../../../config/mapbox';
+import { FilterBar } from './components/Filters/FilterBar';
+import { FilterSheet } from './components/Filters/FilterSheet';
+import { filterStrings } from '../../../domain/spot/filters';
 import { PlaceSearch } from './components/PlaceSearch';
 import { homeStrings, useHome } from './useHome';
 
@@ -25,6 +29,20 @@ export const HomeTemplate = () => {
   const theme = useTheme();
   const home = useHome();
   const emptySheetRef = useRef<BottomSheetModal>(null);
+  const filterSheetRef = useRef<BottomSheetModal>(null);
+  const toast = useToast();
+
+  // Falha ao aplicar: o filtro anterior permanece e a pessoa pode tentar de novo.
+  useEffect(() => {
+    if (!home.applyFailed) return;
+    toast.show({
+      type: 'error',
+      message: filterStrings.applyError,
+      actionLabel: filterStrings.retry,
+      onActionPress: () => filterSheetRef.current?.present(),
+    });
+    home.dismissApplyFailed();
+  }, [home, toast]);
 
   // O vazio é um estado persistente da Home, não um evento: abre ao aparecer
   // e volta a abrir se o vazio reaparecer depois de fechado por gesto.
@@ -33,6 +51,13 @@ export const HomeTemplate = () => {
       emptySheetRef.current?.present();
     }
   }, [home.isEmpty, home.selected, home.emptySheetOpen]);
+
+  // Ao sair do vazio (ex.: "Limpar filtros"), o sheet do vazio se fecha.
+  useEffect(() => {
+    if (!home.isEmpty) {
+      emptySheetRef.current?.dismiss();
+    }
+  }, [home.isEmpty]);
 
   // Sem pico selecionado o resumo some; o sheet do vazio não deve reaparecer
   // por cima do detalhe enquanto ele estiver aberto.
@@ -66,6 +91,11 @@ export const HomeTemplate = () => {
           zIndex={zIndex.header}
           pointerEvents="box-none"
         >
+          <FilterBar
+            filters={home.filters}
+            onOpen={() => filterSheetRef.current?.present()}
+            onChange={home.applyFilters}
+          />
           {home.loading ? (
             <View
               alignSelf="flex-start"
@@ -140,11 +170,32 @@ export const HomeTemplate = () => {
       <BottomSheet
         ref={emptySheetRef}
         withBackdrop={false}
-        title={homeStrings.emptyTitle}
-        description={homeStrings.emptyDescription}
-        primaryLabel={homeStrings.emptyAction}
-        onPrimaryPress={home.createSpot}
+        title={
+          home.filtersActive
+            ? homeStrings.filteredEmptyTitle
+            : homeStrings.emptyTitle
+        }
+        description={
+          home.filtersActive
+            ? homeStrings.filteredEmptyDescription
+            : homeStrings.emptyDescription
+        }
+        primaryLabel={
+          home.filtersActive
+            ? homeStrings.filteredEmptyAction
+            : homeStrings.emptyAction
+        }
+        onPrimaryPress={
+          home.filtersActive ? home.clearFilters : home.createSpot
+        }
         onClose={home.dismissEmptySheet}
+      />
+
+      <FilterSheet
+        ref={filterSheetRef}
+        filters={home.filters}
+        applying={home.applying}
+        onApply={home.applyFilters}
       />
     </S.Container>
   );
