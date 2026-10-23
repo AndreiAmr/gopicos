@@ -22,6 +22,16 @@ export const useProfileHome = () => {
     [navigation],
   );
 
+  const goToSpots = useCallback(
+    () => navigation.navigate('MySpots'),
+    [navigation],
+  );
+
+  const goToReviews = useCallback(
+    () => navigation.navigate('MyReviews'),
+    [navigation],
+  );
+
   const goToDelete = useCallback(
     () => navigation.navigate('DeleteAccount'),
     [navigation],
@@ -49,6 +59,8 @@ export const useProfileHome = () => {
     refresh,
     goToEdit,
     goToPassword,
+    goToSpots,
+    goToReviews,
     goToDelete,
     confirmLogout,
   };

@@ -6,6 +6,9 @@ import { ChangePasswordTemplate } from '../../templates/app/profile/password';
 
 import { DeleteAccountTemplate } from '../../templates/app/profile/delete';
 
+import { MySpotsTemplate } from '../../templates/app/profile/activity/MySpots';
+import { MyReviewsTemplate } from '../../templates/app/profile/activity/MyReviews';
+
 /**
  * Stack da aba Perfil. A TabBar fica visível nas telas de navegação e some nas
  * de formulário (`PROFILE_FORM_SCREENS`, tratado em HomeStack/TabBar).
@@ -20,5 +23,7 @@ export const ProfileStack = createNativeStackNavigator({
     ProfileEdit: { screen: EditProfileTemplate },
     ChangePassword: { screen: ChangePasswordTemplate },
     DeleteAccount: { screen: DeleteAccountTemplate },
+    MySpots: { screen: MySpotsTemplate },
+    MyReviews: { screen: MyReviewsTemplate },
   },
 });
