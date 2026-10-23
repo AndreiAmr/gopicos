@@ -66,7 +66,7 @@ export const useHome = () => {
   }, [navigation, selected]);
 
   const createSpot = useCallback(() => {
-    navigation.navigate('Home', { screen: 'NewSpot' } as never);
+    navigation.navigate('NewSpotLocation');
   }, [navigation]);
 
   const empty = !loading && !error && spots.length === 0;
