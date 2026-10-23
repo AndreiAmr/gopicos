@@ -9,12 +9,17 @@ import {
 } from '@/pages/app/profile/activity/ActivityPages';
 import { PageNotFound } from '@/pages/error/PageNotFound';
 
+import { RequireAuth } from './RequireAuth';
 import { URL } from './url';
 
 export const profileRoutes: RouteObject[] = [
   {
     path: URL.PROFILE,
-    element: <ProfileLayout />,
+    element: (
+      <RequireAuth>
+        <ProfileLayout />
+      </RequireAuth>
+    ),
     errorElement: <PageNotFound />,
     children: [
       { path: URL.PROFILE, element: <MyDataPage /> },

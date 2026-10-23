@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, Navigate, NavLink, Outlet, useLocation } from 'react-router';
+import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import {
   ArrowLeftIcon,
   LockIcon,
@@ -11,22 +11,12 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 
-import { Button } from '@/atomic/atoms/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { LogoutDialog } from '@/components/LogoutDialog';
 import { cn } from '@/lib/utils';
 import { NavigationSetter } from '@/NavigationSetter';
 import { DeleteAccountDialog } from '@/pages/app/profile/delete/DeleteAccountDialog';
 import { PROFILE_STRINGS } from '@/pages/app/profile/profileLogic';
 import { URL } from '@/routes/url';
-import { logout } from '@/utils/logout';
-import { getToken } from '@/utils/session';
 
 type MenuItem = { to: string; label: string; icon: LucideIcon; end?: boolean };
 
@@ -54,11 +44,6 @@ export const ProfileLayout = () => {
   useEffect(() => {
     document.title = PROFILE_STRINGS.pageTitle;
   }, [location.pathname]);
-
-  // Sem sessão: vai ao Login guardando a rota pretendida (o guard geral é a GP-028).
-  if (!getToken()) {
-    return <Navigate to={URL.LOGIN} replace state={{ from: location.pathname }} />;
-  }
 
   return (
     <div className="min-h-full w-full bg-gp-bg">
@@ -125,31 +110,7 @@ export const ProfileLayout = () => {
 
       <DeleteAccountDialog open={deleting} onOpenChange={setDeleting} />
 
-      <Dialog open={confirmingLogout} onOpenChange={setConfirmingLogout}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{PROFILE_STRINGS.logoutTitle}</DialogTitle>
-            <DialogDescription>{PROFILE_STRINGS.logoutText}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="secondary"
-              autoFocus
-              onClick={() => setConfirmingLogout(false)}
-            >
-              {PROFILE_STRINGS.cancel}
-            </Button>
-            <Button
-              onClick={() => {
-                setConfirmingLogout(false);
-                void logout();
-              }}
-            >
-              {PROFILE_STRINGS.logout}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <LogoutDialog open={confirmingLogout} onOpenChange={setConfirmingLogout} />
     </div>
   );
 };

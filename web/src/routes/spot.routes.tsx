@@ -5,10 +5,16 @@ import { NewSpotDetailsTemplate } from '@/templates/spot/newSpot/NewSpotDetails'
 import { SpotDetailsPage } from '@/pages/app/spot/details';
 import { RouteObject } from 'react-router';
 
+import { RequireAuth } from './RequireAuth';
+
 export const spotRoutes: RouteObject[] = [
   {
     path: '/spot',
-    element: <AppLayout />,
+    element: (
+      <RequireAuth>
+        <AppLayout />
+      </RequireAuth>
+    ),
     children: [
       {
         path: '/spot/new-spot',

@@ -8,6 +8,7 @@ import { createBrowserRouter } from 'react-router';
 import { spotRoutes } from './spot.routes';
 import { signUpRoutes } from './auth.routes';
 import { profileRoutes } from './profile.routes';
+import { RequireAuth } from './RequireAuth';
 
 const router = createBrowserRouter([
   {
@@ -19,7 +20,11 @@ const router = createBrowserRouter([
   {
     path: '/home',
     errorElement: <PageNotFound />,
-    element: <AppLayout />,
+    element: (
+      <RequireAuth>
+        <AppLayout />
+      </RequireAuth>
+    ),
     children: [{ path: '/home', element: <HomePage /> }],
   },
   ...spotRoutes,
