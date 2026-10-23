@@ -1,6 +1,6 @@
 # GoPicos - Design System (fundação de tokens)
 
-Issue: #9 (GP-001); seção 14 (sobreposições e zonas) do GP-103 (#180). Status: **v2.0**, com a seção 14 em proposta v3 aguardando aprovação do dono (atualização para a linguagem visual do modelo do dono: paleta laranja, neutros frios, raios menores, marca com logo). A v1.0 foi aprovada anteriormente com acento laranja queimado; a v2.0 troca **apenas valores de token** (nomes `--gp-*` e nomes Tamagui iguais), ver seção 12.
+Issue: #9 (GP-001); seção 14 (sobreposições e zonas) do GP-103 (#180). Seção 14 em proposta v3, aguardando aprovação do dono. Status da base: **v2.0** (atualização para a linguagem visual do modelo do dono: paleta laranja, neutros frios, raios menores, marca com logo). A v1.0 foi aprovada anteriormente com acento laranja queimado; a v2.0 troca **apenas valores de token** (nomes `--gp-*` e nomes Tamagui iguais), ver seção 12.
 Figma (tokens como variáveis + swatches claro/escuro): https://www.figma.com/design/cFlDLcx1lxM6RouTMSrJQN
 
 Modelo do dono (login): https://www.figma.com/design/3VexamkeziZHB1RPfTKedg/GO-picos?node-id=16-37 . Logo provisório (extraído do modelo): `docs/design/assets/logo-gopicos.svg`.
