@@ -7,9 +7,9 @@ import { IProfile } from '@/store/profile/profileTypes';
 const getSignIn = async ({
   email,
   password,
-}: ISignUpCredentials): Promise<IProfile | null> => {
+}: ISignUpCredentials): Promise<IProfile> => {
   const { data } = await apolloClient.mutate<{
-    login: IProfile;
+    login: IProfile | null;
   }>({
     mutation: signInMutation,
     variables: {
@@ -20,7 +20,9 @@ const getSignIn = async ({
     },
   });
 
-  return data?.login || null;
+  if (!data?.login) throw new Error('Login sem dados');
+
+  return data.login;
 };
 
 export const signInRepository = {

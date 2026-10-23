@@ -11,8 +11,18 @@ type Spot {
   entryAmount: String
   coordinates: JSON
   markingType: String
+  openingHours: String
+  ratingAverage: Float
+  reviewsCount: Int
+}
+
+input SpotsFilter {
+  modality: String
+  isPaid: Boolean
+  hasCoverage: Boolean
+  minRating: Int
 }
 
 extend type Query {
-  getAllSpots: [Spot] @Authenticated
+  getAllSpots(filter: SpotsFilter): [Spot] @Authenticated
 }

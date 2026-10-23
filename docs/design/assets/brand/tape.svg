@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="30" viewBox="0 0 150 30" aria-hidden="true" focusable="false">
+  <!-- Fita decorativa (amarelo da marca, fixo nos dois temas). O texto "GO SKATE" é um elemento de texto à parte (fonte display, cor ink). -->
+  <polygon points="0,0 150,0 146,5 150,10 146,15 150,20 146,25 150,30 0,30 4,25 0,20 4,15 0,10 4,5" fill="#FACC15"/>
+</svg>

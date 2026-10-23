@@ -1,25 +1,31 @@
-import { User } from '@prisma/client';
+import bcrypt from 'bcrypt';
 import { SignupModel } from '../../models/authentication/signupModel';
 import { signUpService } from '../../services/authentication/signup/signupService';
-import bcrypt from 'bcrypt';
+import { AppError } from '../../utils/AppError';
+import { normalizeEmail } from '../../utils/email';
+import { SignupInput, validateSignupInput } from './signupValidation';
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const salts = process.env.BCRYPT_SALTS;
+export const signupController = async (props: SignupInput) => {
+  validateSignupInput(props);
 
-export const signupController = async (props: User) => {
-  const { name, email, password } = props;
+  const salts = Number(process.env.BCRYPT_SALTS);
 
-  if (!name || !email || !password) {
-    throw new Error('Invalid credentials');
+  if (!salts) {
+    throw new AppError({
+      type: 'INTERNAL_ERROR',
+      message: 'Erro ao efetuar cadastro',
+      statusCode: 500,
+    });
   }
 
-  if (!emailRegex.test(email)) throw new Error('Email inválido');
+  const hashedPassword = await bcrypt.hash(props.password, salts);
 
-  if (!salts) throw new Error('Missing Salts');
-
-  const hashedPassword = await bcrypt.hash(password, Number(salts));
-
-  await signUpService({ ...props, password: hashedPassword });
+  await signUpService({
+    firstName: props.firstName.trim(),
+    lastName: props.lastName.trim(),
+    email: normalizeEmail(props.email),
+    password: hashedPassword,
+  });
 
   return new SignupModel('Usuário criado com sucesso');
 };

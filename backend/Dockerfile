@@ -1,22 +1,20 @@
-# ./backend/Dockerfile
+# backend/Dockerfile
 FROM node:20.18.0
 
 WORKDIR /app
 
-COPY package*.json ./
+RUN corepack enable
 
-
-RUN apt-get update && apt-get install -y netcat-openbsd
-
-RUN yarn install --frozen-lockfile --check-files
-
-RUN yarn add -D esbuild@latest --force
+COPY package.json yarn.lock .yarnrc.yml ./
+RUN yarn install --immutable
 
 COPY . .
 
+# Gera o Prisma Client, compila o TypeScript e copia o client para dist/
+RUN yarn build
+
 RUN chmod +x start.sh
 
-CMD ["./start.sh"]
-
-
 EXPOSE 4000
+
+CMD ["./start.sh"]

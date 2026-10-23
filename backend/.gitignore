@@ -5,3 +5,7 @@ node_modules
 /generated/prisma
 
 /dist
+/src/prisma/generated
+
+# JS compilado ao lado dos .ts (saída do build vai para /dist)
+src/**/*.js

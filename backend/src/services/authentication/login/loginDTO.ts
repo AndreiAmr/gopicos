@@ -3,13 +3,19 @@ import { User } from '@prisma/client';
 export class LoginDTO implements User {
   email: string;
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   password: string;
+  deactivatedAt: Date | null;
+  createdAt: Date;
 
   constructor(props: User) {
     this.email = props.email;
     this.id = props.id;
-    this.name = props.name;
+    this.firstName = props.firstName;
+    this.lastName = props.lastName;
     this.password = props.password;
+    this.deactivatedAt = props.deactivatedAt;
+    this.createdAt = props.createdAt;
   }
 }

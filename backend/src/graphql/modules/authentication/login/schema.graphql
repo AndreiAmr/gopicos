@@ -8,8 +8,12 @@ type TokenData {
   exp: Int
   createdAt: Int
   name: String
+  firstName: String
+  lastName: String
   email: String
   id: String
+  # true só quando o login reativou uma conta desativada (D14)
+  reactivated: Boolean
 }
 
 extend type Mutation {

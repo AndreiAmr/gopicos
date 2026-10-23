@@ -5,7 +5,6 @@ import {
   newSpotServices,
 } from '../../../services/spot/newSpot/newSpot.service';
 import { cloudinaryModel } from '../../../models/cloudinary/CloudinaryModel';
-// import { generateMockSpotQuery } from '../../../utils/sql';
 
 export type FileUpload = {
   filename: string;
@@ -33,25 +32,19 @@ export const newSpotController = async (
   data: NewSpotInput,
   auth: IAuthentication,
 ) => {
-  try {
-    // const inserSQL = generateMockSpotQuery(data, auth?.id, []);
-    // console.log('🚀 ~ newSpotController ~ inserSQL:', inserSQL);
+  const result = await newSpotServices.createSpotService({ data, auth });
 
-    const result = await newSpotServices.createSpotService({ data, auth });
+  let spot = result;
 
-    for (const image of data.images) {
-      const imageUrl = await cloudinaryModel.uploadImage(
-        image,
-        'a996c0af-96aa-4fc8-bb6a-dae4280904ea',
-        result.id,
-      );
+  for (const image of data.images ?? []) {
+    const imageUrl = await cloudinaryModel.uploadImage(
+      image,
+      auth.id,
+      result.id,
+    );
 
-      await newSpotServices.insertSpotImageService(result.id, imageUrl);
-    }
-
-    return true;
-  } catch (err) {
-    console.log('🚀 ~ newSpotController ~ err):', err);
-    return false;
+    spot = await newSpotServices.insertSpotImageService(result.id, imageUrl);
   }
+
+  return spot;
 };

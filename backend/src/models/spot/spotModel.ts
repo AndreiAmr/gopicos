@@ -1,4 +1,4 @@
-import { Prisma, Spot } from '@prisma/client';
+import { Modality, Prisma, Spot } from '../../prisma/generated';
 
 type Props = Spot & {};
 
@@ -7,7 +7,7 @@ export class SpotModel implements Spot {
   name: string = '';
   description: string = '';
   authorId: string = '';
-  modality: string = '';
+  modality: Modality = 'mixed';
   equipmentRequired: boolean = false;
   isPaid: boolean = false;
   alwaysOpen: boolean = false;

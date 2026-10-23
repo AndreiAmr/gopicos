@@ -4,7 +4,7 @@ import { themes } from './themes';
 
 export const config = createTamagui({
   ...defaultConfig,
-  // themes,
+  themes,
   settings: {
     onlyAllowShorthands: false,
   },

@@ -2,12 +2,17 @@ import {
   SignInActionTypes,
   ISignInAction,
   ISignUpCredentials,
+  SignInErrorType,
 } from './signInTypes';
 
-const getSignInAsync = (credentials: ISignUpCredentials): ISignInAction => ({
+const getSignInAsync = (
+  credentials: ISignUpCredentials,
+  redirectTo?: string | null
+): ISignInAction => ({
   type: SignInActionTypes.GET_SIGN_IN_ASYNC,
   payload: {
     credentials,
+    redirectTo,
   },
 });
 
@@ -16,13 +21,13 @@ const setIsLoadingSignIn = (isLoading: boolean): ISignInAction => ({
   type: SignInActionTypes.SET_IS_LOADING_SIGN_IN,
 });
 
-const setIsErrorSignIn = (isError: boolean): ISignInAction => ({
-  payload: { isError },
-  type: SignInActionTypes.SET_IS_ERROR_SIGN_IN,
+const setErrorSignIn = (error: SignInErrorType | null): ISignInAction => ({
+  payload: { error },
+  type: SignInActionTypes.SET_ERROR_SIGN_IN,
 });
 
 export const signInActions = {
   getSignInAsync,
   setIsLoadingSignIn,
-  setIsErrorSignIn,
+  setErrorSignIn,
 };

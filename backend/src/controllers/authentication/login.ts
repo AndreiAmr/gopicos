@@ -1,7 +1,12 @@
+import { fullName } from '../../utils/fullName';
 import { loginService } from '../../services/authentication/login/loginService';
 import bcrypt from 'bcrypt';
 import { generateToken } from '../../utils/jwt';
+import { userRepository } from '../../database/repositories/User';
 import { AppError } from '../../utils/AppError';
+
+// Hash descartável para manter o custo do bcrypt quando o e-mail não existe
+const DUMMY_HASH = bcrypt.hashSync('gopicos-dummy', 10);
 
 export type LoginControllerProps = {
   email: string;
@@ -22,16 +27,23 @@ export const loginController = async (prop: LoginControllerProps) => {
 
     const user = await loginService(prop);
 
-    const passwordsMatch = await bcrypt.compare(prop.password, user.password);
-    console.log('🚀 ~ loginController ~ passwordsMatch:', passwordsMatch);
+    // Mesma resposta para e-mail inexistente e senha errada (não revela qual falhou)
+    const passwordsMatch = await bcrypt.compare(
+      prop.password,
+      user?.password ?? DUMMY_HASH,
+    );
 
-    if (!passwordsMatch) {
+    if (!user || !passwordsMatch) {
       throw new AppError({
         type: 'INVALID_CREDENTIALS',
         message: 'Email ou senha inválidos',
         statusCode: 401,
       });
     }
+
+    // Conta desativada com senha correta é reativada no login (D14)
+    const reactivated = user.deactivatedAt !== null;
+    if (reactivated) await userRepository.reactivate({ id: user.id });
 
     const tokenPayload = {
       id: user.id,
@@ -42,25 +54,16 @@ export const loginController = async (prop: LoginControllerProps) => {
 
     const loginData = {
       ...tokenData,
-      name: user.name,
+      name: fullName(user),
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       id: user.id,
+      reactivated,
     };
 
-    console.log('🚀 ~ loginController ~ mixpanel disparado com sucesso!');
-
-    const loginDataWithDelay = await new Promise<typeof loginData>(
-      (resolve) => {
-        setTimeout(() => {
-          resolve(loginData);
-        }, 3000);
-      },
-    );
-
-    return loginDataWithDelay;
+    return loginData;
   } catch (err) {
-    console.log(err);
-
     if (err instanceof Error) {
       throw err;
     }

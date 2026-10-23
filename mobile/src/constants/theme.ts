@@ -1,5 +1,10 @@
 const white = '#FFFFFF';
 
+/**
+ * @deprecated Tema legado (styled-components). Os tokens do Design System estão
+ * em `src/config/tamagui/tokens.ts` (cores via tema Tamagui: `$bg`, `$primary`...).
+ * Este objeto continua só para as telas atuais e será removido no GP-005.
+ */
 export const theme = {
   colors: {
     white,

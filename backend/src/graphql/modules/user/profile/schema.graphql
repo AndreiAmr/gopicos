@@ -1,0 +1,15 @@
+type Profile {
+  id: String!
+  name: String!
+  firstName: String!
+  lastName: String!
+  email: String!
+  createdAt: String!
+  spotsCount: Int!
+  reviewsCount: Int!
+}
+
+extend type Query {
+  me: Profile @Authenticated
+  getProfile: Profile @Authenticated
+}

@@ -5,10 +5,10 @@ const signInMutation = gql`
     login(props: $props) {
       token
       exp
-      createdAt
       name
       email
       id
+      reactivated
     }
   }
 `;

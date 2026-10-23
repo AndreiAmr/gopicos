@@ -1,17 +1,10 @@
-type Author {
+"""
+Autor em contexto público (D36): só id e nome no formato "Nome S.".
+Conta desativada aparece como "Usuário Desativado".
+"""
+type SpotAuthor {
   id: String
-  email: String
-  name: String
-}
-
-type Review {
-  id: String
-  title: String
-  description: String
-  authorId: String
-  spotId: String
-  createdAt: String
-  author: Author
+  displayName: String
 }
 
 type SpotDetails {
@@ -28,7 +21,10 @@ type SpotDetails {
   coordinates: JSON
   openingHours: String
   markingType: String
-  reviews: [Review]
+  author: SpotAuthor
+  ratingAverage: Float
+  reviewsCount: Int
+  isOwner: Boolean
 }
 
 extend type Query {

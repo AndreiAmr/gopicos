@@ -1,11 +1,9 @@
-import { User } from '@prisma/client';
 import { signupController } from '../../../../controllers/authentication/signup';
+import { SignupInput } from '../../../../controllers/authentication/signupValidation';
 
 export const signupResolvers = {
   Mutation: {
-    signup: (_: any, props: { props: User }) => {
-      console.log('🚀 ~ props:', props);
-      return signupController(props.props);
-    },
+    signup: (_: unknown, args: { props: SignupInput }) =>
+      signupController(args.props),
   },
 };
