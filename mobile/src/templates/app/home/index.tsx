@@ -18,6 +18,7 @@ import {
   zIndex,
 } from '../../../config/tamagui/tokens';
 import { isMapboxConfigured } from '../../../config/mapbox';
+import { PlaceSearch } from './components/PlaceSearch';
 import { homeStrings, useHome } from './useHome';
 
 export const HomeTemplate = () => {
@@ -50,13 +51,17 @@ export const HomeTemplate = () => {
           onSelectSpot={home.select}
           onMapPress={home.clearSelection}
           onUserLocation={home.setUserPosition}
+          placeTarget={home.placeTarget}
+          placeAnimationMs={home.placeAnimationMs}
         />
       ) : null}
+
+      <PlaceSearch onSelectPlace={home.selectPlace} />
 
       <SafeAreaView edges={['top']} pointerEvents="box-none">
         <View
           paddingHorizontal={space[4]}
-          paddingTop={space[2]}
+          paddingTop={space[2] + 64}
           gap={space[2]}
           zIndex={zIndex.header}
           pointerEvents="box-none"
