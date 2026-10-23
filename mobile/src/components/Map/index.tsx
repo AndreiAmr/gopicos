@@ -1,10 +1,13 @@
-import {
+import { useRef } from 'react';
+import Mapbox, {
   Camera,
+  CircleLayer,
   FillLayer,
   LineLayer,
   LocationPuck,
   MarkerView,
   ShapeSource,
+  SymbolLayer,
   UserLocation,
 } from '@rnmapbox/maps';
 import * as S from './styles';
@@ -13,13 +16,19 @@ import { SpotPin } from '../../atomic/ds';
 import type { CameraTarget } from '../../domain/place/place';
 import {
   SpotSummary,
+  buildPointCollection,
   buildPolygonCollection,
-  drawableSpots,
+  pickPressTarget,
   polygonCenter,
 } from '../../domain/spot/spot';
 
 /** A partir deste zoom os polígonos aparecem; mais longe, só os pins. */
 const POLYGON_MIN_ZOOM = 15;
+/** Cluster nativo (spec 11): raio em px e zoom a partir do qual todo pico aparece solto. */
+const CLUSTER_RADIUS = 50;
+const CLUSTER_MAX_ZOOM = 14;
+const PIN_FONT = ['DIN Pro Medium', 'Arial Unicode MS Regular'];
+const CLUSTER_FONT = ['DIN Pro Bold', 'Arial Unicode MS Bold'];
 
 type MapProps = {
   hideUserLocation?: boolean;
@@ -32,6 +41,8 @@ type MapProps = {
   /** Lugar buscado: a câmera voa até ele (sem animação com "reduzir movimento"). */
   placeTarget?: CameraTarget | null;
   placeAnimationMs?: number;
+  /** Duração da aproximação ao tocar num cluster (0 com "reduzir movimento"). */
+  clusterAnimationMs?: number;
 };
 
 export const Map = ({
@@ -43,7 +54,30 @@ export const Map = ({
   onUserLocation,
   placeTarget = null,
   placeAnimationMs = 800,
+  clusterAnimationMs = 400,
 }: MapProps) => {
+  const cameraRef = useRef<Mapbox.Camera>(null);
+  const pointsRef = useRef<Mapbox.ShapeSource>(null);
+
+  // Toque num cluster aproxima o mapa até expandi-lo; não abre o resumo.
+  const zoomIntoCluster = async (feature: unknown, center: [number, number]) => {
+    try {
+      const zoom = await pointsRef.current?.getClusterExpansionZoom(
+        feature as never,
+      );
+      if (typeof zoom === 'number') {
+        cameraRef.current?.setCamera({
+          centerCoordinate: center,
+          zoomLevel: zoom,
+          animationDuration: clusterAnimationMs,
+          animationMode: 'easeTo',
+        });
+      }
+    } catch {
+      // sem expansão disponível: o toque simplesmente não faz nada
+    }
+  };
+
   const selected = selectedId
     ? spots.find(spot => spot.id === selectedId)
     : undefined;
@@ -59,6 +93,7 @@ export const Map = ({
       {placeTarget && !selectedCenter ? (
         placeTarget.type === 'bounds' ? (
           <Camera
+            ref={cameraRef}
             bounds={{
               ne: placeTarget.ne,
               sw: placeTarget.sw,
@@ -72,6 +107,7 @@ export const Map = ({
           />
         ) : (
           <Camera
+            ref={cameraRef}
             centerCoordinate={placeTarget.center}
             zoomLevel={placeTarget.zoom}
             animationDuration={placeAnimationMs}
@@ -80,12 +116,13 @@ export const Map = ({
         )
       ) : selectedCenter ? (
         <Camera
+            ref={cameraRef}
           centerCoordinate={selectedCenter}
           animationDuration={400}
           animationMode="easeTo"
         />
       ) : (
-        <Camera followUserLocation followZoomLevel={14} />
+        <Camera ref={cameraRef} followUserLocation followZoomLevel={14} />
       )}
 
       <ShapeSource
@@ -116,19 +153,87 @@ export const Map = ({
         />
       </ShapeSource>
 
-      {drawableSpots(spots).map(spot => (
-        <MarkerView
-          key={spot.id}
-          id={`spot-${spot.id}`}
-          coordinate={polygonCenter(spot.coordinates) as [number, number]}
-        >
+      <ShapeSource
+        id="spots-points"
+        ref={pointsRef}
+        shape={buildPointCollection(spots, selectedId)}
+        cluster
+        clusterRadius={CLUSTER_RADIUS}
+        clusterMaxZoomLevel={CLUSTER_MAX_ZOOM}
+        hitbox={{ width: 44, height: 44 }}
+        onPress={event => {
+          const target = pickPressTarget(event.features as never);
+          if (target.kind === 'cluster') {
+            zoomIntoCluster(target.feature, target.center);
+          } else if (target.kind === 'spot') {
+            onSelectSpot?.(target.id);
+          }
+        }}
+      >
+        <CircleLayer
+          id="spots-clusters"
+          filter={['has', 'point_count']}
+          style={{
+            circleColor: mapColors.clusterFill,
+            circleStrokeColor: mapColors.clusterStroke,
+            circleStrokeWidth: 2,
+            circleRadius: ['step', ['get', 'point_count'], 18, 10, 22, 50, 26],
+          }}
+        />
+        <SymbolLayer
+          id="spots-cluster-count"
+          filter={['has', 'point_count']}
+          style={{
+            textField: [
+              'case',
+              ['>', ['get', 'point_count'], 99],
+              '99+',
+              ['to-string', ['get', 'point_count']],
+            ],
+            textFont: CLUSTER_FONT,
+            textSize: 14,
+            textColor: mapColors.clusterText,
+            textAllowOverlap: true,
+          }}
+        />
+        <SymbolLayer
+          id="spots-pin-border"
+          filter={['!', ['has', 'point_count']]}
+          style={{
+            textField: ['get', 'label'],
+            textFont: PIN_FONT,
+            textSize: 13,
+            textColor: mapColors.pinBorder,
+            textHaloColor: mapColors.pinBorder,
+            textHaloWidth: 6,
+            textAllowOverlap: true,
+          }}
+        />
+        <SymbolLayer
+          id="spots-pin"
+          filter={['!', ['has', 'point_count']]}
+          style={{
+            textField: ['get', 'label'],
+            textFont: PIN_FONT,
+            textSize: 13,
+            textColor: mapColors.pinText,
+            textHaloColor: mapColors.pinSurface,
+            textHaloWidth: 4.5,
+            textAllowOverlap: true,
+          }}
+        />
+      </ShapeSource>
+
+      {/* O pico selecionado nunca entra em cluster: pin maior e acessível. */}
+      {selected && selectedCenter ? (
+        <MarkerView id={`spot-${selected.id}`} coordinate={selectedCenter}>
           <SpotPin
-            spot={spot}
-            selected={spot.id === selectedId}
-            onPress={() => onSelectSpot?.(spot.id)}
+            spot={selected}
+            selected
+            onPress={() => onSelectSpot?.(selected.id)}
           />
         </MarkerView>
-      ))}
+      ) : null}
 
       {!hideUserLocation && (
         <>

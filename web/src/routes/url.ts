@@ -7,6 +7,7 @@ export enum URL {
   SIGN_UP_PASSWORD = '/cadastro/senha',
 
   NEW_SPOT = '/spot/new-spot',
+  NEW_SPOT_DETAILS = '/spot/new-spot/details',
 
   PROFILE = '/perfil',
   PROFILE_PASSWORD = '/perfil/senha',

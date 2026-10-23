@@ -1,109 +1,89 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { FormProvider, useForm } from 'react-hook-form';
-import { Outlet } from 'react-router';
-import * as yup from 'yup';
+import { useForm } from 'react-hook-form';
+import { Outlet, useBlocker } from 'react-router';
 
-export type ICoordinates = number[][][] | number[];
+import { Button } from '@/atomic/atoms/button';
+import { Modal } from '@/atomic/molecules/modal';
+import {
+  newSpotDefaults,
+  newSpotSchema,
+  type NewSpotFormData,
+  type Position,
+} from '@/domain/spot/newSpotForm';
+import { URL } from '@/routes/url';
 
-export interface ICreateSpot {
-  coordinates: ICoordinates;
-  name: string;
-  description: string;
-  road: string;
-  suburb: string;
-  number: string;
-  complement: string;
-  reference: string;
-  modality: string;
-  equipamentRequired: boolean;
-  isPaid: boolean;
-  entryAmount: string;
-  alwaysOpen: boolean;
-  openingHours: string;
-  hasCoverage: boolean;
-  openingTime: string;
-  closingTime: string;
-  quarter: string;
-  images: File[];
-  currentStep: number;
-}
+import { NewSpotDraftContext } from './newSpotDraft';
 
-const validationSchema = yup.object().shape({
-  name: yup
-    .string()
-    .required('Nome é obrigatório')
-    .min(3, 'Mínimo 3 caracteres'),
-  description: yup
-    .string()
-    .required('Descrição é obrigatória')
-    .min(20, 'Mínimo 20 caracteres'),
-  road: yup.string().required('Rua é obrigatória'),
-  suburb: yup.string().required('Bairro é obrigatório'),
-  quarter: yup.string(),
-  number: yup.string(),
-  complement: yup.string(),
-  reference: yup.string().min(20, 'Mínimo 20 caracteres'),
-  modality: yup.string().required('Modalidade é obrigatória'),
-  equipamentRequired: yup.boolean(),
-  hasCoverage: yup.boolean(),
-  alwaysOpen: yup.boolean(),
-  openingTime: yup.string().when('alwaysOpen', {
-    is: false,
-    then: (schema) => schema.required('Horário de abertura é obrigatório'),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  closingTime: yup.string().when('alwaysOpen', {
-    is: false,
-    then: (schema) => schema.required('Horário de fechamento é obrigatório'),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  isPaid: yup.boolean(),
-  entryAmount: yup.string().when('isPaid', {
-    is: true,
-    then: (schema) => schema.required('Valor de entrada obrigatório'),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  coordinates: yup.array().required('Coordenadas são obrigatórias'),
-  images: yup
-    .array()
-    .min(2, 'Mínimo 2 imagens obrigatório')
-    .required('Imagens são obrigatórias'),
-});
+const isInsideWizard = (pathname: string) =>
+  pathname === URL.NEW_SPOT || pathname === URL.NEW_SPOT_DETAILS;
 
-const defaultValues: ICreateSpot = {
-  name: '',
-  description: '',
-  road: '',
-  suburb: '',
-  quarter: '',
-  number: '',
-  complement: '',
-  reference: '',
-  modality: '',
-  equipamentRequired: false,
-  hasCoverage: false,
-  alwaysOpen: true,
-  openingTime: '',
-  closingTime: '',
-  isPaid: false,
-  entryAmount: '',
-  images: [],
-  coordinates: [],
-  openingHours: '',
-  currentStep: 0,
-};
-
+/** Guarda o rascunho entre os passos e confirma antes de descartar dados preenchidos. */
 const NewSpotLayout = () => {
-  const formMethods = useForm({
-    defaultValues,
-    resolver: yupResolver(validationSchema),
-    mode: 'onSubmit',
+  const form = useForm<NewSpotFormData>({
+    defaultValues: newSpotDefaults,
+    resolver: yupResolver(newSpotSchema),
+    mode: 'onTouched',
   });
+  const [points, setPoints] = useState<Position[]>([]);
+  const [photos, setPhotos] = useState<File[]>([]);
+  const leaveAllowed = useRef(false);
+
+  const dirty = points.length > 0 || photos.length > 0 || form.formState.isDirty;
+
+  const allowLeave = useCallback(() => {
+    leaveAllowed.current = true;
+  }, []);
+
+  const blocker = useBlocker(
+    ({ nextLocation }) =>
+      dirty && !leaveAllowed.current && !isInsideWizard(nextLocation.pathname),
+  );
+
+  // Fechar a aba ou recarregar com dados também pede confirmação.
+  useEffect(() => {
+    if (!dirty) return;
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (leaveAllowed.current) return;
+      event.preventDefault();
+    };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [dirty]);
+
+  const draft = useMemo(
+    () => ({ form, points, setPoints, photos, setPhotos, allowLeave }),
+    [form, points, photos, allowLeave],
+  );
 
   return (
-    <FormProvider {...formMethods}>
+    <NewSpotDraftContext.Provider value={draft}>
       <Outlet />
-    </FormProvider>
+      <Modal
+        open={blocker.state === 'blocked'}
+        onOpenChange={(open) => {
+          if (!open && blocker.state === 'blocked') blocker.reset();
+        }}
+        title="Descartar este cadastro?"
+        description="Os dados preenchidos serão perdidos."
+        footer={
+          <>
+            <Button
+              variant="ghost"
+              onClick={() => blocker.state === 'blocked' && blocker.reset()}
+            >
+              Continuar editando
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => blocker.state === 'blocked' && blocker.proceed()}
+            >
+              Descartar
+            </Button>
+          </>
+        }
+      />
+    </NewSpotDraftContext.Provider>
   );
 };
 

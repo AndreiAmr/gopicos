@@ -1,69 +1,95 @@
-import { useMutation } from '@tanstack/react-query';
-
-import { ICreateSpot } from './createSpotTypes';
 import http from '@/config/http';
+import { getToken } from '@/utils/session';
 
-export const fetchCreateSpot = async (params: ICreateSpot) => {
-  const formData = new FormData();
-  const files = params.images || [];
+const CREATE_SPOT = `mutation CreateSpot($input: NewSpotInput!) {
+  createSpot(input: $input) { id }
+}`;
 
-  const input = {
-    name: params.name,
-    description: params.description,
-    modality: params.modality,
-    isPaid: params.isPaid,
-    alwaysOpen: params.alwaysOpen,
-    hasCoverage: params.hasCoverage,
-    equipmentRequired: params.equipmentRequired,
-    entryAmount: params.entryAmount,
-    coordinates: params.coordinates,
-    openingHours: params.openingHours,
-    markingType: params.markingType,
-    images: files.map(() => null),
-  };
+/** Falha de envio: `type`/`field` vêm do servidor; sem `type` é erro de rede. */
+export class CreateSpotError extends Error {
+  constructor(
+    message: string,
+    readonly type: string | null = null,
+    readonly field: string | null = null,
+  ) {
+    super(message);
+    this.name = 'CreateSpotError';
+  }
 
-  const operations = {
-    query: `
-      mutation CreateSpot($input: NewSpotInput!) {
-        createSpot(input: $input) {
-          name
-        }
-      }
-    `,
-    variables: { input },
-  };
+  get isNetwork() {
+    return this.type === null;
+  }
+}
 
+/**
+ * Corpo multipart do GraphQL multipart request spec (o que o graphql-upload lê
+ * no backend): `operations`, `map` e um arquivo por foto.
+ */
+export const buildCreateSpotBody = (
+  input: Record<string, unknown>,
+  photos: File[],
+): FormData => {
+  const body = new FormData();
+  body.append(
+    'operations',
+    JSON.stringify({
+      query: CREATE_SPOT,
+      variables: { input: { ...input, images: photos.map(() => null) } },
+    }),
+  );
   const map: Record<string, string[]> = {};
-  files.forEach((_, index) => {
-    map[index] = [`variables.input.images.${index}`];
+  photos.forEach((_, index) => {
+    map[String(index)] = [`variables.input.images.${index}`];
   });
-
-  formData.append('operations', JSON.stringify(operations));
-  formData.append('map', JSON.stringify(map));
-  files.forEach((file, index) => {
-    formData.append(String(index), file);
-  });
-
-  const result = await http.post('/graphql', formData, {
-    headers: {
-      'x-apollo-operation-name': 'CreateSpot',
-      'apollo-require-preflight': 'true',
-    },
-  });
-  return result;
+  body.append('map', JSON.stringify(map));
+  photos.forEach((photo, index) => body.append(String(index), photo));
+  return body;
 };
 
-export const useCreateSpotMutation = () => {
-  return useMutation({
-    mutationFn: async (params: ICreateSpot) => {
-      const result = await fetchCreateSpot(params);
-      if (!result) {
-        throw new Error('Falha ao criar spot');
-      }
-      if (result.data?.errors?.length > 0) {
-        throw new Error(result.data.errors[0].message || 'Falha ao criar spot');
-      }
-      return result;
-    },
-  });
+type GraphQLResponse = {
+  data?: { createSpot?: { id: string } | null } | null;
+  errors?: {
+    message: string;
+    extensions?: { type?: string; field?: string };
+  }[];
+};
+
+/** Cria o pico com as fotos numa única chamada e devolve o id criado. */
+export const createSpotRequest = async (
+  input: Record<string, unknown>,
+  photos: File[],
+): Promise<string> => {
+  const token = getToken();
+
+  let body: GraphQLResponse;
+  try {
+    const response = await http.post<GraphQLResponse>(
+      '/graphql',
+      buildCreateSpotBody(input, photos),
+      {
+        headers: {
+          // Exigido pelo Apollo contra CSRF em requisições multipart.
+          'apollo-require-preflight': 'true',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        validateStatus: () => true,
+      },
+    );
+    body = response.data;
+  } catch {
+    throw new CreateSpotError('Falha de rede');
+  }
+
+  const error = body?.errors?.[0];
+  if (error) {
+    throw new CreateSpotError(
+      error.message,
+      error.extensions?.type ?? 'INTERNAL_ERROR',
+      error.extensions?.field ?? null,
+    );
+  }
+
+  const id = body?.data?.createSpot?.id;
+  if (!id) throw new CreateSpotError('Falha de rede');
+  return id;
 };
