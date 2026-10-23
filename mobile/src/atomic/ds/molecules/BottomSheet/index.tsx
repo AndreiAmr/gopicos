@@ -21,6 +21,12 @@ type BottomSheetProps = {
   /** Chamado quando o sheet fecha (gesto, backdrop ou botão). */
   onClose?: () => void;
   snapPoints?: Array<string | number>;
+  /**
+   * Escurece o fundo e fecha ao toque fora. Desligue para sheets que
+   * acompanham conteúdo persistente da tela (ex.: estado vazio da Home), em
+   * que o fundo precisa continuar visível e utilizável.
+   */
+  withBackdrop?: boolean;
 };
 
 /**
@@ -30,7 +36,7 @@ type BottomSheetProps = {
  * `ref.current?.dismiss()`.
  */
 export const BottomSheet = forwardRef<BottomSheetModal, BottomSheetProps>(
-  ({ onClose, snapPoints, ...content }, ref) => {
+  ({ onClose, snapPoints, withBackdrop = true, ...content }, ref) => {
     const theme = useTheme();
 
     const handleIndicatorStyle = {
@@ -65,7 +71,7 @@ export const BottomSheet = forwardRef<BottomSheetModal, BottomSheetProps>(
         enableDynamicSizing={!snapPoints}
         enablePanDownToClose
         onDismiss={onClose}
-        backdropComponent={renderBackdrop}
+        backdropComponent={withBackdrop ? renderBackdrop : undefined}
         backgroundStyle={{
           backgroundColor: theme.surface.val,
           borderTopLeftRadius: radius.xl,
