@@ -1,4 +1,5 @@
 import {
+  PIN_LABELS,
   SpotSummary,
   buildPointCollection,
   buildPolygonCollection,
@@ -42,6 +43,17 @@ describe('spot domain', () => {
   it('pin mostra a nota ou "Novo"', () => {
     expect(pinText(spot())).toBe('★ 4,6');
     expect(pinText(spot({ ratingAverage: null, reviewsCount: 0 }))).toBe('Novo');
+  });
+
+  it('PIN_LABELS cobre o rótulo de qualquer nota de 0 a 5 (GP-132)', () => {
+    expect(PIN_LABELS).toHaveLength(52);
+    expect(new Set(PIN_LABELS).size).toBe(PIN_LABELS.length);
+    for (let i = 0; i <= 500; i += 1) {
+      const label = pinText(spot({ ratingAverage: i / 100 }));
+      expect(PIN_LABELS).toContain(label);
+    }
+    expect(PIN_LABELS).toContain(pinText(spot({ ratingAverage: 3.5 })));
+    expect(PIN_LABELS).toContain('Novo');
   });
 
   it('rótulos de acessibilidade trazem nota e contagem', () => {
