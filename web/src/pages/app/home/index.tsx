@@ -29,6 +29,8 @@ export const HomePage = () => {
           mapRef={home.mapRef}
           interactiveLayerIds={SPOT_INTERACTIVE_LAYERS}
           onClick={home.handleMapClick}
+          initialViewState={home.initialViewState}
+          onMoveEnd={home.handleMoveEnd}
         >
           <SpotsLayers spots={home.spots} selectedId={home.selectedId} />
 
