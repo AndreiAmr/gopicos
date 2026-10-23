@@ -71,16 +71,31 @@ jobs:
 
       # 3. Envia o link DIRETO do arquivo para o Discord
       - name: Notificar no Discord com Link Direto
-        uses: Ilshidur/action-discord@master
+        uses: Ilshidur/action-discord@0.4.0
         env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_MOBILE || secrets.DISCORD_WEBHOOK }}
         with:
-          args: "✅ **Build Concluído!** O novo APK da branch `${{ github.head_ref }}` está pronto! \n📲 **Clique aqui para baixar direto:** https://github.com/${{ github.repository }}/releases/download/pr-build-${{ github.event.pull_request.number }}/app-release.apk"
-      
+          args: |
+            ✅ **APK da PR #${{ github.event.pull_request.number }} disponível**
+
+            📲 Baixar: ${{ github.server_url }}/${{ github.repository }}/releases/download/pr-build-${{ github.event.pull_request.number }}/app-release.apk
+            🔗 PR: ${{ github.event.pull_request.html_url }}
+
+            🌿 Branch: `${{ github.head_ref }}`
+            👤 Autor: `${{ github.event.pull_request.user.login }}`
+            📝 ${{ github.event.pull_request.title }}
+
       - name: Notificar ERRO no Discord
         if: failure()
-        uses: Ilshidur/action-discord@master
+        uses: Ilshidur/action-discord@0.4.0
         env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_MOBILE || secrets.DISCORD_WEBHOOK }}
         with:
-          args: "❌ **Deu ruim no Build!** A compilação da PR da branch `${{ github.head_ref }}` falhou. \n🔍 **Clique aqui para ver os logs do erro:** https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          args: |
+            ❌ **Falha no build do APK da PR #${{ github.event.pull_request.number }}**
+
+            🌿 Branch: `${{ github.head_ref }}`
+            👤 Autor: `${{ github.event.pull_request.user.login }}`
+            📝 ${{ github.event.pull_request.title }}
+
+            🔍 Logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
