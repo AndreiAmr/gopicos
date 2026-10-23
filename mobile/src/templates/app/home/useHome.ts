@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSpotsQuery } from '../../../hooks/query/spots/useSpotsQuery';
@@ -8,6 +8,14 @@ import {
   formatDistance,
   polygonCenter,
 } from '../../../domain/spot/spot';
+import {
+  NO_FILTERS,
+  SpotFilters,
+  filterByModalities,
+  hasActiveFilters,
+  sameFilters,
+  toQueryFilter,
+} from '../../../domain/spot/filters';
 import type { RootStackParamList } from '../../../routes/types';
 
 export const homeStrings = {
@@ -17,13 +25,31 @@ export const homeStrings = {
   emptyTitle: 'Nenhum pico por aqui ainda',
   emptyDescription: 'Seja o primeiro a cadastrar um pico nesta região.',
   emptyAction: 'Cadastrar o primeiro pico',
+  filteredEmptyTitle: 'Nenhum pico com esses filtros.',
+  filteredEmptyDescription: 'Tente mudar ou limpar os filtros.',
+  filteredEmptyAction: 'Limpar filtros',
   createSpot: 'Cadastrar novo pico',
 } as const;
 
 export const useHome = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { spots, loading, error, unauthenticated, refetch } = useSpotsQuery();
+  const [filters, setFilters] = useState<SpotFilters>(NO_FILTERS);
+  const previousFilters = useRef<SpotFilters>(NO_FILTERS);
+  const [applying, setApplying] = useState(false);
+  const [applyFailed, setApplyFailed] = useState(false);
+  const {
+    spots: fetchedSpots,
+    loading,
+    error,
+    unauthenticated,
+    refetch,
+  } = useSpotsQuery(toQueryFilter(filters));
+  // O backend filtra uma modalidade; o OU entre várias é feito aqui.
+  const spots = useMemo(
+    () => filterByModalities(fetchedSpots, filters.modalities),
+    [fetchedSpots, filters.modalities],
+  );
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [userPosition, setUserPosition] = useState<[number, number] | null>(
@@ -70,6 +96,30 @@ export const useHome = () => {
     navigation.navigate('NewSpotLocation');
   }, [navigation]);
 
+  // Terminou de aplicar; se falhou, volta ao filtro anterior e avisa (spec 8).
+  useEffect(() => {
+    if (!applying) return;
+    if (error) {
+      setFilters(previousFilters.current);
+      setApplying(false);
+      setApplyFailed(true);
+    } else if (!loading) {
+      setApplying(false);
+    }
+  }, [applying, error, loading]);
+
+  const applyFilters = useCallback(
+    (next: SpotFilters) => {
+      if (sameFilters(next, filters)) return;
+      previousFilters.current = filters;
+      setApplyFailed(false);
+      setApplying(true);
+      setSelectedId(null);
+      setFilters(next);
+    },
+    [filters],
+  );
+
   const empty = !loading && !error && spots.length === 0;
 
   // Enquanto o vazio persistir, cada nova transição para "vazio" reabre o
@@ -89,6 +139,13 @@ export const useHome = () => {
     loading: loading && spots.length === 0,
     hasError: error && !unauthenticated,
     isEmpty: empty,
+    filters,
+    filtersActive: hasActiveFilters(filters),
+    applying,
+    applyFailed,
+    dismissApplyFailed: () => setApplyFailed(false),
+    applyFilters,
+    clearFilters: () => applyFilters(NO_FILTERS),
     select: setSelectedId,
     clearSelection: () => setSelectedId(null),
     emptySheetOpen,
