@@ -35,6 +35,10 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>O GoPicos usa a câmera para você fotografar o pico que está cadastrando.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>O GoPicos acessa suas fotos para você escolher imagens do pico que está cadastrando.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>RCTNewArchEnabled</key>
