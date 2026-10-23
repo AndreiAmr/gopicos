@@ -50,6 +50,18 @@ export const reviewStrings = {
   deactivated: 'Usuário Desativado',
   seeMore: 'Ver mais',
   seeLess: 'Ver menos',
+  edit: 'Editar',
+  remove: 'Excluir',
+  editA11y: 'Editar sua avaliação',
+  removeA11y: 'Excluir sua avaliação',
+  deleteTitle: 'Excluir sua avaliação?',
+  deleteDescription:
+    'Sua nota e seu comentário serão removidos. Você poderá avaliar de novo depois.',
+  deleteConfirm: 'Excluir avaliação',
+  deleted: 'Avaliação excluída.',
+  deleteError: 'Não foi possível excluir. Tente novamente.',
+  gone: 'Esta avaliação já não existe.',
+  forbidden: 'Só quem escreveu a avaliação pode alterá-la.',
 } as const;
 
 const RATING_LABELS = ['', 'Ruim', 'Regular', 'Bom', 'Muito bom', 'Excelente'];
