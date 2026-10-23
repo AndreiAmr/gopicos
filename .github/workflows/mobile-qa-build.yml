@@ -5,7 +5,10 @@ on:
     branches:
       - development
     paths:
-      - 'mobile/**' 
+      - 'mobile/**'
+      - 'backend/**'
+      - '.github/workflows/mobile-qa-build.yml'
+  workflow_dispatch:
 permissions:
   contents: write  
   checks: read
