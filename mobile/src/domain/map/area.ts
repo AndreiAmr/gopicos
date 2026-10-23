@@ -4,6 +4,26 @@ import type { SpotSummary } from '../spot/spot';
 export type MapBounds = {
   ne: [number, number];
   sw: [number, number];
+  /** Centro e zoom da câmera: com zoom baixo o Standard vira globo. */
+  center?: [number, number];
+  zoom?: number;
+};
+
+/** Abaixo deste zoom o Standard desenha o globo e a caixa da câmera cobre o mundo. */
+export const GLOBE_MAX_ZOOM = 5;
+/** No globo, só o hemisfério voltado para a pessoa aparece (menos a borda). */
+const GLOBE_VISIBLE_DEG = 80;
+
+const toRad = (deg: number) => (deg * Math.PI) / 180;
+
+/** Distância angular (graus) entre dois pontos [lng, lat]. */
+const angularDistance = (a: [number, number], b: [number, number]) => {
+  const [lng1, lat1] = a.map(toRad);
+  const [lng2, lat2] = b.map(toRad);
+  const cos =
+    Math.sin(lat1) * Math.sin(lat2) +
+    Math.cos(lat1) * Math.cos(lat2) * Math.cos(lng2 - lng1);
+  return (Math.acos(Math.min(1, Math.max(-1, cos))) * 180) / Math.PI;
 };
 
 type Box = { minLng: number; maxLng: number; minLat: number; maxLat: number };
@@ -57,7 +77,16 @@ export const spotInBounds = (
   bounds: MapBounds,
 ): boolean => {
   const box = polygonBox(spot.coordinates);
-  return box !== null && boundsBoxes(bounds).some(area => overlaps(box, area));
+  if (box === null) return false;
+  // Globo: a caixa da câmera não serve; vale o lado visível do globo.
+  if (bounds.center && bounds.zoom !== undefined && bounds.zoom < GLOBE_MAX_ZOOM) {
+    const middle: [number, number] = [
+      (box.minLng + box.maxLng) / 2,
+      (box.minLat + box.maxLat) / 2,
+    ];
+    return angularDistance(bounds.center, middle) <= GLOBE_VISIBLE_DEG;
+  }
+  return boundsBoxes(bounds).some(area => overlaps(box, area));
 };
 
 /** Quantos picos estão na área; sem área conhecida ainda, `null`. */

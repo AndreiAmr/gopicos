@@ -34,13 +34,14 @@ function App() {
           defaultTheme={colorScheme === 'dark' ? 'dark' : 'light'}
         >
           <ThemeProvider theme={theme}>
-            <BottomSheetModalProvider>
-              <ToastProvider>
+            {/* Toast fora do provider dos sheets: aparece acima do véu dos modais. */}
+            <ToastProvider>
+              <BottomSheetModalProvider>
                 <ApolloClientProvider>
                   <Navigation ref={navigationRef} />
                 </ApolloClientProvider>
-              </ToastProvider>
-            </BottomSheetModalProvider>
+              </BottomSheetModalProvider>
+            </ToastProvider>
           </ThemeProvider>
         </TamaguiProvider>
       </SafeAreaProvider>

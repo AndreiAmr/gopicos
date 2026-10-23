@@ -1,4 +1,5 @@
 import { ReactNode, useEffect, useRef } from 'react';
+import { StyleSheet } from 'react-native';
 import GorhomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import type { SharedValue } from 'react-native-reanimated';
 import { useTheme } from 'tamagui';
@@ -65,14 +66,8 @@ export const MapSheet = ({
         borderTopLeftRadius: radius.xl,
         borderTopRightRadius: radius.xl,
       }}
-      handleIndicatorStyle={{ backgroundColor: theme.border.val, width: 36 }}
-      style={{
-        shadowColor: theme.ink.val,
-        shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.16,
-        shadowRadius: 16,
-        elevation: 8,
-      }}
+      handleIndicatorStyle={[styles.handle, { backgroundColor: theme.border.val }]}
+      style={[styles.shadow, { shadowColor: theme.ink.val }]}
       accessibilityLabel={accessibilityLabel}
     >
       <BottomSheetView
@@ -84,3 +79,13 @@ export const MapSheet = ({
     </GorhomSheet>
   );
 };
+
+const styles = StyleSheet.create({
+  handle: { width: 36 },
+  shadow: {
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.16,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+});

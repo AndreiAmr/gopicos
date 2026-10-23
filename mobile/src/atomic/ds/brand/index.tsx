@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useState } from 'react';
-import { AccessibilityInfo } from 'react-native';
+import { AccessibilityInfo, StyleSheet } from 'react-native';
 import Animated, {
   Easing,
   cancelAnimation,
@@ -26,6 +26,11 @@ import { Text } from '../atoms/Text';
  * Peças da camada de marca (DS 13 e spec home.md): spray, fita, sticker e
  * título em Permanent Marker. Tudo vetor e decorativo (fora do leitor de tela).
  */
+
+const styles = StyleSheet.create({
+  tapeShadow: { position: 'absolute', top: 2, left: 1 },
+  fill: { flex: 1 },
+});
 
 const decorative = {
   accessibilityElementsHidden: true,
@@ -133,7 +138,7 @@ const TapeBackground = ({ points }: { points: string }) => {
         height="100%"
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
-        style={{ position: 'absolute', top: 2, left: 1 }}
+        style={styles.tapeShadow}
       >
         <Polygon points={points} fill={theme.ink.val} opacity={0.28} />
       </Svg>
@@ -216,11 +221,11 @@ export const ScoreTape = ({
         paddingVertical={6}
       >
         {spinning ? <SpinningWheel color={theme.ink.val} /> : null}
+        {/* flex 1: com fonte grande a fita quebra em 2 linhas em vez de cortar. */}
         <Text
-          flexShrink={1}
+          flex={1}
           fontFamily={fontFamily.semiBold}
           fontSize={14}
-          lineHeight={18}
           color="$ink"
           testID="score-tape-text"
         >
@@ -472,7 +477,7 @@ const BusyRing = ({ color }: { color: string }) => {
   }));
   if (reduceMotion) return null;
   return (
-    <Animated.View style={[{ flex: 1 }, style]}>
+    <Animated.View style={[styles.fill, style]}>
       <Svg width="100%" height="100%" viewBox="0 0 38 38">
         <Path
           d="M19 2.5 A16.5 16.5 0 0 1 35.5 19"

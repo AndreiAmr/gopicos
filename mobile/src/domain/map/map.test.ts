@@ -1,3 +1,4 @@
+import { pinLayout } from './pinLayout';
 import { countInArea, isValidCoordinate, spotInBounds, spotsBounds } from './area';
 import {
   DEFAULT_MAP_LAYER,
@@ -139,5 +140,33 @@ describe('domain/map/location', () => {
     expect(locationA11yLabel('denied')).toBe(
       'Localização desativada. Toque para saber como ativar',
     );
+  });
+});
+
+describe('pin e globo', () => {
+  it('"★ 4,6" fica centralizado e com espaço entre a estrela e a nota', () => {
+    const rated = pinLayout('★ 4,6');
+    expect(rated.text.value).toBe('4,6');
+    expect(rated.star).not.toBeNull();
+    // A nota começa depois da estrela (0,8 em) mais o espaço (0,3 em).
+    expect(rated.text.x - (rated.star?.x ?? 0)).toBeCloseTo(12 * 1.1);
+    // Margens iguais dos dois lados.
+    const textWidth = 12 * (0.6 + 0.3 + 0.6);
+    const right = rated.width - (rated.text.x + textWidth);
+    expect(Math.abs(right - (rated.star?.x ?? 0))).toBeLessThan(1);
+    const novo = pinLayout('Novo', true);
+    expect(novo.star).toBeNull();
+    expect(novo.height).toBe(30);
+  });
+
+  it('com o globo (zoom baixo) só conta o lado visível', () => {
+    const world = { ne: [180, 85] as [number, number], sw: [-180, -85] as [number, number] };
+    const globe = { ...world, center: [-46.6, -23.5] as [number, number], zoom: 1 };
+    const brazil = square(-46.6, -23.5);
+    const japan = square(139.7, 35.7);
+    expect(countInArea([brazil, japan], world)).toBe(2);
+    expect(countInArea([brazil, japan], globe)).toBe(1);
+    // Com zoom de rua, a caixa da câmera vale.
+    expect(countInArea([brazil, japan], { ...globe, zoom: 14 })).toBe(2);
   });
 });

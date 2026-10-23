@@ -62,8 +62,9 @@ const ModalitySticker = ({ label }: { label: string }) => {
   const theme = useTheme();
   return (
     <View
-      height={26}
+      minHeight={26}
       paddingHorizontal={10}
+      paddingVertical={2}
       justifyContent="center"
       borderRadius={4}
       borderWidth={sticker.borderWidth}
@@ -72,7 +73,8 @@ const ModalitySticker = ({ label }: { label: string }) => {
       rotate="-2deg"
       boxShadow={stickerShadow(theme.stickerShadow.val, sticker.shadowOffsetSm)}
     >
-      <Text fontFamily={fontFamily.semiBold} fontSize={13} lineHeight={16} color="$ink">
+      {/* Sem altura fixa: com fonte grande o adesivo cresce e não corta o texto. */}
+      <Text fontFamily={fontFamily.semiBold} fontSize={13} color="$ink" flexShrink={0}>
         {label}
       </Text>
     </View>

@@ -1,4 +1,5 @@
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
+import { StyleSheet } from 'react-native';
 import {
   BottomSheetFooter,
   BottomSheetFooterProps,
@@ -156,7 +157,7 @@ export const FilterSheet = forwardRef<BottomSheetModal, FilterSheetProps>(
         renderContent={() => (
           <BottomSheetScrollView
             stickyHeaderIndices={[0]}
-            contentContainerStyle={{ paddingBottom: 96 }}
+            contentContainerStyle={styles.body}
             testID="filter-sheet"
           >
             <View backgroundColor="$surface" paddingHorizontal={space[4]} paddingTop={space[2]} paddingBottom={space[2]}>
@@ -261,3 +262,8 @@ export const FilterSheet = forwardRef<BottomSheetModal, FilterSheetProps>(
 );
 
 FilterSheet.displayName = 'FilterSheet';
+
+const styles = StyleSheet.create({
+  // Espaço para o rodapé fixo ("Aplicar filtros").
+  body: { paddingBottom: 96 },
+});

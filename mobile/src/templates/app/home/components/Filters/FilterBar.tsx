@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import { SlidersHorizontal, X } from 'lucide-react-native';
 import { View, useTheme } from 'tamagui';
 import {
@@ -112,12 +112,7 @@ export const ActiveChips = ({ filters, onChange }: ActiveChipsProps) => {
       showsHorizontalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
       // Margem para a sombra e o giro não serem cortados.
-      contentContainerStyle={{
-        gap: 10,
-        alignItems: 'center',
-        paddingHorizontal: space[4],
-        paddingVertical: 4,
-      }}
+      contentContainerStyle={styles.chips}
       testID="filter-chips"
     >
       {chips.map((chip, index) => (
@@ -142,7 +137,8 @@ export const ActiveChips = ({ filters, onChange }: ActiveChipsProps) => {
             borderWidth={sticker.borderWidth}
             borderColor="$ink"
             backgroundColor="$brandYellow"
-            rotate={index % 2 === 0 ? '-1deg' : '1deg'}
+            // Giro alternado -1/+1 grau (spec 6.2).
+            transform={[{ rotate: index % 2 === 0 ? '-1deg' : '1deg' }]}
             boxShadow={stickerShadow(theme.stickerShadow.val, sticker.shadowOffsetSm)}
           >
             <Text fontFamily={fontFamily.semiBold} fontSize={14} lineHeight={18} color="$ink">
@@ -155,3 +151,8 @@ export const ActiveChips = ({ filters, onChange }: ActiveChipsProps) => {
     </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  // Margem para a sombra e o giro não serem cortados.
+  chips: { gap: 10, alignItems: 'center', paddingHorizontal: space[4], paddingVertical: 4 },
+});

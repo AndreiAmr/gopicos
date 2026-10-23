@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { StyleSheet } from 'react-native';
 import Animated, {
   SharedValue,
   runOnJS,
@@ -94,17 +95,7 @@ export const ControlColumn = ({
       pointerEvents={invisible ? 'none' : 'box-none'}
       accessibilityElementsHidden={invisible}
       importantForAccessibility={invisible ? 'no-hide-descendants' : 'auto'}
-      style={[
-        {
-          position: 'absolute',
-          right: GUTTER,
-          bottom: COLUMN_GAP,
-          height: COLUMN_HEIGHT,
-          justifyContent: 'space-between',
-          zIndex: zIndex.mapControls,
-        },
-        style,
-      ]}
+      style={[styles.column, style]}
       testID="control-column"
     >
       <MapControlButton
@@ -136,3 +127,14 @@ export const ControlColumn = ({
     </Animated.View>
   );
 };
+
+const styles = StyleSheet.create({
+  column: {
+    position: 'absolute',
+    right: GUTTER,
+    bottom: COLUMN_GAP,
+    height: COLUMN_HEIGHT,
+    justifyContent: 'space-between',
+    zIndex: zIndex.mapControls,
+  },
+});

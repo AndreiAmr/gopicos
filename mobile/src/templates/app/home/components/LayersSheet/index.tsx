@@ -161,15 +161,19 @@ export const LayersSheet = forwardRef<BottomSheetModal, LayersSheetProps>(
                     testID={`layer-${option.value}`}
                   >
                     <Thumbnail layer={option.value} dark={dark} />
+                    {/* Nome numa linha, reduzindo com fonte grande (nunca quebra "Concret/o"). */}
                     <Text
                       fontFamily={fontFamily.semiBold}
                       fontSize={16}
-                      lineHeight={20}
                       marginTop={space[2]}
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                      minimumFontScale={0.7}
                     >
                       {option.label}
                     </Text>
-                    <Text variant="caption" tone="muted" marginTop={2} numberOfLines={3}>
+                    {/* Descrição sem corte: a spec aceita 3 linhas ou mais com fonte grande. */}
+                    <Text variant="caption" tone="muted" marginTop={2}>
                       {option.description}
                     </Text>
                     {selected ? (
