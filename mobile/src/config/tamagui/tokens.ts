@@ -59,6 +59,13 @@ export const mapColors = {
   spotFill: 'rgba(185, 60, 8, 0.25)',
   spotStroke: '#B93C08',
   spotSelected: '#1D4ED8',
+  pinSurface: '#FFFFFF',
+  pinBorder: '#7D858C',
+  pinText: '#18181B',
+  /** Cluster: `primary`, texto `on-primary` e borda escura (spec 11). */
+  clusterFill: '#F97316',
+  clusterText: '#18181B',
+  clusterStroke: '#18181B',
 } as const;
 
 export const space = {

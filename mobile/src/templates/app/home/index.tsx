@@ -78,6 +78,7 @@ export const HomeTemplate = () => {
           onUserLocation={home.setUserPosition}
           placeTarget={home.placeTarget}
           placeAnimationMs={home.placeAnimationMs}
+          clusterAnimationMs={home.placeAnimationMs === 0 ? 0 : 400}
         />
       ) : null}
 

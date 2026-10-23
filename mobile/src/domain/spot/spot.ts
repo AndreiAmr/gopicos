@@ -90,6 +90,59 @@ export const buildPolygonCollection = (
   })),
 });
 
+/**
+ * Pontos (um por pico) para o cluster nativo do Mapbox. O pico selecionado fica
+ * de fora: ele nunca entra em cluster (permanece solto enquanto o resumo está aberto).
+ */
+export const buildPointCollection = (
+  spots: SpotSummary[],
+  excludeId: string | null = null,
+) => ({
+  type: 'FeatureCollection' as const,
+  features: drawableSpots(spots)
+    .filter(spot => spot.id !== excludeId)
+    .map(spot => ({
+      type: 'Feature' as const,
+      id: spot.id,
+      properties: { id: spot.id, label: pinText(spot) },
+      geometry: {
+        type: 'Point' as const,
+        coordinates: polygonCenter(spot.coordinates) as [number, number],
+      },
+    })),
+});
+
+/** Rótulo de acessibilidade do cluster. */
+export const clusterA11yLabel = (count: number): string =>
+  `${count} picos nesta área, toque para aproximar`;
+
+/** O que um toque em feature(s) do mapa atingiu. */
+export type PressTarget =
+  | { kind: 'cluster'; feature: unknown; center: [number, number] }
+  | { kind: 'spot'; id: string }
+  | { kind: 'none' };
+
+type PressFeature = {
+  properties?: Record<string, unknown> | null;
+  geometry?: { coordinates?: unknown } | null;
+};
+
+export const pickPressTarget = (
+  features: PressFeature[] | null | undefined,
+): PressTarget => {
+  const cluster = features?.find(feature => feature.properties?.cluster);
+  const coordinates = cluster?.geometry?.coordinates as number[] | undefined;
+  if (cluster && coordinates && coordinates.length >= 2) {
+    return {
+      kind: 'cluster',
+      feature: cluster,
+      center: [coordinates[0], coordinates[1]],
+    };
+  }
+  const spot = features?.find(feature => feature.properties?.id);
+  return spot ? { kind: 'spot', id: String(spot.properties?.id) } : { kind: 'none' };
+};
+
 const EARTH_RADIUS_KM = 6371;
 
 /** Distância em km entre dois pontos [lng, lat] (haversine). */

@@ -1,6 +1,9 @@
 import {
   SpotSummary,
+  buildPointCollection,
   buildPolygonCollection,
+  clusterA11yLabel,
+  pickPressTarget,
   cardA11yLabel,
   distanceKm,
   drawableSpots,
@@ -87,5 +90,43 @@ describe('spot domain', () => {
     expect(km).toBeLessThan(1.3);
     expect(formatDistance(1.234)).toBe('A 1,2 km de você');
     expect(formatDistance(0.35)).toBe('A 400 m de você');
+  });
+});
+
+describe('cluster de pins', () => {
+  it('monta pontos com o rótulo e deixa o pico selecionado de fora', () => {
+    const spots = [spot(), spot({ id: '2', ratingAverage: null, reviewsCount: 0 })];
+
+    const all = buildPointCollection(spots);
+    expect(all.features.map(f => f.properties)).toEqual([
+      { id: '1', label: '★ 4,6' },
+      { id: '2', label: 'Novo' },
+    ]);
+    expect(all.features[0].geometry.coordinates[0]).toBeCloseTo(-46.65);
+    expect(all.features[0].geometry.coordinates[1]).toBeCloseTo(-23.55);
+
+    expect(buildPointCollection(spots, '1').features.map(f => f.properties.id)).toEqual(['2']);
+  });
+
+  it('rotula o cluster para acessibilidade', () => {
+    expect(clusterA11yLabel(7)).toBe('7 picos nesta área, toque para aproximar');
+  });
+
+  it('identifica o alvo do toque: cluster, pico ou vazio', () => {
+    const cluster = {
+      properties: { cluster: true, cluster_id: 3, point_count: 5 },
+      geometry: { coordinates: [-46.6, -23.5] },
+    };
+    expect(pickPressTarget([cluster])).toEqual({
+      kind: 'cluster',
+      feature: cluster,
+      center: [-46.6, -23.5],
+    });
+    expect(pickPressTarget([{ properties: { id: 's1' } }])).toEqual({
+      kind: 'spot',
+      id: 's1',
+    });
+    expect(pickPressTarget([])).toEqual({ kind: 'none' });
+    expect(pickPressTarget(undefined)).toEqual({ kind: 'none' });
   });
 });
