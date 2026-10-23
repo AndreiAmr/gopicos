@@ -2,8 +2,10 @@ import { getToken } from '@/utils/session';
 import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 
+import { GRAPHQL_URL } from './env';
+
 const httpLink = new HttpLink({
-  uri: 'http://localhost:4000/graphql',
+  uri: GRAPHQL_URL,
 });
 
 // Lê o token a cada requisição: o login acontece depois de o client ser criado.

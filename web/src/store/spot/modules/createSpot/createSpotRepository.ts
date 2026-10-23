@@ -38,10 +38,6 @@ const fetchCreateSpot = async (
       openingHours,
       markingType: spotInfos.markingType,
     };
-    console.log(
-      '🚀 ~ fetchCreateSpot ~ spotInfos.markingType:',
-      spotInfos.markingType,
-    );
 
     const { data } = await apolloClient.mutate<CreateSpotResponse>({
       mutation: createSpotMutation,

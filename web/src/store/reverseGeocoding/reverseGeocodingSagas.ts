@@ -21,15 +21,10 @@ export function* getReverseGeocodingAsync({
       lat: payload.lat,
       lng: payload.lng,
     };
-    console.log('🚀 ~ getReverseGeocodingAsync ~ params:', params);
 
     const reverseGeocoding: IReverseGeocoding = yield call(
       reverseGeocodingRepository.getReverseGeocoding,
       params
-    );
-    console.log(
-      '🚀 ~ getReverseGeocodingAsync ~ reverseGeocoding:',
-      reverseGeocoding
     );
 
     yield put(reverseGeocodingActions.setReverseGeocoding(reverseGeocoding));
