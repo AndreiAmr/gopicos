@@ -15,6 +15,8 @@ const getListSpotsQuery = gql`
       entryAmount
       coordinates
       markingType
+      ratingAverage
+      reviewsCount
     }
   }
 `;

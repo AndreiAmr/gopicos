@@ -1,3 +1,4 @@
+import type { SpotCoordinates } from '@/domain/spot/spot';
 import { ICreateSpotState } from './modules/createSpot/createSpotTypes';
 import { IListSpotsState } from './modules/listSpots/listSpotsTypes';
 
@@ -17,6 +18,8 @@ export type ISpot = {
   images: [string?];
   equipmentRequired: boolean;
   entryAmount: string;
-  coordinates: number[][][];
+  coordinates: SpotCoordinates;
   markingType: string;
+  ratingAverage?: number | null;
+  reviewsCount?: number;
 };
