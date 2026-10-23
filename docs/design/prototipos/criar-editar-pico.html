@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GoPicos - Criar e editar pico - protótipo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Permanent+Marker&display=swap" rel="stylesheet">
+<!-- Protótipo HTML estático e autocontido (só Google Fonts de fora). Não é código de produção.
+     Feito em HTML porque o Figma MCP (plano Starter) bateu o limite de chamadas; fallback autorizado pelo dono. -->
+<style>
+:root{
+  --bg:#F0F3F5;--surface:#FFFFFF;--sunken:#E3E8EC;--text:#18181B;--muted:#565757;--subtle:#5C646A;
+  --border:#7D858C;--divider:#D5DBE0;--primary:#F97316;--primary-hover:#EA580C;--on-primary:#18181B;
+  --primary-soft:#FFEDD5;--primary-text:#A84300;--star:#C77700;--success:#146C35;--error:#B3201F;--on-error:#FFFFFF;
+  --error-soft:#FDECEC;--warning:#8F5200;--info:#1D4ED8;--focus:#1D4ED8;--yellow:#FACC15;--ink:#18181B;
+  --outline:#18181B;--stk:#18181B;--dim:rgba(0,0,0,.4);
+  --shadow2:0 4px 12px rgba(24,24,27,.14);--shadow3:0 12px 32px rgba(24,24,27,.22);
+  --page:#D9DFE4;--page-text:#18181B;--kb:#D1D4DA;--key:#FFFFFF;--key2:#ADB3BC;
+  --map-land:#F2EFE9;--map-bld:#E3DED4;--map-road:#FFFFFF;--map-case:#D6CFC3;--map-park:#CDE6C2;--map-water:#A9D3EE;--map-label:#4F555C;
+}
+[data-theme="dark"]{
+  --bg:#0F1113;--surface:#181B1F;--sunken:#0A0B0D;--text:#F5F6F7;--muted:#B2B8BE;--subtle:#9AA1A8;
+  --border:#838B93;--divider:#2C3138;--primary:#FB923C;--primary-hover:#FDBA74;--on-primary:#1A0B02;
+  --primary-soft:#3A2008;--primary-text:#FDBA74;--star:#FBBF24;--success:#4ADE80;--error:#FF8A80;--on-error:#0F1113;
+  --error-soft:#3A1414;--warning:#FBBF24;--info:#7FA8FF;--focus:#7FA8FF;
+  --outline:#F5F6F7;--stk:#FACC15;--dim:rgba(0,0,0,.55);
+  --shadow2:0 0 0 1px rgba(255,255,255,.08);--shadow3:0 0 0 1px rgba(255,255,255,.10),0 12px 32px rgba(0,0,0,.5);
+  --page:#050607;--page-text:#F5F6F7;--kb:#2B2B2E;--key:#6B6B70;--key2:#47474B;
+  --map-land:#1A2131;--map-bld:#232C3F;--map-road:#2E3950;--map-case:#141A26;--map-park:#1B332E;--map-water:#0B1727;--map-label:#AEB8CB;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:Inter,system-ui,sans-serif;background:var(--page);color:var(--page-text);-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer}
+.pm{font-family:'Permanent Marker','Inter',cursive;font-weight:400;letter-spacing:.2px}
+
+/* barra do protótipo */
+.proto-bar{position:sticky;top:0;z-index:1000;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end;padding:12px 24px;background:var(--surface);color:var(--text);border-bottom:1px solid var(--divider);box-shadow:var(--shadow2)}
+.proto-bar h1{margin:0 12px 0 0;font-size:20px;line-height:24px;display:flex;align-items:center;gap:10px}
+.proto-bar h1 small{font:500 12px Inter;color:var(--muted);display:block}
+.pb-group{display:flex;flex-direction:column;gap:4px}
+.pb-group>span{font:600 11px Inter;color:var(--muted)}
+.pb-seg{display:flex;border:1.5px solid var(--border);border-radius:6px;overflow:hidden}
+.pb-seg button{border:0;background:var(--surface);color:var(--text);font:600 13px Inter;padding:8px 12px;min-height:36px}
+.pb-seg button[aria-pressed="true"]{background:var(--primary);color:var(--on-primary)}
+.proto-bar select{min-height:36px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font:500 13px Inter;padding:0 8px;max-width:340px}
+.pb-check{display:flex;align-items:center;gap:8px;min-height:36px;font:600 13px Inter;border:1.5px solid var(--border);border-radius:6px;padding:0 12px;background:var(--surface);color:var(--text)}
+.pb-check input{width:18px;height:18px;accent-color:var(--primary)}
+.pb-nav{display:flex;gap:6px}
+.pb-nav button{min-height:36px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text);font:600 13px Inter;padding:0 10px}
+.proto-bar :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+main{padding:20px 24px 64px}
+.note{max-width:1240px;margin:0 auto 18px;display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.note-card{flex:1 1 560px;background:var(--surface);color:var(--text);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow2);font-size:14px;line-height:20px}
+.note-card b{font-weight:700}
+.note-card ul{margin:6px 0 0;padding-left:18px}
+.legend{flex:0 1 520px;display:flex;flex-wrap:wrap;gap:6px;background:var(--surface);color:var(--text);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow2);font:600 12px Inter}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-2px;border:2px dashed}
+.legend span{white-space:nowrap;margin-right:10px}
+.phones{display:flex;flex-wrap:wrap;gap:36px;justify-content:center;align-items:flex-start}
+.device{display:flex;flex-direction:column;align-items:center;gap:10px;margin:0}
+.device figcaption{font:600 13px Inter;color:var(--page-text);text-align:center}
+.device figcaption small{display:block;font-weight:500;opacity:.75}
+.bezel{background:#0B0B0C;box-shadow:0 30px 60px rgba(0,0,0,.35),inset 0 0 0 2px #2A2A2D}
+.bezel.se{padding:72px 12px;border-radius:50px;position:relative}
+.bezel.se::before{content:"";position:absolute;top:30px;left:50%;width:56px;height:6px;margin-left:-28px;border-radius:3px;background:#222}
+.bezel.se::after{content:"";position:absolute;bottom:13px;left:50%;width:46px;height:46px;margin-left:-23px;border-radius:50%;border:2px solid #333}
+.bezel.and{padding:10px;border-radius:30px}
+.bezel.notch{padding:12px;border-radius:60px}
+.screen{position:relative;overflow:hidden;background:var(--bg);isolation:isolate;color:var(--text)}
+.bezel.and .screen{border-radius:22px}
+.bezel.notch .screen{border-radius:48px}
+.a{position:absolute}
+h2.sec{max-width:1240px;margin:44px auto 14px;font-size:18px;color:var(--page-text);display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+h2.sec small{font:500 13px Inter;opacity:.75}
+.webs{display:flex;flex-direction:column;gap:28px;align-items:center}
+.webbox{display:flex;flex-direction:column;gap:8px;align-items:center}
+.webbox figcaption{font:600 13px Inter}
+.webclip{overflow:hidden;border-radius:12px;box-shadow:0 30px 60px rgba(0,0,0,.3)}
+.web{position:relative;overflow:hidden;background:var(--bg);transform-origin:top left;color:var(--text)}
+
+/* sistema */
+.statusbar{left:0;right:0;top:0;display:flex;align-items:center;justify-content:space-between;font:600 15px Inter;z-index:90;padding:0 22px;color:var(--text);pointer-events:none}
+.island{left:50%;top:11px;width:126px;height:37px;margin-left:-63px;border-radius:20px;background:#000;z-index:96}
+.punch{left:50%;top:8px;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:#000;z-index:96;box-shadow:0 0 0 2px #1b1b1b}
+.homeind{left:50%;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--text);z-index:95}
+.andnav{left:0;right:0;display:flex;justify-content:space-around;align-items:center;color:var(--muted);z-index:95;background:var(--surface)}
+.kb{left:0;right:0;background:var(--kb);z-index:70;padding:6px 3px 0}
+.kbrow{display:flex;justify-content:center;gap:5px;margin:0 0 10px}
+.key{height:40px;flex:1;max-width:34px;border-radius:5px;background:var(--key);box-shadow:0 1px 0 rgba(0,0,0,.3);display:grid;place-items:center;font:400 19px Inter;color:var(--text)}
+.key.w{max-width:none;flex:1.5;background:var(--key2);font-size:14px}
+.key.sp{max-width:none;flex:5;font-size:14px}
+.key.go{max-width:none;flex:2;background:var(--info);color:#fff;font-size:14px;font-weight:600}
+.kbpred{display:flex;justify-content:space-around;height:36px;align-items:center;font:500 15px Inter;color:var(--text);margin-bottom:6px}
+
+/* zonas */
+.zone{position:absolute;border:2px dashed;border-radius:4px;z-index:200;pointer-events:none!important;font:700 10px/12px Inter;padding:2px 4px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.zone em{font-style:normal;display:inline-block;padding:1px 4px;border-radius:3px;background:rgba(0,0,0,.6)}
+
+/* componentes base */
+.btn{height:48px;border-radius:6px;font:600 16px Inter;display:flex;align-items:center;justify-content:center;gap:8px;border:0;width:100%;padding:0 16px;white-space:nowrap}
+.btn.primary{background:var(--primary);color:var(--on-primary)}
+.btn.primary:active{background:var(--primary-hover)}
+.btn.primary[disabled]{background:var(--sunken);color:var(--subtle);cursor:not-allowed}
+.btn.secondary{background:var(--surface);border:1.5px solid var(--border);color:var(--text)}
+.btn.ghost{background:transparent;color:var(--text)}
+.btn.danger{background:var(--error);color:var(--on-error)}
+.btn.danger-ghost{background:transparent;color:var(--error)}
+.btn.loading{opacity:.85}
+.btn .spin,.spin{animation:spin 1s linear infinite;transform-origin:50% 50%}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+.xbtn{width:48px;height:48px;border:0;background:none;color:var(--text);display:grid;place-items:center;border-radius:6px;flex:none}
+.backbtn{width:48px;height:48px;border:0;background:none;color:var(--text);display:grid;place-items:center;border-radius:6px;flex:none}
+.lnk{color:var(--primary-text);font-weight:600;text-decoration:underline;white-space:nowrap;background:none;border:0;padding:0;font-size:14px;min-height:44px}
+.caption{font:500 12px/16px Inter;color:var(--muted)}
+.lbl{font:600 14px/20px Inter;color:var(--text);display:block;margin-bottom:6px}
+.help{font:500 12px/16px Inter;color:var(--muted);margin-top:4px}
+.err{font:600 12px/16px Inter;color:var(--error);margin-top:4px;display:flex;gap:4px;align-items:flex-start}
+.input{height:48px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);display:flex;align-items:center;padding:0 14px;font:400 16px Inter;color:var(--text);gap:8px}
+.input.ph{color:var(--subtle)}
+.input.focus{border:2px solid var(--focus);box-shadow:0 0 0 3px color-mix(in srgb,var(--focus) 18%,transparent)}
+.input.bad{border:2px solid var(--error)}
+.input.ta{height:auto;min-height:96px;align-items:flex-start;padding-top:12px;line-height:22px}
+.caret{display:inline-block;width:2px;height:20px;background:var(--focus);vertical-align:-4px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.field{margin-bottom:16px}
+.banner{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--error-soft);border:1.5px solid var(--error);border-radius:6px;font:500 14px/20px Inter;color:var(--text)}
+.banner .ico{color:var(--error);flex:none;margin-top:1px}
+.banner.info{background:var(--surface);border-color:var(--info)}
+.banner.info .ico{color:var(--info)}
+.toast{display:flex;gap:10px;align-items:flex-start;padding:12px;background:var(--surface);border-radius:12px;box-shadow:var(--shadow2);border:1px solid var(--divider);border-left:4px solid var(--error);font:500 14px/20px Inter;color:var(--text);z-index:60}
+.toast.info{border-left-color:var(--info)}
+.toast.success{border-left-color:var(--success)}
+
+/* marca */
+.tape-wrap{display:inline-block;filter:drop-shadow(1px 2px 0 rgba(0,0,0,.28))}
+.tape{display:inline-flex;align-items:center;gap:6px;min-height:28px;padding:4px 14px;background:var(--yellow);color:var(--ink);font:700 13px/16px Inter;transform:rotate(-3deg);
+  clip-path:polygon(0 14%,3% 0,6% 10%,9% 0,91% 0,94% 10%,97% 0,100% 16%,98% 50%,100% 84%,96% 100%,92% 90%,88% 100%,12% 100%,8% 90%,4% 100%,0 86%,2% 50%)}
+.caution{height:10px;background:repeating-linear-gradient(-45deg,var(--yellow) 0 10px,var(--ink) 10px 20px)}
+.halftone{background-image:radial-gradient(circle,var(--primary) 1.3px,transparent 1.7px);background-size:7px 7px;opacity:.38;pointer-events:none;
+  -webkit-mask-image:radial-gradient(circle at 100% 0,#000 20%,transparent 72%);mask-image:radial-gradient(circle at 100% 0,#000 20%,transparent 72%)}
+.stk{min-height:44px;padding:0 14px;display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--border);border-radius:4px;background:var(--surface);color:var(--text);font:600 14px Inter}
+.stk.on{background:var(--yellow);color:var(--ink);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--stk);transform:rotate(-2deg)}
+.stk.on:nth-child(even){transform:rotate(1.5deg)}
+.mchip{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 10px;background:var(--yellow);color:var(--ink);border:2px solid var(--ink);border-radius:4px;box-shadow:2px 2px 0 var(--stk);font:600 13px Inter;transform:rotate(-2deg)}
+.mchip.alt{background:var(--surface);color:var(--text);border-color:var(--outline);transform:rotate(1.5deg)}
+.seg{display:flex;border:2px solid var(--outline);border-radius:6px;background:var(--sunken);padding:2px;gap:2px;height:48px}
+.seg button{flex:1;border:0;border-radius:4px;background:transparent;color:var(--text);font:600 14px Inter;display:flex;align-items:center;justify-content:center;gap:4px}
+.seg button.on{background:var(--primary);color:var(--on-primary);box-shadow:inset 0 0 0 2px var(--ink)}
+.swrow{display:flex;align-items:center;justify-content:space-between;min-height:48px;font:500 16px Inter;color:var(--text)}
+.sw{width:48px;height:28px;border-radius:14px;background:var(--sunken);border:2px solid var(--border);position:relative;flex:none}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--surface);border:2px solid var(--border);box-sizing:border-box}
+.sw.on{background:var(--primary);border-color:var(--ink)}
+.sw.on::after{left:22px;border-color:var(--ink);background:#fff}
+.cbrow{display:flex;align-items:center;gap:12px;min-height:48px;font:500 16px Inter}
+.cb{width:24px;height:24px;border:2px solid var(--border);border-radius:4px;display:grid;place-items:center;flex:none;background:var(--surface)}
+.cb.on{background:var(--primary);border-color:var(--ink);color:var(--on-primary)}
+.ctl{width:48px;height:48px;border-radius:6px;background:var(--surface);border:2px solid var(--outline);box-shadow:3px 3px 0 var(--stk);display:grid;place-items:center;color:var(--text);position:relative;padding:0}
+.ctl[disabled]{color:var(--subtle);box-shadow:none;border-color:var(--border);cursor:not-allowed}
+.ctl:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--stk)}
+
+/* header de tela (mobile) */
+.hdr{left:0;right:0;top:0;background:var(--surface);border-bottom:2px solid var(--outline);z-index:30;overflow:hidden}
+.hdr-row{position:absolute;left:0;right:0;bottom:0;height:64px;display:flex;align-items:center;gap:4px;padding:0 12px 0 4px}
+.hdr .ttl{font-family:'Permanent Marker',cursive;font-size:24px;line-height:28px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr .sprayw{position:absolute;left:52px;bottom:6px}
+.hdr .halftone{position:absolute;right:0;top:0;width:110px;height:100%}
+
+/* sheet */
+.veil{left:0;right:0;background:var(--dim);z-index:35}
+.sheet{left:0;right:0;background:var(--surface);border-radius:20px 20px 0 0;box-shadow:var(--shadow3);overflow:hidden;z-index:40;color:var(--text);display:flex;flex-direction:column}
+[data-theme="dark"] .sheet{border-top:1px solid var(--divider)}
+.sheet.stk-edge{border-top:2px solid var(--outline)}
+.handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:8px auto 0;flex:none;border:0;padding:0}
+.sheet .caution{flex:none}
+.sheet-body{padding:12px 16px 16px;display:flex;flex-direction:column;gap:12px;position:relative}
+.sheet .halftone{position:absolute;right:0;top:0;width:120px;height:90px}
+.st-title{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.st-title .pmt{font-family:'Permanent Marker',cursive;font-size:26px;line-height:32px}
+.st-title h3{margin:0;font:700 20px/28px Inter}
+.optrow{display:flex;align-items:center;gap:14px;min-height:64px;padding:8px 12px;border:1.5px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text);text-align:left;width:100%}
+.optrow .oi{width:44px;height:44px;border-radius:6px;background:var(--yellow);border:2px solid var(--ink);box-shadow:2px 2px 0 var(--stk);display:grid;place-items:center;color:var(--ink);flex:none;transform:rotate(-3deg)}
+.optrow b{display:block;font:600 16px/22px Inter}
+.optrow small{display:block;font:500 12px/16px Inter;color:var(--muted)}
+.optrow.danger{color:var(--error)}
+.optrow.danger .oi{background:var(--error-soft);border-color:var(--error);color:var(--error);box-shadow:none}
+
+/* dialog web */
+.wveil{background:var(--dim);z-index:35}
+.dlg{background:var(--surface);border-radius:12px;border:2px solid var(--outline);box-shadow:6px 6px 0 var(--stk);z-index:40;color:var(--text);display:flex;flex-direction:column;overflow:hidden}
+.dlg .halftone{position:absolute;right:0;top:0;width:140px;height:100px}
+.dlg-body{padding:20px 24px 24px;display:flex;flex-direction:column;gap:14px;position:relative}
+.dlg-foot{display:flex;justify-content:flex-end;gap:12px}
+.dlg-foot .btn{width:auto}
+
+/* web chrome */
+.wheader{left:0;right:0;top:0;height:64px;background:var(--surface);border-bottom:2px solid var(--outline);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:30;color:var(--text)}
+.wrail{left:0;top:64px;bottom:0;width:72px;background:var(--surface);border-right:2px solid var(--outline);z-index:30;display:flex;flex-direction:column;align-items:stretch;padding-top:8px;gap:4px}
+.witem{height:72px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font:600 12px/14px Inter;color:var(--muted);background:none;border:0;position:relative}
+.witem.on{color:var(--text);font-weight:700;background:var(--primary-soft)}
+.witem.on::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:4px;background:var(--primary);border-radius:0 2px 2px 0}
+.newstk{width:40px;height:34px;border-radius:4px;background:var(--primary);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--stk);display:grid;place-items:center;color:var(--on-primary);transform:rotate(-3deg);margin-bottom:3px}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--sunken);display:grid;place-items:center;font:700 15px Inter;color:var(--text);border:2px solid var(--outline);flex:none}
+.wpanel{background:var(--surface);border:2px solid var(--outline);border-radius:12px;box-shadow:4px 4px 0 var(--stk);z-index:20;color:var(--text)}
+
+/* tab bar (mobile) */
+.tabbar{left:0;right:0;background:var(--surface);border-top:2px solid var(--outline);z-index:30}
+.tabs{display:flex;height:64px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:600 12px/14px Inter;color:var(--muted);background:none;border:0;padding:0;position:relative}
+.tab.on{color:var(--text);font-weight:700}
+
+[data-go]{cursor:pointer}
+
+</style>
+</head>
+<body>
+<header class="proto-bar" id="bar" aria-label="Controles do protótipo"></header>
+<main>
+  <div class="note"><div class="note-card" id="note" aria-live="polite"></div><div class="legend" id="legend" aria-label="Legenda das zonas reservadas"></div></div>
+  <h2 class="sec">Mobile <small>toque nos elementos das telas para navegar entre os estados</small></h2>
+  <div class="phones" id="phones"></div>
+  <h2 class="sec">Web <small>o mesmo estado no navegador</small></h2>
+  <div class="webs" id="webs"></div>
+</main>
+<script>
+/* ===== Base comum dos protótipos (gerada; não é código de produção) ===== */
+var GP=(function(){
+'use strict';
+const DEV={
+  se:{id:'se',w:375,h:667,top:20,bot:0,kb:260,label:'iPhone SE 375 x 667',sub:'status 20, sem home indicator'},
+  and:{id:'and',w:360,h:640,top:24,bot:48,kb:256,label:'Android 360 x 640',sub:'status 24, navegação de 3 botões (48)'},
+  notch:{id:'notch',w:393,h:852,top:59,bot:34,kb:302,label:'iPhone com Dynamic Island 393 x 852',sub:'top 59, home indicator 34'}
+};
+const IP={
+ search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+ locate:'<line x1="2" x2="5" y1="12" y2="12"/><line x1="19" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="5"/><line x1="12" x2="12" y1="19" y2="22"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/>',
+ undo:'<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+ trash:'<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+ pin:'<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
+ user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+ plus:'<path d="M5 12h14"/><path d="M12 5v14"/>',
+ minus:'<path d="M5 12h14"/>',
+ x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+ check:'<path d="M20 6 9 17l-5-5"/>',
+ star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+ alert:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+ info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+ arrowL:'<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
+ chevR:'<path d="m9 18 6-6-6-6"/>',
+ chevL:'<path d="m15 18-6-6 6-6"/>',
+ camera:'<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',
+ image:'<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
+ upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/>',
+ edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+ more:'<circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/>',
+ logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>',
+ lock:'<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+ mail:'<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+ eye:'<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+ eyeOff:'<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/>',
+ map:'<polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/>',
+ msg:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+ shield:'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
+ key:'<circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/>',
+ doc:'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>',
+ wheel:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M12 3v3"/>',
+ loader:'<path d="M21 12a9 9 0 1 1-6.219-8.56"/>'
+};
+function ic(n,s,o){s=s||24;o=o||{};
+  return '<svg'+(o.cls?' class="'+o.cls+'"':'')+' width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="'+(o.fill||'none')+'" stroke="'+(o.stroke||'currentColor')+'" stroke-width="'+(o.sw||2)+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IP[n]+'</svg>';}
+function spray(w,h){w=w||90;h=h||10;
+  return '<svg width="'+w+'" height="'+h+'" viewBox="0 0 120 14" preserveAspectRatio="none" aria-hidden="true" style="display:block"><path d="M3 9 C 22 3, 42 12, 62 7 S 100 3, 117 8" stroke="var(--primary)" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M10 12 C 44 9, 80 13, 112 11" stroke="var(--primary)" stroke-width="2" opacity=".55" fill="none" stroke-linecap="round"/><circle cx="118" cy="4" r="1.6" fill="var(--primary)"/></svg>';}
+function stars(v,s,interactive){s=s||14;let o='<span style="display:inline-flex;gap:'+(interactive?8:1)+'px;vertical-align:-2px" aria-hidden="true">';const n=Math.round(v||0);
+  for(let i=1;i<=5;i++)o+=i<=n?ic('star',s,{fill:'var(--star)',stroke:'var(--star)',sw:1.5}):ic('star',s,{stroke:'var(--border)',sw:1.5});return o+'</span>';}
+function tape(t,rot){return '<span class="tape-wrap"><span class="tape" style="transform:rotate('+(rot==null?-3:rot)+'deg)">'+t+'</span></span>';}
+function btn(label,cls,o){o=o||{};return '<button class="btn '+(cls||'primary')+'"'+(o.go?' data-go="'+o.go+'"':'')+(o.act?' data-act="'+o.act+'"':'')+(o.disabled?' disabled':'')+(o.style?' style="'+o.style+'"':'')+'>'+(o.loading?ic('loader',20,{cls:'spin'}):'')+(o.icon?ic(o.icon,20):'')+label+'</button>';}
+function kb(d){const top=d.h-d.bot-d.kb;
+  const row=k=>'<div class="kbrow">'+k.split('').map(c=>'<span class="key">'+c+'</span>').join('')+'</div>';
+  return {top:top,html:'<div class="a kb" style="top:'+top+'px;height:'+d.kb+'px" aria-hidden="true"><div class="kbpred"><span>pico</span><span>praça</span><span>rolê</span></div>'+row('qwertyuiop')+row('asdfghjkl')+'<div class="kbrow"><span class="key w">⇧</span>'+'zxcvbnm'.split('').map(c=>'<span class="key">'+c+'</span>').join('')+'<span class="key w">⌫</span></div><div class="kbrow"><span class="key w">123</span><span class="key sp">espaço</span><span class="key go">seguinte</span></div></div>'};}
+function chrome(d,o){o=o||{};let h='';
+  h+='<div class="a statusbar" style="height:'+d.top+'px;'+(d.id==='notch'?'padding:0 34px;':'')+(o.statusOnDark?'color:#fff':'')+'"><span>9:41</span><span style="font-size:12px">5G ▮▮▮ 100%</span></div>';
+  if(d.id==='notch')h+='<div class="a island"></div>';
+  if(d.id==='and')h+='<div class="a punch"></div>';
+  if(d.id==='notch'&&!o.kb)h+='<div class="a homeind" style="bottom:8px"></div>';
+  if(d.id==='and')h+='<div class="a andnav" style="bottom:0;height:48px"><span>◁</span><span>○</span><span>□</span></div>';
+  return h;}
+function zoneHtml(z){const c=z.c||'#E11D48';const st='top:'+z.y0+'px;height:'+Math.max(4,z.y1-z.y0)+'px;left:'+(z.x0||0)+'px;'+(z.x1!=null?'width:'+(z.x1-(z.x0||0))+'px;':'right:0;')+'border-color:'+c+';background:'+c+'22';
+  return '<div class="zone" style="'+st+'"><em>'+z.n+'</em></div>';}
+/* mapa simulado */
+const mcache={};
+function map(w,h,o){o=o||{};const key=w+'x'+h+(o.seed||0);if(mcache[key])return mcache[key];
+  let s='<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" aria-hidden="true" style="display:block"><rect width="'+w+'" height="'+h+'" fill="var(--map-land)"/>';
+  const step=46,cx=w/2,cy=h/2;s+='<g transform="rotate(-14 '+cx+' '+cy+')">';
+  let seed=7+(o.seed||0);const rr=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
+  for(let x=-0.4*w;x<1.4*w;x+=step)for(let y=-0.3*h;y<1.3*h;y+=step){const bw=14+rr()*18,bh=12+rr()*18;s+='<rect x="'+(x+7).toFixed(1)+'" y="'+(y+7).toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+bh.toFixed(1)+'" rx="1.5" fill="var(--map-bld)"/>';}
+  s+='</g><path d="M'+(.04*w)+' '+(.62*h)+' L'+(.40*w)+' '+(.58*h)+' L'+(.44*w)+' '+(.72*h)+' L'+(.30*w)+' '+(.84*h)+' L'+(.02*w)+' '+(.82*h)+'Z" fill="var(--map-park)"/>';
+  s+='<path d="M-30 '+(.22*h)+' C '+(.30*w)+' '+(.15*h)+', '+(.62*w)+' '+(.31*h)+', '+(w+30)+' '+(.24*h)+'" stroke="var(--map-water)" stroke-width="22" fill="none"/>';
+  s+='<g transform="rotate(-14 '+cx+' '+cy+')">';let mn='';
+  for(let x=-0.4*w;x<1.4*w;x+=step)mn+='M'+x.toFixed(1)+' '+(-0.3*h)+' V'+(1.3*h)+' ';
+  for(let y=-0.3*h;y<1.3*h;y+=step)mn+='M'+(-0.4*w)+' '+y.toFixed(1)+' H'+(1.4*w)+' ';
+  s+='<path d="'+mn+'" stroke="var(--map-case)" stroke-width="9" fill="none"/><path d="'+mn+'" stroke="var(--map-road)" stroke-width="6" fill="none"/>';
+  const ay=Math.round((.40*h)/step)*step,ax=Math.round((.58*w)/step)*step;
+  s+='<path d="M'+(-0.4*w)+' '+ay+' H'+(1.4*w)+' M'+ax+' '+(-0.3*h)+' V'+(1.3*h)+'" stroke="var(--map-case)" stroke-width="15" fill="none"/><path d="M'+(-0.4*w)+' '+ay+' H'+(1.4*w)+' M'+ax+' '+(-0.3*h)+' V'+(1.3*h)+'" stroke="var(--map-road)" stroke-width="11" fill="none"/>';
+  s+='<text x="'+(w*.3)+'" y="'+(ay+4)+'" font-family="Inter" font-size="11" font-weight="600" fill="var(--map-label)" stroke="var(--map-land)" stroke-width="3" paint-order="stroke" text-anchor="middle">Av. Paulista</text>';
+  s+='<text x="'+(ax+4)+'" y="'+(h*.82)+'" transform="rotate(90 '+(ax+4)+' '+(h*.82)+')" font-family="Inter" font-size="11" font-weight="600" fill="var(--map-label)" stroke="var(--map-land)" stroke-width="3" paint-order="stroke" text-anchor="middle">R. da Consolação</text>';
+  s+='</g></svg>';mcache[key]=s;return s;}
+function mbx(x,y){return '<div class="a" style="left:'+x+'px;top:'+y+'px;display:flex;gap:6px;align-items:center;font:700 11px Inter;color:var(--map-label);z-index:9" aria-hidden="true"><span>◉ mapbox</span><span style="width:18px;height:18px;border-radius:50%;display:grid;place-items:center;border:1.5px solid currentColor;font:italic 700 11px Georgia">i</span></div>';}
+/* header de tela mobile */
+function header(d,o){const h=d.top+64;let x='<div class="a hdr" style="height:'+h+'px">'+(o.halftone===false?'':'<div class="halftone"></div>')+'<div class="hdr-row">';
+  x+=o.back===false?'<span style="width:12px"></span>':'<button class="backbtn" aria-label="Voltar" data-go="'+(o.backGo||'')+'">'+ic(o.close?'x':'arrowL',24)+'</button>';
+  x+='<div style="flex:1;min-width:0;position:relative;padding-bottom:6px"><div class="ttl">'+o.title+'</div><div style="position:absolute;left:0;bottom:0">'+spray(o.sprayW||70,8)+'</div></div>';
+  if(o.right)x+=o.right;x+='</div></div>';return {h:h,html:x};}
+/* sheet */
+function sheet(d,o){/* o: top (abs), bottom (abs, default h-bot... ), html, caution, veilTop */
+  const bottom=o.bottom!=null?o.bottom:d.h;let x='';
+  if(o.veil!==false)x+='<div class="a veil" style="top:'+(o.veilTop||0)+'px;height:'+((o.veilBottom!=null?o.veilBottom:d.h)-(o.veilTop||0))+'px" data-go="'+(o.closeGo||'')+'"></div>';
+  x+='<div class="a sheet'+(o.edge?' stk-edge':'')+'" role="dialog" aria-modal="'+(o.veil!==false)+'" style="top:'+o.top+'px;height:'+(bottom-o.top)+'px">'+(o.caution?'<div class="caution" aria-hidden="true"></div>':'')+'<div class="handle" aria-hidden="true"></div>'+o.html+'</div>';
+  return x;}
+function confirmSheet(o){/* título Inter (aviso), ilustração, botões */
+  return '<div class="sheet-body"><div style="display:flex;gap:12px;align-items:flex-start">'+(o.ill||cone(44))+'<div style="flex:1"><h3 style="margin:0;font:700 20px/28px Inter">'+o.title+'</h3><p style="margin:6px 0 0;font:400 16px/24px Inter;color:var(--muted)">'+o.body+'</p></div></div>'+(o.banner||'')+
+    '<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">'+btn(o.danger,'danger',{go:o.dangerGo,loading:o.loading})+btn(o.cancel||'Continuar editando','secondary',{go:o.cancelGo})+'</div></div>';}
+function confirmDialog(o){return '<div class="caution" aria-hidden="true"></div><div class="dlg-body"><div style="display:flex;gap:14px;align-items:flex-start">'+(o.ill||cone(48))+'<div style="flex:1"><h3 style="margin:0;font:700 20px/28px Inter">'+o.title+'</h3><p style="margin:6px 0 0;font:400 16px/24px Inter;color:var(--muted)">'+o.body+'</p></div></div>'+(o.banner||'')+
+  '<div class="dlg-foot">'+btn(o.cancel||'Continuar editando','secondary',{go:o.cancelGo})+btn(o.danger,'danger',{go:o.dangerGo})+'</div></div>';}
+/* ilustrações vetoriais (decorativas) */
+function cone(s){s=s||44;return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 48 48" aria-hidden="true" style="flex:none"><path d="M24 4 L36 40 H12 Z" fill="var(--primary)" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/><path d="M17.5 24 H30.5 M15 32 H33" stroke="#fff" stroke-width="4"/><rect x="6" y="40" width="36" height="5" rx="1.5" fill="var(--ink)"/></svg>';}
+function spraycan(s){s=s||44;return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 48 48" aria-hidden="true" style="flex:none"><rect x="14" y="14" width="18" height="30" rx="4" fill="var(--yellow)" stroke="var(--ink)" stroke-width="2.5"/><rect x="18" y="8" width="10" height="7" rx="2" fill="var(--ink)"/><path d="M14 24 H32" stroke="var(--ink)" stroke-width="2"/><circle cx="36" cy="8" r="1.8" fill="var(--primary)"/><circle cx="41" cy="5" r="1.4" fill="var(--primary)"/><circle cx="40" cy="12" r="1.2" fill="var(--primary)"/></svg>';}
+function deck(s){s=s||44;return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 48 48" aria-hidden="true" style="flex:none"><rect x="5" y="17" width="38" height="12" rx="6" fill="var(--yellow)" stroke="var(--ink)" stroke-width="2.5" transform="rotate(-12 24 23)"/><circle cx="14" cy="36" r="4" fill="var(--primary)" stroke="var(--ink)" stroke-width="2"/><circle cx="33" cy="32" r="4" fill="var(--primary)" stroke="var(--ink)" stroke-width="2"/></svg>';}
+return {DEV,ic,spray,stars,tape,btn,kb,chrome,zoneHtml,map,mbx,header,sheet,confirmSheet,confirmDialog,cone,spraycan,deck};
+})();
+
+
+/* ===== GP-106: criar e editar pico (+ busca de lugar no web) ===== */
+var APP=(function(){
+'use strict';
+const {ic,spray,tape,btn,kb,chrome,map,mbx,header,sheet,confirmSheet,confirmDialog,cone,spraycan,deck}=GP;
+const STATES=[
+ ['Criar pico - passo 1 (local)',[
+  ['p1Vazio','Passo 1 - sem pontos, painel compacto'],
+  ['p1Pontos','Passo 1 - 4 pontos, pode continuar'],
+  ['p1Exp','Passo 1 - painel expandido (todas as ferramentas)'],
+  ['p1Toast','Passo 1 - toast visível'],
+  ['p1Perm','Passo 1 - localização negada (sheet)'],
+  ['p1Desc','Passo 1 - descartar o local (sheet / Dialog)']]],
+ ['Criar pico - passo 2 (detalhes)',[
+  ['p2','Passo 2 - repouso'],
+  ['p2Kb','Passo 2 - teclado aberto no Nome'],
+  ['p2Foto','Passo 2 - escolher foto: câmera ou galeria (sheet)'],
+  ['p2Foto130','Passo 2 - escolher foto com fonte a 130%'],
+  ['p2Erro','Passo 2 - erros de validação'],
+  ['p2Env','Passo 2 - enviando'],
+  ['p2Falha','Passo 2 - falha ao criar'],
+  ['p2Desc','Passo 2 - descartar cadastro (sheet / Dialog)']]],
+ ['Editar pico',[
+  ['ed','Editar - repouso (com alteração)'],
+  ['edKb','Editar - teclado aberto na Descrição'],
+  ['edFotoMin','Editar - tentar remover a última foto'],
+  ['edDesc','Editar - descartar alterações (sheet / Dialog)'],
+  ['edLocal','Alterar local - painel compacto'],
+  ['edLocalExp','Alterar local - painel expandido'],
+  ['edLocalDesc','Alterar local - descartar alteração']]],
+ ['Home web (complemento)',[
+  ['webBusca','Busca de lugar no web (lista inline com identidade)']]]
+];
+const LEG=[['Z0','status bar / notch'],['Z1','header da tela'],['Z2','coluna de controles do mapa'],['Z3','logo e atribuição Mapbox'],['Z4','toast'],['Z5','sheet / Dialog'],['Z6','rodapé de ação fixo'],['Z7','teclado'],['Z8','mira (centro da área livre)']];
+
+/* ---------- fotos simuladas ---------- */
+const PH=[['#9AA3AB','#5F6870'],['#C9B8A0','#7A6A55'],['#8FA7B8','#4C6270']];
+function photo(i,w,h){const p=PH[i%3];return '<svg width="'+w+'" height="'+h+'" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="display:block"><rect width="100" height="100" fill="'+p[0]+'"/><path d="M0 70 L100 55 L100 100 L0 100Z" fill="'+p[1]+'"/><path d="M10 64 L70 54 L70 60 L10 70Z" fill="#E6E2DA"/><rect x="20" y="64" width="3" height="10" fill="#333"/><rect x="60" y="57" width="3" height="10" fill="#333"/><circle cx="80" cy="22" r="9" fill="#F5E7B0" opacity=".8"/></svg>';}
+
+/* ---------- passo 1 (mobile) ---------- */
+function polyPts(n,cx,cy){const P=[[-62,-42],[54,-56],[72,30],[-40,52],[2,74]];return P.slice(0,n).map(p=>[cx+p[0],cy+p[1]]);}
+function step1(d,o){/* o: points, exp, toast, overlay, edit */
+  const H=d.top+64, panelH=(o.exp?306:156)+d.bot, pTop=d.h-panelH;
+  const cy=Math.round((H+pTop)/2), cx=Math.round(d.w/2);
+  const colB=pTop-16, colT=colB-104, showCol=(colT-(H+16))>=0;
+  const logoT=pTop-8-20;
+  let h='<div class="a" style="inset:0;z-index:0">'+map(d.w,d.h)+'</div>';
+  // polígono
+  const pts=polyPts(o.points,cx,cy);
+  if(pts.length){let svg='<svg class="a" width="'+d.w+'" height="'+d.h+'" style="left:0;top:0;z-index:5" aria-hidden="true">';
+    if(pts.length>=3)svg+='<polygon points="'+pts.map(p=>p.join(',')).join(' ')+'" fill="var(--primary)" fill-opacity=".22" stroke="var(--primary)" stroke-width="2.5"/>';
+    else if(pts.length===2)svg+='<line x1="'+pts[0][0]+'" y1="'+pts[0][1]+'" x2="'+pts[1][0]+'" y2="'+pts[1][1]+'" stroke="var(--primary)" stroke-width="2.5" stroke-dasharray="6 4"/>';
+    pts.forEach((p,i)=>{svg+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="10" fill="var(--surface)" stroke="var(--ink)" stroke-width="3"/><text x="'+p[0]+'" y="'+(p[1]+4)+'" font:="" font-family="Inter" font-size="10" font-weight="700" text-anchor="middle" fill="var(--text)">'+(i+1)+'</text>';});
+    h+=svg+'</svg>';}
+  // mira
+  h+='<div class="a" style="left:'+(cx-22)+'px;top:'+(cy-22)+'px;width:44px;height:44px;z-index:6" aria-hidden="true"><svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="13" fill="none" stroke="#fff" stroke-width="5"/><circle cx="22" cy="22" r="13" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-dasharray="5 3"/><path d="M22 2v12M22 30v12M2 22h12M30 22h12" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path d="M22 3v11M22 30v11M3 22h11M30 22h11" stroke="var(--primary-text)" stroke-width="2.5" stroke-linecap="round"/></svg></div>';
+  h+=mbx(8,logoT);
+  // coluna de controles
+  if(showCol)h+='<div class="a" style="right:16px;top:'+colT+'px;width:48px;display:flex;flex-direction:column;gap:8px;z-index:10"><button class="ctl" aria-label="Desfazer último ponto"'+(o.points?'':' disabled')+' data-act="undo">'+ic('undo',24)+'</button><button class="ctl" aria-label="Centralizar na minha localização">'+ic('locate',24)+'</button></div>';
+  // header
+  const hd=header(d,{title:o.edit?'Alterar local':'Marque o local',backGo:o.points&&!o.edit?'p1Desc':(o.edit?'edLocalDesc':''),right:o.edit?'':tape('1 de 2')});
+  h+=hd.html;
+  // painel (sheet persistente, sem véu)
+  const ok=o.points>=3;
+  let body='<div class="sheet-body" style="gap:12px">';
+  body+='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:40px"><div><b style="font:600 16px/22px Inter" aria-live="polite">'+(o.points===0?'Nenhum ponto marcado':o.points+(o.points===1?' ponto marcado':' pontos marcados'))+'</b><div class="caption">'+(ok?'Pode ajustar ou seguir.':'Marque pelo menos 3 pontos')+'</div></div>'+(ok?'<span class="mchip">'+ic('check',14)+' Local fechado</span>':'')+'</div>';
+  if(o.exp){
+    body+='<p style="margin:0;font:400 14px/20px Inter;color:var(--muted)">Toque no mapa para marcar os cantos do pico ou use a mira. Arraste um ponto para ajustar.</p>';
+    body+='<div style="display:flex;gap:8px;align-items:center;font:500 14px/20px Inter">'+ic('pin',18)+'<span>Perto de R. Augusta, 1200 · São Paulo</span></div>';
+    body+='<div style="display:flex;gap:8px">'+btn('Limpar','danger-ghost',{icon:'trash',disabled:!o.points,style:'flex:1;border:1.5px solid var(--border)'})+btn('Minha posição','ghost',{icon:'locate',style:'flex:1;border:1.5px solid var(--border)'})+'</div>';
+  }
+  body+='<div style="display:flex;gap:8px">'+btn('Adicionar ponto','secondary',{icon:'plus',act:'add',style:'flex:1;padding:0 10px'})+btn(o.edit?'Usar este local':'Continuar','primary',{disabled:!ok,go:o.edit?'ed':'p2',style:'flex:1;padding:0 10px'})+'</div></div>';
+  h+='<div class="a sheet stk-edge" style="top:'+pTop+'px;height:'+panelH+'px;z-index:25" aria-label="Ferramentas do local"><button class="handle" aria-label="'+(o.exp?'Recolher':'Expandir')+' ferramentas" data-go="'+(o.edit?(o.exp?'edLocal':'edLocalExp'):(o.exp?'p1Pontos':'p1Exp'))+'"></button>'+body+'</div>';
+  const zones=[{n:'Z0',y0:0,y1:d.top},{n:'Z1 header',y0:d.top,y1:H},{n:'Z5 painel',y0:pTop,y1:d.h-d.bot},{n:'Z8 mira',y0:cy-22,y1:cy+22,x0:cx-22,x1:cx+22},{n:'Z3',y0:logoT,y1:logoT+20,x0:8,x1:110}];
+  if(showCol)zones.push({n:'Z2',y0:colT,y1:colB,x0:d.w-16-48,x1:d.w-16});
+  if(d.bot)zones.push({n:'Z0 base',y0:d.h-d.bot,y1:d.h});
+  // toast
+  if(o.toast){const tb=logoT-8,tt=tb-72;h+='<div class="a toast" style="left:16px;width:'+(d.w-16-16-48-8)+'px;top:'+tt+'px">'+ic('alert',20,{stroke:'var(--error)'})+'<div>Não foi possível achar sua localização. Tente de novo.</div></div>';zones.push({n:'Z4 toast',y0:tt,y1:tb,x0:16,x1:d.w-16-48-8});}
+  // sobreposições modais
+  if(o.overlay==='desc'){const sh=270+d.bot;h+=sheet(d,{top:d.h-sh,veilTop:H,caution:true,closeGo:o.edit?'edLocal':'p1Pontos',html:confirmSheet(o.edit?{title:'Descartar a alteração do local?',body:'O pico continua com o local de antes.',danger:'Descartar',dangerGo:'ed',cancelGo:'edLocal'}:{title:'Descartar o local marcado?',body:'Os '+o.points+' pontos que você marcou vão se perder.',danger:'Descartar',dangerGo:'p1Vazio',cancelGo:'p1Pontos'})});zones.push({n:'Z5 sheet modal',y0:d.h-sh,y1:d.h-d.bot});}
+  if(o.overlay==='perm'){const sh=262+d.bot;h+=sheet(d,{top:d.h-sh,veilTop:H,closeGo:'p1Pontos',html:'<div class="sheet-body"><div style="display:flex;gap:12px">'+deck(44)+'<div><h3 style="margin:0;font:700 20px/28px Inter">Ative a localização</h3><p style="margin:6px 0 0;font:400 16px/24px Inter;color:var(--muted)">Assim dá para marcar o pico onde você está. Ative nos ajustes do aparelho.</p></div></div>'+btn('Abrir ajustes','primary')+btn('Agora não','ghost',{go:'p1Pontos'})+'</div>'});zones.push({n:'Z5 sheet modal',y0:d.h-sh,y1:d.h-d.bot});}
+  h+=chrome(d);
+  return {html:h,zones};}
+
+/* ---------- formulário (passo 2 e editar) ---------- */
+function formContent(w,o){/* o: edit, focus, errors, sending, scale */
+  const ro=o.sending?'opacity:.6;':'';const nPh=o.edit?3:(o.errors?0:2);
+  let c='<div style="padding:16px;'+ro+'">';
+  // local
+  c+='<div style="display:flex;gap:12px;align-items:center;padding:8px;border:1.5px solid var(--divider);border-radius:12px;background:var(--surface);min-height:88px"><div style="width:72px;height:72px;border-radius:6px;overflow:hidden;flex:none;position:relative">'+map(72,72,{seed:3})+'<svg class="a" style="left:0;top:0" width="72" height="72"><polygon points="18,20 54,16 58,50 22,56" fill="var(--primary)" fill-opacity=".3" stroke="var(--primary)" stroke-width="2"/></svg></div><div style="flex:1;min-width:0"><b style="font:600 16px/22px Inter">Local marcado</b><div class="caption">'+(o.edit?5:4)+' pontos · R. Augusta</div></div><button class="lnk" data-go="'+(o.edit?'edLocal':'p1Pontos')+'">'+(o.edit?'Alterar local':'Alterar')+'</button></div>';
+  // fotos
+  c+='<div style="margin-top:20px;display:flex;justify-content:space-between;align-items:baseline"><span class="lbl" style="margin:0">Fotos</span><span class="caption">'+nPh+' de 5 · até 5 MB cada</span></div>';
+  if(o.web){
+    c+='<div style="margin-top:8px;height:120px;border:2px dashed '+(o.drag?'var(--primary)':(o.errors?'var(--error)':'var(--outline)'))+';border-radius:12px;background:'+(o.drag?'color-mix(in srgb,var(--yellow) 28%,var(--surface))':'var(--sunken)')+';display:flex;align-items:center;justify-content:center;gap:16px;font:500 15px Inter;color:var(--text)">'+(o.drag?'<span style="display:flex;gap:10px;align-items:center;font-weight:700">'+ic('upload',24)+'Solte para adicionar 2 fotos</span>':ic('upload',24)+'<span>Arraste as fotos aqui ou</span>'+btn('Escolher no computador','secondary',{style:'width:auto'}))+'</div>';
+    c+='<div style="display:flex;gap:8px;margin-top:10px">';
+    for(let i=0;i<nPh;i++)c+='<div style="width:120px;height:84px;border-radius:6px;overflow:hidden;position:relative">'+photo(i,120,84)+(i===0?'<span class="a" style="left:4px;bottom:4px">'+tape('Capa',-4)+'</span>':'')+'<span class="a" style="top:4px;right:4px;width:28px;height:28px;border-radius:50%;background:var(--surface);border:2px solid var(--outline);display:grid;place-items:center">'+ic('x',16)+'</span></div>';
+  } else {
+  const tw=Math.floor((w-32-16)/3);
+  c+='<div style="display:grid;grid-template-columns:repeat(3,'+tw+'px);gap:8px;margin-top:8px">';
+  for(let i=0;i<nPh;i++){c+='<div style="position:relative;height:100px;border-radius:6px;overflow:hidden">'+photo(i,tw,100)+(i===0?'<span class="a" style="left:4px;bottom:6px">'+tape('Capa',-4)+'</span>':'')+'<button class="a" aria-label="Remover foto '+(i+1)+'" '+(o.edit&&o.edit!=='min'?'':'')+' style="top:2px;right:2px;width:44px;height:44px;border:0;background:none;display:grid;place-items:center;padding:0" data-go="'+(o.edit?'edFotoMin':'')+'"><span style="width:28px;height:28px;border-radius:50%;background:var(--surface);border:2px solid var(--outline);display:grid;place-items:center;color:var(--text)">'+ic('x',16)+'</span></button></div>';}
+  if(nPh<5)c+='<button style="height:100px;border-radius:6px;border:2px dashed '+(o.errors?'var(--error)':'var(--outline)')+';background:var(--sunken);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--text);font:600 14px Inter" data-go="'+(o.edit?'':'p2Foto')+'">'+ic('camera',24)+'Adicionar</button>';
+  }
+  c+='</div>';
+  if(o.errors)c+='<div class="err">'+ic('alert',14)+'Adicione ao menos 1 foto.</div>';
+  else if(o.edit==='min')c+='<div class="err">'+ic('alert',14)+'O pico precisa ter ao menos 1 foto.</div>';
+  // campos
+  const nm=o.edit?'Praça Roosevelt':(o.focus==='nome'?'Praça Roo':'');
+  c+='<div class="field" style="margin-top:20px"><label class="lbl">Nome</label><div class="input'+(o.focus==='nome'?' focus':'')+(o.errors?' bad':'')+(nm?'':' ph')+'">'+(nm||'Ex.: Praça Roosevelt')+(o.focus==='nome'?'<span class="caret"></span>':'')+'</div>'+(o.errors?'<div class="err">'+ic('alert',14)+'Informe o nome do pico.</div>':'<div class="help">Até 80 caracteres</div>')+'</div>';
+  const ds=o.edit?'Pico clássico do centro. Bancos de granito, escada de 5 e gap pro asfalto. Melhor de manhã.'+(o.focus==='desc'?' Chão liso depois da<span class="caret"></span>':''):'';
+  c+='<div class="field"><label class="lbl">Descrição</label><div class="input ta'+(o.focus==='desc'?' focus':'')+(ds?'':' ph')+'" style="min-height:'+(o.focus==='desc'?120:96)+'px">'+(ds||'Como é o chão, obstáculos, melhor horário...')+'</div><div class="help" style="display:flex;justify-content:space-between"><span>Obrigatório</span><span>'+(ds?118:0)+'/1000</span></div></div>';
+  c+='<div class="field"><span class="lbl">Modalidade</span><div style="display:flex;flex-wrap:wrap;gap:8px">'+['Street','Park','Bowl/Pool','Vertical','Downhill','Mista'].map((m,i)=>'<span class="stk'+((o.edit||o.focus)&&i===0?' on':'')+'">'+((o.edit||o.focus)&&i===0?ic('check',16):'')+m+'</span>').join('')+'</div></div>';
+  c+='<div class="field"><span class="lbl">Entrada</span><div class="seg"><button class="on">Gratuito</button><button>Pago</button></div></div>';
+  c+='<div class="swrow"><span>Aberto 24 horas</span><span class="sw on"></span></div>';
+  c+='<div class="cbrow"><span class="cb on">'+ic('check',16)+'</span>Coberto</div><div class="cbrow"><span class="cb"></span>Exige equipamento de proteção</div>';
+  c+='</div>';return c;}
+function form(d,o){/* o: edit, focus, scroll, overlay, errors, sending, fail */
+  const H=d.top+64;const k=o.focus?kb(d):null;
+  const footBase=72+(o.fail?76:0);
+  const footTop=k?k.top-footBase:d.h-d.bot-footBase-(d.bot?0:0);
+  const footH=k?footBase:footBase+d.bot;
+  let h='<div class="a" style="left:0;right:0;top:'+H+'px;height:'+(footTop-H)+'px;overflow:hidden;background:var(--bg)"><div style="transform:translateY(-'+(o.scroll||0)+'px)">'+formContent(d.w,o)+'</div></div>';
+  const hd=header(d,{title:o.edit?'Editar pico':'Detalhes do pico',backGo:o.edit?'edDesc':'p2Desc',right:o.edit?'':tape('2 de 2')});h+=hd.html;
+  // rodapé fixo
+  let f='<div class="a" style="left:0;right:0;top:'+footTop+'px;height:'+footH+'px;background:var(--surface);border-top:2px solid var(--outline);padding:12px 16px;z-index:28;display:flex;flex-direction:column;gap:12px">';
+  if(o.fail)f+='<div class="banner" role="alert" style="padding:8px 10px">'+ic('alert',18,{cls:'ico'})+'<div style="font-size:13px;line-height:18px">'+(o.edit?'Não foi possível salvar.':'Não foi possível criar o pico.')+' Seus dados foram mantidos. <button class="lnk" style="min-height:0;font-size:13px">Tentar novamente</button></div></div>';
+  f+=btn(o.sending?(o.edit?'Salvando...':'Criando pico...'):(o.edit?'Salvar alterações':'Criar pico'),'primary',{loading:o.sending,go:o.errors===false?'':''})+'</div>';
+  h+=f;
+  const zones=[{n:'Z0',y0:0,y1:d.top},{n:'Z1 header',y0:d.top,y1:H},{n:'Z6 rodapé',y0:footTop,y1:footTop+footBase}];
+  if(k){h+=k.html;zones.push({n:'Z7 teclado',y0:k.top,y1:d.h-d.bot});}
+  if(d.bot&&!(k&&d.id==='notch'))zones.push({n:'Z0 base',y0:d.h-d.bot,y1:d.h});
+  if(o.overlay==='foto'){const big=o.big;const sh=(big?406:344)+d.bot;
+    const body='<div class="sheet-body" style="gap:12px"><div class="halftone"></div><div class="st-title"><div style="position:relative"><div class="pmt">Adicionar foto</div>'+spray(110,9)+'</div><button class="xbtn" aria-label="Fechar" data-go="p2">'+ic('x',24)+'</button></div><div class="caption" style="'+(big?'font-size:15px;line-height:20px':'')+'">Faltam 3 de 5 fotos · até 5 MB cada</div>'+
+      '<button class="optrow">'+'<span class="oi">'+ic('camera',22)+'</span><span style="flex:1"><b style="'+(big?'font-size:20px;line-height:26px':'')+'">Tirar foto</b><small style="'+(big?'font-size:15px;line-height:20px':'')+'">Abre a câmera do aparelho</small></span>'+ic('chevR',20)+'</button>'+
+      '<button class="optrow">'+'<span class="oi" style="transform:rotate(2deg)">'+ic('image',22)+'</span><span style="flex:1"><b style="'+(big?'font-size:20px;line-height:26px':'')+'">Escolher da galeria</b><small style="'+(big?'font-size:15px;line-height:20px':'')+'">Até 3 fotos de uma vez</small></span>'+ic('chevR',20)+'</button>'+
+      btn('Cancelar','secondary',{go:'p2'})+'</div>';
+    h+=sheet(d,{top:d.h-sh,veilTop:H,closeGo:'p2',html:body});zones.push({n:'Z5 sheet modal',y0:d.h-sh,y1:d.h-d.bot});}
+  if(o.overlay==='desc'){const sh=270+d.bot;const c=o.edit?{title:'Descartar alterações?',body:'As mudanças que você fez neste pico não serão salvas.',danger:'Descartar',cancelGo:'ed'}:{title:'Descartar este cadastro?',body:'O local, as fotos e os dados que você preencheu vão se perder.',danger:'Descartar',cancelGo:'p2',dangerGo:'p1Vazio'};
+    h+=sheet(d,{top:d.h-sh,veilTop:H,caution:true,closeGo:c.cancelGo,html:confirmSheet(c)});zones.push({n:'Z5 sheet modal',y0:d.h-sh,y1:d.h-d.bot});}
+  h+=chrome(d,{kb:!!k});
+  return {html:h,zones};}
+
+/* ---------- mobile por estado ---------- */
+function mobile(st,d,S){
+  switch(st){
+    case 'p1Vazio':return step1(d,{points:0});
+    case 'p1Pontos':return step1(d,{points:S.points||4});
+    case 'p1Exp':return step1(d,{points:S.points||4,exp:true});
+    case 'p1Toast':return step1(d,{points:2,toast:true});
+    case 'p1Perm':return step1(d,{points:2,overlay:'perm'});
+    case 'p1Desc':return step1(d,{points:4,overlay:'desc'});
+    case 'p2':return form(d,{});
+    case 'p2Kb':return form(d,{focus:'nome',scroll:262});
+    case 'p2Foto':return form(d,{overlay:'foto'});
+    case 'p2Foto130':return form(d,{overlay:'foto',big:true});
+    case 'p2Erro':return form(d,{errors:true,scroll:100});
+    case 'p2Env':return form(d,{sending:true,scroll:0});
+    case 'p2Falha':return form(d,{fail:true,scroll:0});
+    case 'p2Desc':return form(d,{overlay:'desc'});
+    case 'ed':return form(d,{edit:true});
+    case 'edKb':return form(d,{edit:true,focus:'desc',scroll:494});
+    case 'edFotoMin':return form(d,{edit:'min',scroll:60});
+    case 'edDesc':return form(d,{edit:true,overlay:'desc'});
+    case 'edLocal':return step1(d,{points:5,edit:true});
+    case 'edLocalExp':return step1(d,{points:5,edit:true,exp:true});
+    case 'edLocalDesc':return step1(d,{points:5,edit:true,overlay:'desc'});
+    case 'webBusca':return {html:'<div class="a" style="inset:0;display:grid;place-items:center;padding:24px;text-align:center;font:500 14px/20px Inter;color:var(--muted)">Estado só do web.<br>No mobile a busca já está no protótipo da Home (estado "Teclado aberto na busca"): lista inline sob o campo, exceção D39.</div>',zones:[]};
+  }
+  return {html:'',zones:[]};}
+
+/* ---------- web ---------- */
+function wHeader(w){return '<div class="a wheader"><div style="display:flex;align-items:center;gap:10px"><span class="pm" style="font-size:26px">GoPicos</span></div><div style="display:flex;gap:12px;align-items:center"><span class="caption">Marina S.</span><span class="avatar">M</span></div></div>';}
+function wStep1(w,H,o){let h='<div class="a" style="left:0;top:64px">'+map(w,H-64,{seed:1})+'</div>'+wHeader(w);
+  const pw=360,px=16,top=80;const cx=Math.round((px+pw+16+w)/2),cy=Math.round((64+H)/2);
+  const pts=polyPts(o.points,cx,cy).map(p=>[cx+(p[0]-cx)*1.6,cy+(p[1]-cy)*1.6]);
+  if(pts.length){let svg='<svg class="a" width="'+w+'" height="'+H+'" style="left:0;top:0;z-index:5">';if(pts.length>=3)svg+='<polygon points="'+pts.map(p=>p.join(',')).join(' ')+'" fill="var(--primary)" fill-opacity=".22" stroke="var(--primary)" stroke-width="2.5"/>';pts.forEach((p,i)=>svg+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="10" fill="var(--surface)" stroke="var(--ink)" stroke-width="3"/><text x="'+p[0]+'" y="'+(p[1]+4)+'" font-family="Inter" font-size="10" font-weight="700" text-anchor="middle" fill="var(--text)">'+(i+1)+'</text>');h+=svg+'</svg>';}
+  h+='<div class="a" style="left:'+(cx-22)+'px;top:'+(cy-22)+'px;z-index:6"><svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="13" fill="none" stroke="#fff" stroke-width="5"/><circle cx="22" cy="22" r="13" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-dasharray="5 3"/><path d="M22 3v11M22 30v11M3 22h11M30 22h11" stroke="var(--primary-text)" stroke-width="2.5" stroke-linecap="round"/></svg></div>';
+  const ok=o.points>=3;
+  let p='<div class="a wpanel" style="left:'+px+'px;top:'+top+'px;width:'+pw+'px;bottom:16px;display:flex;flex-direction:column;overflow:hidden"><div class="halftone a" style="right:0;top:0;width:120px;height:90px"></div><div style="padding:20px 20px 0;flex:1;display:flex;flex-direction:column;gap:14px;position:relative">';
+  if(!o.edit)p+='<div>'+tape('1 de 2')+'</div>';
+  p+='<div><div class="pm" style="font-size:30px;line-height:36px">'+(o.edit?'Alterar local':'Marque o local do pico')+'</div>'+spray(120,10)+'</div>';
+  p+='<p style="margin:0;font:400 15px/22px Inter;color:var(--muted)">Clique no mapa para marcar os cantos. Arraste um ponto para ajustar. <b style="color:var(--text)">Ctrl+Z</b> desfaz.</p>';
+  if(o.perm)p+='<div class="banner info">'+ic('info',18,{cls:'ico'})+'<div>A localização está bloqueada neste navegador. Libere nas configurações do site para usar sua posição.</div></div>';
+  p+='<div><b style="font:600 16px Inter">'+(o.points?o.points+' pontos marcados':'Nenhum ponto marcado')+'</b> '+(ok?'<span class="mchip" style="margin-left:6px">'+ic('check',14)+' Local fechado</span>':'<div class="caption">Marque pelo menos 3 pontos</div>')+'</div>';
+  p+='<div style="display:flex;gap:8px;align-items:center;font:500 14px Inter">'+ic('pin',18)+'Perto de R. Augusta, 1200 · São Paulo</div>';
+  p+=btn('Adicionar ponto no centro do mapa','secondary',{icon:'plus'})+'<div style="display:flex;gap:8px">'+btn('Desfazer','ghost',{icon:'undo',style:'border:1.5px solid var(--border)'})+btn('Limpar','danger-ghost',{icon:'trash',style:'border:1.5px solid var(--border)'})+'</div>'+btn('Usar minha posição','ghost',{icon:'locate',style:'border:1.5px solid var(--border)'});
+  p+='</div><div style="padding:16px 20px;border-top:2px solid var(--outline)">'+btn(o.edit?'Usar este local':'Continuar','primary',{disabled:!ok,go:o.edit?'ed':'p2'})+'</div></div>';
+  h+=p;
+  h+='<div class="a" style="right:24px;bottom:24px;display:flex;flex-direction:column;gap:8px;z-index:10"><button class="ctl" aria-label="Aproximar">'+ic('plus',24)+'</button><button class="ctl" aria-label="Afastar">'+ic('minus',24)+'</button><button class="ctl" aria-label="Centralizar na minha localização">'+ic('locate',24)+'</button></div>';
+  h+=mbx(px+pw+24,H-32);
+  const zones=[{n:'Z1 header',y0:0,y1:64},{n:'Z5 painel',y0:top,y1:H-16,x0:px,x1:px+pw},{n:'Z2',y0:H-24-160,y1:H-24,x0:w-24-48,x1:w-24},{n:'Z8 mira',y0:cy-22,y1:cy+22,x0:cx-22,x1:cx+22},{n:'Z3',y0:H-32,y1:H-12,x0:px+pw+24,x1:px+pw+140}];
+  if(o.toast){h+='<div class="a toast" style="left:'+(px+pw+24)+'px;bottom:48px;width:380px">'+ic('alert',20,{stroke:'var(--error)'})+'<div>Não foi possível achar sua localização. Tente de novo.</div></div>';zones.push({n:'Z4 toast',y0:H-48-72,y1:H-48,x0:px+pw+24,x1:px+pw+24+380});}
+  if(o.desc){h+='<div class="a wveil" style="left:0;right:0;top:64px;bottom:0"></div><div class="a dlg" role="alertdialog" style="left:'+(w/2-220)+'px;top:'+(64+(H-64)/2-130)+'px;width:440px">'+confirmDialog(o.edit?{title:'Descartar a alteração do local?',body:'O pico continua com o local de antes.',danger:'Descartar',cancelGo:'edLocal',dangerGo:'ed'}:{title:'Descartar o local marcado?',body:'Os 4 pontos que você marcou vão se perder.',danger:'Descartar',cancelGo:'p1Pontos',dangerGo:'p1Vazio'})+'</div>';zones.push({n:'Z5 Dialog',y0:64+(H-64)/2-130,y1:64+(H-64)/2+120,x0:w/2-220,x1:w/2+220});}
+  return {html:h,zones};}
+function wForm(w,H,o){const cw=560,cx=(w-cw)/2;const footH=72+(o.fail?64:0);
+  let c='<div style="width:'+cw+'px;margin:0 auto;padding:28px 0 24px;position:relative">';
+  if(!o.edit)c+='<div style="margin-bottom:10px">'+tape('Passo 2 de 2')+'</div>';
+  c+='<div class="pm" style="font-size:34px;line-height:40px">'+(o.edit?'Editar pico':'Detalhes do pico')+'</div>'+spray(150,11);
+  c+='<div style="height:20px"></div>';
+  let fc=formContent(cw+32,Object.assign({web:true},o));
+  const _unused='<div style="margin-top:8px;height:120px;border:2px dashed '+(o.drag?'var(--primary)':'var(--outline)')+';border-radius:12px;background:'+(o.drag?'color-mix(in srgb,var(--yellow) 28%,var(--surface))':'var(--sunken)')+';display:flex;align-items:center;justify-content:center;gap:16px;font:500 15px Inter;color:var(--text)">'+(o.drag?'<span style="display:flex;gap:10px;align-items:center;font-weight:700">'+ic('upload',24)+'Solte para adicionar 2 fotos</span>':ic('upload',24)+'<span>Arraste as fotos aqui ou</span>'+btn('Escolher no computador','secondary',{style:'width:auto'}))+'</div>';
+  c+=fc.replace('<div style="padding:16px;','<div style="padding:0;');
+  c+='</div>';
+  let h='<div class="a" style="left:0;right:0;top:64px;bottom:'+footH+'px;overflow:hidden"><div class="halftone a" style="right:0;top:0;width:260px;height:200px"></div><div style="transform:translateY(-'+(o.scroll||0)+'px)">'+c+'</div></div>'+wHeader(w);
+  h+='<div class="a" style="left:0;right:0;bottom:0;height:'+footH+'px;background:var(--surface);border-top:2px solid var(--outline);z-index:28"><div style="width:'+cw+'px;margin:0 auto;padding:12px 0;display:flex;flex-direction:column;gap:10px">'+(o.fail?'<div class="banner" role="alert">'+ic('alert',18,{cls:'ico'})+'<div>'+(o.edit?'Não foi possível salvar.':'Não foi possível criar o pico.')+' Seus dados foram mantidos. <button class="lnk" style="min-height:0">Tentar novamente</button></div></div>':'')+'<div style="display:flex;justify-content:space-between;gap:12px">'+btn(o.edit?'Cancelar':'Voltar','ghost',{style:'width:auto;border:1.5px solid var(--border)',go:o.edit?'edDesc':'p1Pontos'})+btn(o.sending?(o.edit?'Salvando...':'Criando pico...'):(o.edit?'Salvar alterações':'Criar pico'),'primary',{loading:o.sending,style:'width:auto;min-width:200px'})+'</div></div></div>';
+  const zones=[{n:'Z1 header',y0:0,y1:64},{n:'Z6 rodapé',y0:H-footH,y1:H}];
+  if(o.desc){const c2=o.edit?{title:'Descartar alterações?',body:'As mudanças que você fez neste pico não serão salvas.',danger:'Descartar',cancelGo:'ed'}:{title:'Descartar este cadastro?',body:'O local, as fotos e os dados que você preencheu vão se perder.',danger:'Descartar',cancelGo:'p2',dangerGo:'p1Vazio'};
+    h+='<div class="a wveil" style="left:0;right:0;top:64px;bottom:0"></div><div class="a dlg" role="alertdialog" style="left:'+(w/2-220)+'px;top:'+(64+(H-64)/2-130)+'px;width:440px">'+confirmDialog(c2)+'</div>';zones.push({n:'Z5 Dialog',y0:64+(H-64)/2-130,y1:64+(H-64)/2+120,x0:w/2-220,x1:w/2+220});}
+  return {html:h,zones};}
+function wBusca(w,H){let h='<div class="a" style="left:72px;top:64px">'+map(w-72,H-64,{seed:2})+'</div>'+wHeader(w);
+  h+='<div class="a wrail"><button class="witem on">'+ic('map',24)+'Mapa</button><button class="witem"><span class="newstk">'+ic('plus',22)+'</span>Novo pico</button><button class="witem">'+ic('user',24)+'Perfil</button></div>';
+  const x=96,y=88,sw=420;
+  h+='<div class="a" style="left:'+x+'px;top:'+y+'px;width:'+sw+'px;z-index:22"><div class="input focus" role="combobox" aria-expanded="true" style="box-shadow:var(--shadow2)">'+ic('search',20)+'<span>praça roo<span class="caret"></span></span><span style="flex:1"></span>'+ic('x',18)+'</div>';
+  h+='<div role="listbox" aria-label="Lugares encontrados" style="margin-top:8px;background:var(--surface);border:2px solid var(--outline);border-radius:12px;box-shadow:4px 4px 0 var(--stk);overflow:hidden">';
+  h+='<div style="padding:10px 14px 6px;display:flex;justify-content:space-between;align-items:center"><span class="caption" style="font-weight:700">LUGARES</span><span class="caption">↑ ↓ para navegar · Enter escolhe · Esc fecha</span></div>';
+  [['Praça Roosevelt','Consolação, São Paulo - SP'],['Praça Roosevelt, 100','República, São Paulo - SP'],['Rua Praça Roosevelt','Curitiba - PR'],['Praça Roosevelt','Campinas - SP'],['Praça Rooselvelt (Metrô)','São Paulo - SP']].forEach((r,i)=>{h+='<div role="option" aria-selected="'+(i===0)+'" style="display:flex;gap:12px;align-items:center;min-height:56px;padding:8px 14px;border-top:1px solid var(--divider);position:relative;'+(i===0?'background:var(--primary-soft)':'')+'">'+(i===0?'<span class="a" style="left:0;top:8px;bottom:8px;width:4px;background:var(--primary)"></span>':'')+ic('pin',20)+'<div><b style="font:600 16px/22px Inter;display:block">'+r[0]+'</b><span class="caption">'+r[1]+'</span></div></div>';});
+  h+='</div></div>';
+  h+='<div class="a" style="left:'+x+'px;top:'+(y+56)+'px;display:flex;gap:12px;align-items:center;z-index:20;opacity:.35"><span class="ctl" style="width:auto;padding:0 14px;gap:8px;display:flex">Filtros</span></div>';
+  h+='<div class="a" style="right:24px;bottom:24px;display:flex;flex-direction:column;gap:8px;z-index:10">'+['layers','locate','plus','minus'].map(n=>'<span class="ctl">'+ic(n==='layers'?'map':n,24)+'</span>').join('')+'</div>';
+  return {html:h,zones:[{n:'Z1 header',y0:0,y1:64},{n:'Z5 lista inline',y0:y+56,y1:y+56+8+30+5*57,x0:x,x1:x+sw},{n:'Z2',y0:H-24-216,y1:H-24,x0:w-72,x1:w-24}]};}
+function web(st,w,H,S){
+  switch(st){
+    case 'p1Vazio':return wStep1(w,H,{points:0});
+    case 'p1Pontos':case 'p1Exp':return wStep1(w,H,{points:4});
+    case 'p1Toast':return wStep1(w,H,{points:2,toast:true});
+    case 'p1Perm':return wStep1(w,H,{points:2,perm:true});
+    case 'p1Desc':return wStep1(w,H,{points:4,desc:true});
+    case 'p2':case 'p2Kb':return wForm(w,H,{focus:st==='p2Kb'?'nome':null});
+    case 'p2Foto':case 'p2Foto130':return wForm(w,H,{drag:true});
+    case 'p2Erro':return wForm(w,H,{errors:true});
+    case 'p2Env':return wForm(w,H,{sending:true});
+    case 'p2Falha':return wForm(w,H,{fail:true});
+    case 'p2Desc':return wForm(w,H,{desc:true});
+    case 'ed':case 'edKb':return wForm(w,H,{edit:true,focus:st==='edKb'?'desc':null,scroll:st==='edKb'?300:0});
+    case 'edFotoMin':return wForm(w,H,{edit:'min'});
+    case 'edDesc':return wForm(w,H,{edit:true,desc:true});
+    case 'edLocal':case 'edLocalExp':return wStep1(w,H,{points:5,edit:true});
+    case 'edLocalDesc':return wStep1(w,H,{points:5,edit:true,desc:true});
+    case 'webBusca':return wBusca(w,H);
+  }}
+
+/* ---------- notas ---------- */
+const N={
+ p1Vazio:'<b>Passo 1, sem pontos.</b> Header com título de tela em Permanent Marker + spray e a fita "Passo 1 de 2" (Inter 13/700 sobre amarelo, 11,57:1). O painel é um <b>sheet persistente sem véu</b> (o mapa continua usável) com 2 alturas: compacto (156 + inset) e expandido (306 + inset). Desfazer e Localização saem do painel e viram a <b>coluna de controles</b> (mesmo MapControlButton da Home). A <b>mira fica no centro da área livre</b> (entre o header e o topo do painel), não no centro da tela: hoje ela fica sob o painel no SE.',
+ p1Pontos:'<b>4 pontos.</b> "Continuar" habilita a partir de 3 pontos; o adesivo "Local fechado" confirma (texto + ícone, não só cor). Toque em "Adicionar ponto" para somar um vértice na mira; toque na alça para expandir.',
+ p1Exp:'<b>Painel expandido.</b> Mostra instrução, endereço sugerido, Limpar e Minha posição. A coluna sobe junto e continua 16 acima do painel; se o espaço livre ficar menor que 104 + 32 ela some (nunca fica meio coberta). A mira recentraliza na nova área livre (padding da câmera = altura do painel).',
+ p1Toast:'<b>Toast com o painel aberto.</b> Zona Z4: à esquerda da coluna, 8 acima do logo do Mapbox, até 3 linhas. Nunca cobre o header nem a coluna. Erro sem gíria (D42).',
+ p1Perm:'<b>Localização negada.</b> Igual à Home (UX-H15): sheet com "Abrir ajustes" em vez de toast sem ação. O véu cobre o mapa, <b>não o header</b>: tocar em Voltar fecha o sheet primeiro. No web o navegador controla a permissão, então vira um aviso inline no painel.',
+ p1Desc:'<b>Descartar o local.</b> Confirmação em sheet com a <b>fita zebrada</b> (amarelo + ink) no topo: o sinal de "atenção" da identidade, usado só em confirmações destrutivas. Título e texto em Inter, sem gíria (D42). Foco inicial em "Continuar editando". No web: Dialog 440 com a mesma fita, borda 2 e sombra rígida.',
+ p2:'<b>Passo 2, repouso.</b> O botão "Criar pico" vira <b>rodapé fixo</b> (72 + inset) em vez de ficar no fim da rolagem: com teclado aberto ele precisa continuar visível (CT-SOBREP). Fotos com a fita "Capa" na primeira. Modalidade como adesivos (mesmo FilterChip v3 da Home).',
+ p2Kb:'<b>Teclado aberto no Nome.</b> O rodapé sobe e fica colado no topo do teclado; o formulário rola para o campo focado ficar 16 abaixo do header. SE: header 20 a 84, área do formulário 84 a 335, rodapé 335 a 407, teclado 407 a 667. Android 360 x 640: área 88 a 264, rodapé 264 a 336, teclado 336 a 592, navegação 592 a 640.',
+ p2Foto:'<b>Escolher foto.</b> O Alert.alert vira sheet com título de marca "Adicionar foto", duas opções grandes (64 de altura, ícone em adesivo) e Cancelar. Abrir o sheet fecha o teclado antes. As telas de câmera e galeria continuam nativas (D39). No web não há escolha câmera/galeria: o navegador abre o seletor de arquivos; o estado mostrado é o arrastar-e-soltar com a identidade.',
+ p2Foto130:'<b>Fonte do sistema a 130%.</b> As opções crescem (alvo continua inteiro), o sheet passa de 312 para 372 e continua abaixo do header; se não couber, o conteúdo rola dentro do sheet com Cancelar visível.',
+ p2Erro:'<b>Erros de validação.</b> Ao tocar "Criar pico" com erros, rola até o primeiro campo inválido (Fotos) e anuncia "Corrija os campos destacados". Erro em Inter com ícone, borda de 2 em error (nunca só cor).',
+ p2Env:'<b>Enviando.</b> Botão em loading com a largura mantida, campos somente leitura. Voltar fica desabilitado durante o envio (não abre o descarte).',
+ p2Falha:'<b>Falha ao criar.</b> O AlertBanner entra no rodapé, acima do botão, para ficar visível sem rolar; nada é limpo.',
+ p2Desc:'<b>Descartar cadastro.</b> Mesmo padrão do passo 1 (fita zebrada, Descartar em cima, Continuar editando embaixo, foco inicial no seguro).',
+ ed:'<b>Editar pico.</b> Mesmo formulário, sem fita de passo; rodapé fixo "Salvar alterações". "Alterar local" abre o editor do passo 1 em modo edição.',
+ edKb:'<b>Teclado na Descrição (multilinha).</b> A Descrição cresce até 5 linhas e rola por dentro; o rodapé continua acima do teclado. A tecla Enter quebra linha (não envia).',
+ edFotoMin:'<b>Remover a última foto.</b> A foto não sai; aparece o erro "O pico precisa ter ao menos 1 foto." sob a grade.',
+ edDesc:'<b>Descartar alterações.</b> Sheet com fita zebrada; no web, Dialog vindo do bloqueio de navegação (useBlocker).',
+ edLocal:'<b>Alterar local.</b> Editor do passo 1 com o polígono atual; o botão principal é "Usar este local"; sem fita de passo.',
+ edLocalExp:'<b>Alterar local, painel expandido.</b>',
+ edLocalDesc:'<b>Descartar a alteração do local.</b> Volta ao formulário com o polígono antigo.',
+ webBusca:'<b>Busca de lugar no web.</b> O Dialog "Locais encontrados" sai: os resultados viram uma <b>lista inline (combobox)</b> sob o campo, como no mobile (D39) e na picos.md 9. Identidade: borda 2, sombra rígida, opção ativa com barra laranja. Cobre a linha de Filtros só enquanto aberta; Esc ou clicar fora fecha.'
+};
+function note(st){return (N[st]||'')+'<div class="caption" style="margin-top:8px">Spec: docs/design/specs/criar-editar-pico.md. Ligue "Mostrar zonas reservadas" para ver Z0 a Z8.</div>';}
+function act(a,S){if(a==='add'){S.points=Math.min(5,(S.points||(S.state==='p1Vazio'?0:4))+1);if(S.state==='p1Vazio')S.state='p1Pontos';}
+  if(a==='undo'){S.points=Math.max(0,(S.points||4)-1);if(S.points===0)S.state='p1Vazio';}}
+return {title:'Criar e editar pico',subtitle:'Protótipo da spec criar-editar-pico.md. #183 (GP-106)',states:STATES,legend:LEG,mobile,web,note,act,initial:{points:0}};
+})();
+
+/* ===== motor do protótipo ===== */
+(function(){
+'use strict';
+const ZC={Z0:'#7C3AED',Z1:'#DB2777',Z2:'#0891B2',Z3:'#65A30D',Z4:'#EA580C',Z5:'#2563EB',Z6:'#9333EA',Z7:'#DC2626',Z8:'#0D9488'};
+const S=window.S=Object.assign({theme:'light',state:APP.states[0][1][0][0],zones:false},APP.initial||{});
+function allStates(){const a=[];APP.states.forEach(g=>g[1].forEach(s=>a.push(s)));return a;}
+function readHash(){const p=new URLSearchParams(location.hash.slice(1));if(p.get('estado'))S.state=p.get('estado');if(p.get('tema'))S.theme=p.get('tema')==='escuro'?'dark':'light';if(p.get('zonas'))S.zones=p.get('zonas')==='1';}
+function writeHash(){history.replaceState(null,'','#estado='+S.state+'&tema='+(S.theme==='dark'?'escuro':'claro')+(S.zones?'&zonas=1':''));}
+function bar(){let h='<h1><span class="pm" style="font-size:26px">GoPicos</span><span>'+APP.title+'<small>'+APP.subtitle+'</small></span></h1>';
+  h+='<div class="pb-group"><span>Tema</span><div class="pb-seg" id="pb-theme"><button data-v="light">Claro</button><button data-v="dark">Escuro</button></div></div>';
+  h+='<div class="pb-group"><span>Estado exibido</span><div class="pb-nav"><button id="pb-prev" aria-label="Estado anterior">◀</button><select id="pb-state" aria-label="Estado exibido">';
+  APP.states.forEach(g=>{h+='<optgroup label="'+g[0]+'">';g[1].forEach(s=>h+='<option value="'+s[0]+'">'+s[1]+'</option>');h+='</optgroup>';});
+  h+='</select><button id="pb-next" aria-label="Próximo estado">▶</button></div></div>';
+  h+='<label class="pb-check"><input type="checkbox" id="pb-zones"> Mostrar zonas reservadas</label>';
+  document.getElementById('bar').innerHTML=h;
+  document.querySelectorAll('#pb-theme button').forEach(b=>b.onclick=()=>{S.theme=b.dataset.v;render();});
+  document.getElementById('pb-state').onchange=e=>{S.state=e.target.value;render();};
+  document.getElementById('pb-zones').onchange=e=>{S.zones=e.target.checked;render();};
+  const step=k=>{const a=allStates().map(s=>s[0]);let i=a.indexOf(S.state)+k;if(i<0)i=a.length-1;if(i>=a.length)i=0;S.state=a[i];render();};
+  document.getElementById('pb-prev').onclick=()=>step(-1);document.getElementById('pb-next').onclick=()=>step(1);}
+function render(){
+  document.documentElement.dataset.theme=S.theme;
+  document.querySelectorAll('#pb-theme button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===S.theme)));
+  document.getElementById('pb-state').value=S.state;document.getElementById('pb-zones').checked=S.zones;
+  const n=APP.note(S.state,S);document.getElementById('note').innerHTML=n;
+  let lg='';(APP.legend||[]).forEach(z=>lg+='<span><i style="border-color:'+ZC[z[0]]+';background:'+ZC[z[0]]+'22"></i>'+z[0]+' '+z[1]+'</span>');
+  document.getElementById('legend').innerHTML=lg;document.getElementById('legend').style.display=S.zones?'flex':'none';
+  let ph='';(APP.devices||['se','and','notch']).forEach(id=>{const d=GP.DEV[id];const r=APP.mobile(S.state,d,S);
+    let inner=r.html;if(S.zones)(r.zones||[]).forEach(z=>{z.c=z.c||ZC[z.n.split(' ')[0]];inner+=GP.zoneHtml(z);});
+    ph+='<figure class="device"><div class="bezel '+id+'"><div class="screen" style="width:'+d.w+'px;height:'+d.h+'px">'+inner+'</div></div><figcaption>'+d.label+'<small>'+d.sub+'</small></figcaption></figure>';});
+  document.getElementById('phones').innerHTML=ph;
+  let wb='';(APP.webWidths||[1280]).forEach(w=>{const H=w<640?740:(w<1024?900:800);const r=APP.web(S.state,w,H,S);if(!r)return;
+    let inner=r.html;if(S.zones)(r.zones||[]).forEach(z=>{z.c=z.c||ZC[z.n.split(' ')[0]];inner+=GP.zoneHtml(z);});
+    const maxW=Math.min(1200,document.body.clientWidth-48);const sc=Math.min(1,maxW/w);
+    wb+='<figure class="webbox" style="margin:0"><div class="webclip" style="width:'+(w*sc)+'px;height:'+(H*sc)+'px"><div class="web" style="width:'+w+'px;height:'+H+'px;transform:scale('+sc+')">'+inner+'</div></div><figcaption>Web '+w+' x '+H+(sc<1?' (exibido a '+Math.round(sc*100)+'%)':'')+'</figcaption></figure>';});
+  document.getElementById('webs').innerHTML=wb||'<p class="caption">Sem frame web neste estado.</p>';
+  writeHash();}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-go],[data-act]');if(!t||t.closest('.proto-bar'))return;
+  if(t.dataset.act&&APP.act){APP.act(t.dataset.act,S);render();return;}
+  if(t.dataset.go){S.state=t.dataset.go;render();window.scrollTo({top:0,behavior:'smooth'});}});
+window.addEventListener('resize',()=>render());
+readHash();bar();render();
+})();
+
+</script>
+</body>
+</html>
