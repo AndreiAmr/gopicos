@@ -10,4 +10,5 @@ export const mapColors = {
   pinBorder: '#7D858C',
   pinText: '#18181B',
   pinSelectedBorder: '#18181B',
+  clusterStroke: '#18181B',
 } as const;

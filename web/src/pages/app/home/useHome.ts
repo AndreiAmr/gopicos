@@ -17,7 +17,9 @@ import {
 import { URL } from '@/routes/url';
 import { loadViewport, saveViewport } from '@/utils/mapViewport';
 import type { ViewStateChangeEvent } from 'react-map-gl/mapbox';
-import { announceSpot, cycleSpot } from './logic';
+import { CLUSTER_SOURCE_ID } from '@/components/map/spotsLayers/constants';
+import type { GeoJSONSource } from 'mapbox-gl';
+import { announceSpot, cycleSpot, pickClickTarget } from './logic';
 
 export const useHome = () => {
   const dispatch = useDispatch();
@@ -84,11 +86,37 @@ export const useHome = () => {
     }
   }, []);
 
-  const handleMapClick = useCallback((event: MapMouseEvent) => {
-    const id = event.features?.find((feature) => feature.properties?.id)
-      ?.properties?.id;
-    setSelectedId(id ? String(id) : null);
-  }, []);
+  // Cluster: aproxima até expandi-lo (animação curta; sem animação com
+  // "reduzir movimento"). Não abre o resumo.
+  const zoomIntoCluster = useCallback(
+    (clusterId: number, center: [number, number]) => {
+      const map = mapRef.current?.getMap();
+      const source = map?.getSource(CLUSTER_SOURCE_ID) as
+        | GeoJSONSource
+        | undefined;
+      source?.getClusterExpansionZoom(clusterId, (error, zoom) => {
+        if (error || zoom == null) return;
+        if (prefersReducedMotion()) {
+          map?.jumpTo({ center, zoom });
+        } else {
+          map?.easeTo({ center, zoom, duration: 400 });
+        }
+      });
+    },
+    [],
+  );
+
+  const handleMapClick = useCallback(
+    (event: MapMouseEvent) => {
+      const target = pickClickTarget(event.features);
+      if (target.kind === 'cluster') {
+        zoomIntoCluster(target.clusterId, target.center);
+      } else {
+        setSelectedId(target.kind === 'spot' ? target.id : null);
+      }
+    },
+    [zoomIntoCluster],
+  );
 
   const visibleSpots = useCallback(() => {
     const drawable = drawableSpots(spots);

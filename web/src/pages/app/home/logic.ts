@@ -35,3 +35,32 @@ export const announceSpot = (
   position: number,
   total: number,
 ): string => `Pico ${position} de ${total}: ${spot.name}`;
+
+type ClickFeature = {
+  properties?: Record<string, unknown> | null;
+  geometry?: { type?: string; coordinates?: unknown } | null;
+};
+
+export type ClickTarget =
+  | { kind: 'cluster'; clusterId: number; center: [number, number] }
+  | { kind: 'spot'; id: string }
+  | { kind: 'none' };
+
+/** O que um clique no mapa atingiu: cluster (aproxima), pico (seleciona) ou nada (fecha). */
+export const pickClickTarget = (
+  features: ClickFeature[] | null | undefined,
+): ClickTarget => {
+  const cluster = features?.find((feature) => feature.properties?.cluster);
+  if (cluster) {
+    const coordinates = cluster.geometry?.coordinates as number[] | undefined;
+    if (coordinates && coordinates.length >= 2) {
+      return {
+        kind: 'cluster',
+        clusterId: Number(cluster.properties?.cluster_id),
+        center: [coordinates[0], coordinates[1]],
+      };
+    }
+  }
+  const spot = features?.find((feature) => feature.properties?.id);
+  return spot ? { kind: 'spot', id: String(spot.properties?.id) } : { kind: 'none' };
+};
