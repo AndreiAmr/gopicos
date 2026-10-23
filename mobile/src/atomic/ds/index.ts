@@ -28,6 +28,7 @@ export {
   SwitchRow,
 } from './molecules/FormControls';
 export { PhotoPicker } from './molecules/PhotoPicker';
+export { InfoRow } from './molecules/InfoRow';
 export { Toast, ToastProvider, useToast } from './molecules/Toast';
 export { AlertBanner } from './auth/AlertBanner';
 export { TextLink } from './auth/TextLink';

@@ -1,6 +1,9 @@
 import { prisma, useTestDatabase } from '../test/db';
 import { createSpot, createUser, tokenFor } from '../test/factories';
 import { executeAnonymous, executeAuthenticated } from '../test/graphql';
+import { fakeUpload } from '../test/uploads';
+
+jest.mock('cloudinary', () => require('../test/uploads').cloudinaryMock());
 
 const CREATE_SPOT = `mutation { createSpot(input: { name: "Pico", description: "d", modality: "street", isPaid: false, alwaysOpen: true, coordinates: { type: "Polygon", coordinates: [[[-46.65, -23.55], [-46.64, -23.55], [-46.64, -23.56], [-46.65, -23.55]]] } }) { id name } }`;
 const createReview = (spotId: string, extra = '') =>
@@ -22,7 +25,11 @@ describe('proteção das operações de pico (integração)', () => {
   it('createSpot salva com authorId igual ao id do token', async () => {
     const user = await createUser();
 
-    const res = await executeAuthenticated(tokenFor(user), CREATE_SPOT);
+    const res = await executeAuthenticated(
+      tokenFor(user),
+      `mutation ($images: [Upload!]) { createSpot(input: { name: "Pico", description: "d", modality: "street", isPaid: false, alwaysOpen: true, images: $images, coordinates: { type: "Polygon", coordinates: [[[-46.65, -23.55], [-46.64, -23.55], [-46.64, -23.56], [-46.65, -23.55]]] } }) { id name } }`,
+      { images: [fakeUpload()] },
+    );
 
     expect(res.errors).toBeUndefined();
     const saved = await prisma.spot.findUniqueOrThrow({

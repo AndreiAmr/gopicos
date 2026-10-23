@@ -71,8 +71,7 @@ export const useNewSpotLocation = () => {
   // Sair com pontos marcados pede confirmação (voltar, gesto).
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', event => {
-      // RESET vem do sucesso do cadastro (vai ao detalhe do pico novo).
-      if (points.length === 0 || event.data.action.type === 'RESET') return;
+      if (points.length === 0) return;
 
       event.preventDefault();
       Alert.alert(newSpotLocationStrings.discardTitle, undefined, [
