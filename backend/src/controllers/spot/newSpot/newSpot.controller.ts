@@ -1,10 +1,5 @@
-// import FileUpload from 'graphql-upload/index';
 import { IAuthentication } from '../../../models/authentication/authenticationModel';
-import {
-  // newSpotService,
-  newSpotServices,
-} from '../../../services/spot/newSpot/newSpot.service';
-import { cloudinaryModel } from '../../../models/cloudinary/CloudinaryModel';
+import { newSpotServices } from '../../../services/spot/newSpot/newSpot.service';
 
 export type FileUpload = {
   filename: string;
@@ -16,35 +11,21 @@ export type FileUpload = {
 export type NewSpotInput = {
   name: string;
   description: string;
-  images: Promise<FileUpload>[];
+  /** Uploads do graphql-upload (com `.promise`). */
+  images?: unknown[] | null;
   modality: string;
   isPaid: boolean;
   alwaysOpen: boolean;
   hasCoverage: boolean;
   equipmentRequired: boolean;
-  entryAmount?: string;
-  coordinates: number[];
-  openingHours?: string;
-  markingType: string;
+  entryAmount?: string | null;
+  /** GeoJSON Polygon em ordem [lng, lat]. */
+  coordinates: unknown;
+  openingHours?: string | null;
+  markingType?: string | null;
 };
 
 export const newSpotController = async (
   data: NewSpotInput,
   auth: IAuthentication,
-) => {
-  const result = await newSpotServices.createSpotService({ data, auth });
-
-  let spot = result;
-
-  for (const image of data.images ?? []) {
-    const imageUrl = await cloudinaryModel.uploadImage(
-      image,
-      auth.id,
-      result.id,
-    );
-
-    spot = await newSpotServices.insertSpotImageService(result.id, imageUrl);
-  }
-
-  return spot;
-};
+) => newSpotServices.createSpotService({ data, auth });
