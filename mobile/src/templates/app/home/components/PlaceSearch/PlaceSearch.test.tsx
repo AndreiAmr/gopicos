@@ -50,16 +50,36 @@ const setup = async (over: Partial<typeof mockSearch> = {}) => {
 beforeEach(() => jest.clearAllMocks());
 
 describe('PlaceSearch', () => {
-  it('mostra o campo com o placeholder e a lista só ao focar', async () => {
+  it('focar sem digitar não mostra caixa de resultados (GP-135)', async () => {
     await setup();
 
     expect(screen.getByPlaceholderText('Buscar cidade ou endereço')).toBeTruthy();
     expect(screen.queryByTestId('place-search-list')).toBeNull();
 
     await fireEvent(screen.getByTestId('place-search-input'), 'focus');
-    expect(screen.getByTestId('place-search-list')).toBeTruthy();
+    expect(screen.queryByTestId('place-search-list')).toBeNull();
     expect(screen.getByTestId('place-search-dim')).toBeTruthy();
     expect(screen.getByText('Cancelar')).toBeTruthy();
+  });
+
+  it('nome de lugar já escolhido no campo não abre a caixa ao focar', async () => {
+    await setup({ status: 'idle', text: 'Avenida Paulista' });
+    await fireEvent(screen.getByTestId('place-search-input'), 'focus');
+    expect(screen.queryByTestId('place-search-list')).toBeNull();
+  });
+
+  it('com 1 resultado a caixa tem a altura do conteúdo, sem ocupar o mapa (GP-135)', async () => {
+    await setup({ status: 'ready', text: 'paulista', results: [place] });
+    await fireEvent(screen.getByTestId('place-search-input'), 'focus');
+
+    const list = screen.getByTestId('place-search-list');
+    expect(screen.getAllByTestId('place-result')).toHaveLength(1);
+    const style = Array.isArray(list.props.style)
+      ? Object.assign({}, ...list.props.style)
+      : list.props.style;
+    expect(style.flex).toBeUndefined();
+    expect(style.flexGrow).toBeUndefined();
+    expect(style.flexShrink).toBe(1);
   });
 
   it('mostra a dica com 1 a 2 letras', async () => {
