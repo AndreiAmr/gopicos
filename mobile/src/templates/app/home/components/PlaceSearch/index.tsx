@@ -26,6 +26,8 @@ import { usePlaceSearch } from '../../../../../hooks/query/places/usePlaceSearch
 type PlaceSearchProps = {
   /** Lugar escolhido: a Home centraliza o mapa nele. */
   onSelectPlace: (place: Place) => void;
+  /** Busca focada (teclado aberto): a Home esconde coluna, toast e sheets (Z7). */
+  onFocusChange?: (focused: boolean) => void;
 };
 
 const Row = ({ place, onPress }: { place: Place; onPress: () => void }) => {
@@ -67,7 +69,7 @@ const Row = ({ place, onPress }: { place: Place; onPress: () => void }) => {
  * escurece e a lista de sugestões ocupa do campo até o teclado; "Cancelar"
  * restaura o texto anterior; o return do teclado escolhe a primeira sugestão.
  */
-export const PlaceSearch = ({ onSelectPlace }: PlaceSearchProps) => {
+export const PlaceSearch = ({ onSelectPlace, onFocusChange }: PlaceSearchProps) => {
   const theme = useTheme();
   const search = usePlaceSearch();
   const inputRef = useRef<TextInput>(null);
@@ -113,8 +115,7 @@ export const PlaceSearch = ({ onSelectPlace }: PlaceSearchProps) => {
           left={0}
           right={0}
           bottom={0}
-          backgroundColor="$text"
-          opacity={0.45}
+          backgroundColor="$mapDim"
           onPress={cancel}
           testID="place-search-dim"
         />
@@ -132,7 +133,7 @@ export const PlaceSearch = ({ onSelectPlace }: PlaceSearchProps) => {
               gap={space[2]}
               backgroundColor="$surface"
               borderRadius={radius.md}
-              borderWidth={focused ? 2 : 1}
+              borderWidth={focused ? 2 : 1.5}
               borderColor={focused ? '$focus' : '$border'}
               {...elevation[1]}
             >
@@ -144,8 +145,12 @@ export const PlaceSearch = ({ onSelectPlace }: PlaceSearchProps) => {
                 onFocus={() => {
                   previousText.current = search.text;
                   setFocused(true);
+                  onFocusChange?.(true);
                 }}
-                onBlur={() => setFocused(false)}
+                onBlur={() => {
+                  setFocused(false);
+                  onFocusChange?.(false);
+                }}
                 onSubmitEditing={() => {
                   if (results[0]) choose(results[0]);
                 }}

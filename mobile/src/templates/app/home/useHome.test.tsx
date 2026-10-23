@@ -186,4 +186,57 @@ describe('useHome', () => {
       expect(result.current.applying).toBe(false);
     });
   });
+
+  describe('contagem na área e prévia (spec home.md 6.1 e UX-H19)', () => {
+    const far = {
+      ...spot,
+      id: 'far',
+      modality: 'park',
+      coordinates: {
+        type: 'Polygon',
+        coordinates: [[[10, 10], [10.01, 10], [10.01, 10.01], [10, 10.01], [10, 10]]],
+      },
+    };
+    const area = { ne: [-46.6, -23.5] as [number, number], sw: [-46.7, -23.6] as [number, number] };
+
+    it('conta só os picos da área visível e mostra o vazio da área', async () => {
+      const { result } = await render([
+        { request: { query: spotsQuery }, result: { data: { getAllSpots: [spot, far] } } },
+      ]);
+      await waitFor(() => expect(result.current.spots).toHaveLength(2));
+      expect(result.current.tape.text).toBe('Carregando picos...');
+
+      await act(async () => result.current.setBounds(area));
+      expect(result.current.areaCount).toBe(1);
+      expect(result.current.tape.text).toBe('1 pico na área');
+      expect(result.current.isEmpty).toBe(false);
+
+      await act(async () =>
+        result.current.setBounds({ ne: [0.1, 0.1], sw: [0, 0] }),
+      );
+      expect(result.current.tape.text).toBe('Nenhum pico na área');
+      expect(result.current.isEmpty).toBe(true);
+      expect(result.current.emptyKind).toBe('empty');
+    });
+
+    it('a prévia filtra no cliente sem mudar os filtros aplicados', async () => {
+      const { result } = await render([
+        { request: { query: spotsQuery }, result: { data: { getAllSpots: [spot, far] } } },
+      ]);
+      await waitFor(() => expect(result.current.spots).toHaveLength(2));
+      await act(async () => result.current.setBounds(area));
+
+      await act(async () =>
+        result.current.setPreview({ modalities: ['park'], entry: 'all', coveredOnly: false, minRating: 0 }),
+      );
+      expect(result.current.spots.map(item => item.id)).toEqual(['far']);
+      expect(result.current.tape.text).toBe('0 picos com 1 filtro');
+      expect(result.current.filterCount).toBe(1);
+      expect(result.current.filtersActive).toBe(false);
+
+      await act(async () => result.current.setPreview(null));
+      expect(result.current.spots).toHaveLength(2);
+      expect(result.current.tape.text).toBe('1 pico na área');
+    });
+  });
 });

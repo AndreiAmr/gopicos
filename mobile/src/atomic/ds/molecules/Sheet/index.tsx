@@ -10,6 +10,7 @@ import {
 import { dsStrings } from '../../strings';
 import { Button } from '../../atoms/Button';
 import { Text } from '../../atoms/Text';
+import { BrandTitle } from '../../brand';
 
 /** Superfície do sheet: `surface`, raio `xl` no topo e elevação 3. */
 export const SheetFrame = styled(View, {
@@ -45,6 +46,12 @@ type SheetContentProps = {
   onSecondaryPress?: () => void;
   /** Mostra o botão "X" de fechar no cabeçalho. */
   onClose?: () => void;
+  /** Rótulo do "X" (padrão "Fechar"). */
+  closeLabel?: string;
+  /** Título fixo em Permanent Marker com spray (D43). */
+  brandTitle?: boolean;
+  /** Elemento à direita do título (ex.: ilustração do vazio). */
+  titleAccessory?: ReactNode;
 };
 
 /** Conteúdo padrão de um sheet: título, descrição, corpo e ações. */
@@ -58,6 +65,9 @@ export const SheetContent = ({
   secondaryLabel,
   onSecondaryPress,
   onClose,
+  closeLabel,
+  brandTitle = false,
+  titleAccessory,
 }: SheetContentProps) => {
   const theme = useTheme();
 
@@ -65,15 +75,22 @@ export const SheetContent = ({
     <View gap={space[4]}>
       <View flexDirection="row" alignItems="flex-start" gap={space[2]}>
         <View flex={1} gap={space[1]}>
-          <Text variant="h2" accessibilityRole="header">
-            {title}
-          </Text>
+          {brandTitle ? (
+            <BrandTitle fontSize={24} sprayWidth={80}>
+              {title}
+            </BrandTitle>
+          ) : (
+            <Text variant="h2" accessibilityRole="header">
+              {title}
+            </Text>
+          )}
           {description ? (
             <Text variant="body" tone="muted">
               {description}
             </Text>
           ) : null}
         </View>
+        {titleAccessory}
         {onClose ? (
           <View
             width={size.touch}
@@ -85,7 +102,7 @@ export const SheetContent = ({
             onPress={onClose}
             accessible
             accessibilityRole="button"
-            accessibilityLabel={dsStrings.close}
+            accessibilityLabel={closeLabel ?? dsStrings.close}
             testID="ds-sheet-close"
           >
             <X size={24} color={theme.text.val} />

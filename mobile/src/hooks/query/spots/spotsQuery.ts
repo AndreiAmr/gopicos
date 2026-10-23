@@ -17,6 +17,10 @@ export const spotsQuery: TypedDocumentNode<
       id
       name
       modality
+      description
+      isPaid
+      hasCoverage
+      images
       coordinates
       ratingAverage
       reviewsCount

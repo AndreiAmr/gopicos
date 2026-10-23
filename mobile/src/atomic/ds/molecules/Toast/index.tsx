@@ -124,9 +124,20 @@ export type ToastOptions = {
   duration?: number;
 };
 
+/**
+ * Onde o toast aparece. Padrão: topo da safe area. A Home usa a zona Z4
+ * (embaixo, à esquerda da coluna de controles, spec home.md seção 4):
+ * `bottom` é a distância da base da tela.
+ */
+export type ToastPlacement =
+  | { position: 'top' }
+  | { position: 'bottom'; bottom: number; left: number; right: number };
+
 type ToastContextValue = {
   show: (options: ToastOptions) => void;
   hide: () => void;
+  /** A tela em foco define a zona do toast; `null` volta ao padrão. */
+  setPlacement: (placement: ToastPlacement | null) => void;
 };
 
 const ToastContext = createContext<ToastContextValue | null>(null);
@@ -146,6 +157,11 @@ export const resolveToastDuration = (options: ToastOptions): number => {
 export const ToastProvider = ({ children }: { children: ReactNode }) => {
   const insets = useSafeAreaInsets();
   const [current, setCurrent] = useState<ToastOptions | null>(null);
+  const [placement, setPlacementState] = useState<ToastPlacement | null>(null);
+  const setPlacement = useCallback(
+    (next: ToastPlacement | null) => setPlacementState(next),
+    [],
+  );
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearTimer = () => {
@@ -176,7 +192,18 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => clearTimer, []);
 
-  const value = useMemo(() => ({ show, hide }), [show, hide]);
+  const value = useMemo(
+    () => ({ show, hide, setPlacement }),
+    [show, hide, setPlacement],
+  );
+  const zone =
+    placement?.position === 'bottom'
+      ? {
+          bottom: placement.bottom,
+          left: placement.left,
+          right: placement.right,
+        }
+      : { top: insets.top + space[2], left: space[4], right: space[4] };
 
   return (
     <ToastContext.Provider value={value}>
@@ -184,11 +211,10 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
       {current ? (
         <View
           position="absolute"
-          top={insets.top + space[2]}
-          left={space[4]}
-          right={space[4]}
+          {...zone}
           zIndex={zIndex.toast}
           pointerEvents="box-none"
+          testID="ds-toast-zone"
         >
           <Toast
             type={current.type}

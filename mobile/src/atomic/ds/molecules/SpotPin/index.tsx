@@ -1,5 +1,10 @@
-import { View } from 'tamagui';
-import { elevation, radius, space } from '../../../../config/tamagui/tokens';
+import { View, useTheme } from 'tamagui';
+import {
+  fontFamily,
+  space,
+  sticker,
+  stickerShadow,
+} from '../../../../config/tamagui/tokens';
 import {
   SpotSummary,
   pinA11yLabel,
@@ -14,36 +19,57 @@ type SpotPinProps = {
 };
 
 /**
- * Marcador em pílula "★ 4,6" (ou "Novo"). Selecionado: fundo `primary`, texto
- * `onPrimary` e altura maior. A área de toque é 44 (maior que o desenho).
+ * Pin sticker "★ 4,6" ou "Novo" (spec home.md 6.6): pílula `surface` com borda
+ * `sticker-outline` e sombra rígida. Selecionado: 30 de altura, `primary`,
+ * borda 2 `ink`, sombra 3 e giro -3 (a forma muda, não só a cor). Alvo 44.
  */
-export const SpotPin = ({ spot, selected = false, onPress }: SpotPinProps) => (
-  <View
-    minWidth={44}
-    height={44}
-    alignItems="center"
-    justifyContent="center"
-    onPress={onPress}
-    accessible
-    accessibilityRole="button"
-    accessibilityLabel={pinA11yLabel(spot)}
-    accessibilityState={{ selected }}
-    testID={`spot-pin-${spot.id}`}
-  >
+export const SpotPin = ({ spot, selected = false, onPress }: SpotPinProps) => {
+  const theme = useTheme();
+  const label = pinText(spot);
+  const rated = label.startsWith('★');
+  const color = selected ? '$onPrimary' : '$text';
+  return (
     <View
-      height={selected ? 30 : 26}
-      paddingHorizontal={space[2]}
-      borderRadius={radius.full}
-      borderWidth={1.5}
-      borderColor={selected ? '$text' : '$border'}
-      backgroundColor={selected ? '$primary' : '$surface'}
+      minWidth={44}
+      height={44}
       alignItems="center"
       justifyContent="center"
-      {...elevation[1]}
+      onPress={onPress}
+      accessible
+      accessibilityRole="button"
+      accessibilityLabel={pinA11yLabel(spot)}
+      accessibilityState={{ selected }}
+      testID={`spot-pin-${spot.id}`}
     >
-      <Text variant="caption" tone={selected ? 'onPrimary' : 'default'}>
-        {pinText(spot)}
-      </Text>
+      <View
+        height={selected ? 30 : 26}
+        paddingHorizontal={space[2] + 1}
+        borderRadius={selected ? 15 : 13}
+        borderWidth={selected ? sticker.borderWidth : 1.5}
+        borderColor={selected ? '$ink' : '$stickerOutline'}
+        backgroundColor={selected ? '$primary' : '$surface'}
+        alignItems="center"
+        justifyContent="center"
+        rotate={selected ? '-3deg' : '0deg'}
+        boxShadow={stickerShadow(
+          theme.stickerShadow.val,
+          selected ? sticker.shadowOffset : sticker.shadowOffsetSm,
+        )}
+      >
+        <Text
+          fontFamily={fontFamily.bold}
+          fontSize={selected ? 13 : 12}
+          lineHeight={16}
+          color={color}
+        >
+          {rated ? (
+            <Text fontFamily={fontFamily.bold} fontSize={selected ? 13 : 12} color={selected ? color : '$star'}>
+              ★
+            </Text>
+          ) : null}
+          {rated ? label.slice(1) : label}
+        </Text>
+      </View>
     </View>
-  </View>
-);
+  );
+};

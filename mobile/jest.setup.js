@@ -2,6 +2,10 @@
 // Mocks globais para libs nativas usadas pelos componentes do DS.
 require('react-native-gesture-handler/jestSetup');
 
+jest.mock('react-native-worklets', () =>
+  require('react-native-worklets/src/mock'),
+);
+
 jest.mock('react-native-reanimated', () =>
   require('react-native-reanimated/mock'),
 );
@@ -29,3 +33,11 @@ jest.mock('lucide-react-native', () => {
     },
   );
 });
+
+// Persistência da camada do mapa (AsyncStorage) e permissão de localização.
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
+);
+jest.mock('react-native-permissions', () =>
+  require('react-native-permissions/mock'),
+);

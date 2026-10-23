@@ -12,25 +12,33 @@ import {
 import {
   NO_FILTERS,
   SpotFilters,
+  activeFilterCount,
+  applyFilters as filterSpots,
   filterByModalities,
   hasActiveFilters,
   sameFilters,
+  scoreTape,
   toQueryFilter,
 } from '../../../domain/spot/filters';
+import { MapBounds, countInArea } from '../../../domain/map/area';
 import { CameraTarget, Place, cameraTarget } from '../../../domain/place/place';
 import type { RootStackParamList } from '../../../routes/types';
 
 export const homeStrings = {
-  loading: 'Carregando picos...',
-  error: 'Não foi possível carregar os picos. Verifique sua conexão.',
+  error: 'Não foi possível carregar os picos.',
+  offline: 'Sem conexão. Os picos não foram atualizados.',
+  retry: 'Tentar novamente',
   mapError: 'Não foi possível carregar o mapa. Tente novamente mais tarde.',
-  emptyTitle: 'Nenhum pico por aqui ainda',
-  emptyDescription: 'Seja o primeiro a cadastrar um pico nesta região.',
+  emptyTitle: 'Nenhum pico por aqui',
+  emptyDescription: 'Conhece um pico nessa área? Marca ele aí pra galera.',
   emptyAction: 'Cadastrar o primeiro pico',
-  filteredEmptyTitle: 'Nenhum pico com esses filtros.',
+  filteredEmptyTitle: 'Nada com esses filtros',
   filteredEmptyDescription: 'Tente mudar ou limpar os filtros.',
   filteredEmptyAction: 'Limpar filtros',
   createSpot: 'Cadastrar novo pico',
+  summary: 'Resumo do pico',
+  closeSummary: 'Fechar resumo',
+  viewDetails: 'Ver detalhes',
 } as const;
 
 export const useHome = () => {
@@ -44,23 +52,32 @@ export const useHome = () => {
     spots: fetchedSpots,
     loading,
     error,
+    offline,
     unauthenticated,
     refetch,
   } = useSpotsQuery(toQueryFilter(filters));
+  // Todos os picos, sem filtro: base da prévia ao vivo dos filtros (UX-H19).
+  // Sem filtro ativo é a mesma consulta (o Apollo não repete a requisição).
+  const { spots: allSpots } = useSpotsQuery(null);
   // O backend filtra uma modalidade; o OU entre várias é feito aqui.
   const spots = useMemo(
     () => filterByModalities(fetchedSpots, filters.modalities),
     [fetchedSpots, filters.modalities],
   );
 
+  /** Rascunho do sheet de filtros aberto (prévia); `null` fora do sheet. */
+  const [preview, setPreview] = useState<SpotFilters | null>(null);
+  /** Área visível do mapa, atualizada quando a câmera para. */
+  const [bounds, setBounds] = useState<MapBounds | null>(null);
+
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [userPosition, setUserPosition] = useState<[number, number] | null>(
     null,
   );
-  // Controla o sheet do estado vazio. O vazio é um estado persistente (não um
-  // evento): abrimos quando ele aparece e deixamos o usuário fechar por gesto.
   const [placeTarget, setPlaceTarget] = useState<CameraTarget | null>(null);
   const [reduceMotion, setReduceMotion] = useState(false);
+  // Controla o sheet do estado vazio. O vazio é um estado persistente (não um
+  // evento): abrimos quando ele aparece e deixamos o usuário fechar por gesto.
   const [emptySheetOpen, setEmptySheetOpen] = useState(true);
 
   useEffect(() => {
@@ -83,9 +100,16 @@ export const useHome = () => {
     }
   }, [unauthenticated, navigation]);
 
+  // Com o sheet de filtros aberto, os pins e a contagem mostram a prévia.
+  const shownSpots = useMemo(
+    () => (preview ? filterSpots(allSpots, preview) : spots),
+    [preview, allSpots, spots],
+  );
+  const shownFilters = preview ?? filters;
+
   const selected = useMemo(
-    () => spots.find(spot => spot.id === selectedId) ?? null,
-    [spots, selectedId],
+    () => shownSpots.find(spot => spot.id === selectedId) ?? null,
+    [shownSpots, selectedId],
   );
 
   const distanceLabel = useMemo(() => {
@@ -130,7 +154,23 @@ export const useHome = () => {
     [filters],
   );
 
-  const empty = !loading && !error && spots.length === 0;
+  const firstLoad = loading && spots.length === 0;
+  const hasError = error && !unauthenticated;
+  const areaCount = countInArea(shownSpots, bounds);
+  const filterCount = activeFilterCount(shownFilters);
+  const tape = scoreTape({
+    loading: firstLoad,
+    updating: applying,
+    count: areaCount,
+    filterCount,
+  });
+
+  // "Vazio" é da área visível; antes de saber a área, da lista inteira.
+  const empty =
+    !firstLoad &&
+    !hasError &&
+    !applying &&
+    (bounds ? areaCount === 0 : spots.length === 0);
 
   // Enquanto o vazio persistir, cada nova transição para "vazio" reabre o
   // sheet. Fechar por gesto é respeitado até a Home sair e voltar ao vazio.
@@ -141,16 +181,29 @@ export const useHome = () => {
   }, [empty]);
 
   return {
-    spots,
+    spots: shownSpots,
+    allSpots,
     selected,
     selectedId,
     distanceLabel,
     // Mostra "Carregando" só na primeira carga; depois mantém o último resultado.
-    loading: loading && spots.length === 0,
-    hasError: error && !unauthenticated,
+    loading: firstLoad,
+    hasError,
+    offline,
     isEmpty: empty,
+    emptyKind: hasActiveFilters(shownFilters)
+      ? ('filtered' as const)
+      : ('empty' as const),
     filters,
+    shownFilters,
     filtersActive: hasActiveFilters(filters),
+    filterCount,
+    preview,
+    setPreview,
+    bounds,
+    setBounds,
+    areaCount,
+    tape,
     applying,
     applyFailed,
     dismissApplyFailed: () => setApplyFailed(false),
@@ -162,6 +215,7 @@ export const useHome = () => {
     },
     placeTarget,
     placeAnimationMs: reduceMotion ? 0 : 800,
+    reduceMotion,
     selectPlace: (place: Place) => {
       setSelectedId(null);
       setPlaceTarget(cameraTarget(place));
@@ -169,6 +223,7 @@ export const useHome = () => {
     clearSelection: () => setSelectedId(null),
     emptySheetOpen,
     dismissEmptySheet: () => setEmptySheetOpen(false),
+    userPosition,
     setUserPosition,
     openDetails,
     createSpot,
