@@ -30,6 +30,9 @@ type PlaceSearchProps = {
   onFocusChange?: (focused: boolean) => void;
 };
 
+/** A lista não cresce além do conteúdo (a caixa acompanha os resultados). */
+const listScrollStyle = { flexGrow: 0 };
+
 const Row = ({ place, onPress }: { place: Place; onPress: () => void }) => {
   const theme = useTheme();
   const context = placeContext(place);
@@ -66,8 +69,10 @@ const Row = ({ place, onPress }: { place: Place; onPress: () => void }) => {
 
 /**
  * Busca de cidade ou endereço no topo do mapa (spec 9 e 7). Ao focar, o mapa
- * escurece e a lista de sugestões ocupa do campo até o teclado; "Cancelar"
- * restaura o texto anterior; o return do teclado escolhe a primeira sugestão.
+ * escurece; a caixa de sugestões só aparece com texto digitado e tem a altura
+ * do conteúdo (rola se passar do espaço até o teclado), sem cobrir o mapa
+ * (GP-135). "Cancelar" restaura o texto anterior; o return do teclado escolhe
+ * a primeira sugestão.
  */
 export const PlaceSearch = ({ onSelectPlace, onFocusChange }: PlaceSearchProps) => {
   const theme = useTheme();
@@ -97,6 +102,8 @@ export const PlaceSearch = ({ onSelectPlace, onFocusChange }: PlaceSearchProps) 
   }, [search]);
 
   const { status, results } = search;
+  // Campo vazio (ou nome de um lugar já escolhido): nada para listar.
+  const showList = focused && search.text.trim().length > 0 && status !== 'idle';
 
   return (
     <View
@@ -122,7 +129,14 @@ export const PlaceSearch = ({ onSelectPlace, onFocusChange }: PlaceSearchProps) 
       ) : null}
 
       <SafeAreaView edges={['top']} pointerEvents="box-none" style={{ flex: focused ? 1 : 0 }}>
-        <View paddingHorizontal={space[4]} paddingTop={space[2]} gap={space[2]} flex={focused ? 1 : 0}>
+        {/* box-none: abaixo da caixa, o toque chega ao escurecimento (cancela). */}
+        <View
+          paddingHorizontal={space[4]}
+          paddingTop={space[2]}
+          gap={space[2]}
+          flex={focused ? 1 : 0}
+          pointerEvents="box-none"
+        >
           <View flexDirection="row" alignItems="center" gap={space[2]}>
             <View
               flex={1}
@@ -192,16 +206,16 @@ export const PlaceSearch = ({ onSelectPlace, onFocusChange }: PlaceSearchProps) 
             ) : null}
           </View>
 
-          {focused ? (
+          {showList ? (
             <View
-              flex={1}
+              flexShrink={1}
               backgroundColor="$surface"
               borderRadius={radius.md}
               overflow="hidden"
               marginBottom={space[2]}
               testID="place-search-list"
             >
-              <ScrollView keyboardShouldPersistTaps="handled">
+              <ScrollView keyboardShouldPersistTaps="handled" style={listScrollStyle}>
                 {status === 'hint' ? (
                   <Text variant="caption" tone="muted" padding={space[4]}>
                     {placeStrings.hint}
