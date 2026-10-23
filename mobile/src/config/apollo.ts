@@ -1,8 +1,10 @@
 import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client';
 import { SetContextLink } from '@apollo/client/link/context';
+import { ErrorLink } from '@apollo/client/link/error';
 import { Platform } from 'react-native';
 import { ELoginErrors } from '../hooks/mutation/login/useLoginMutation';
 import { getToken } from '../services/session';
+import { isUnauthenticatedError } from '../services/session/errors';
 import { API_URL } from '@env';
 
 const defaultHost = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
@@ -49,8 +51,26 @@ const authLink = new SetContextLink(async ({ headers }) => {
   };
 });
 
+let onUnauthenticated: (() => void) | null = null;
+
+/**
+ * Registra o que fazer quando o backend recusa a sessão (o App registra
+ * `expireSession`; fica fora daqui para o client não depender da navegação).
+ */
+export const setUnauthenticatedHandler = (handler: (() => void) | null) => {
+  onUnauthenticated = handler;
+};
+
+// Guard global: qualquer `UNAUTHENTICATED` (token ausente, vencido ou
+// revogado), em qualquer tela protegida, aciona o handler registrado.
+const unauthenticatedLink = new ErrorLink(({ error }) => {
+  if (isUnauthenticatedError(error)) {
+    onUnauthenticated?.();
+  }
+});
+
 const apolloClient = new ApolloClient({
-  link: authLink.concat(httpLink),
+  link: unauthenticatedLink.concat(authLink).concat(httpLink),
   cache: new InMemoryCache(),
 });
 
