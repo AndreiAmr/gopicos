@@ -213,7 +213,7 @@ Visual novo:
 
 Gíria (D42) só em vazio e convite ("pra galera", "Marca ele aí"); títulos e erros diretos.
 
-## 10. Web (adaptação, **para aprovação do dono**)
+## 10. Web (adaptação, aprovada pelo dono em 2026-10-23)
 
 A tab bar é só do mobile. No web, o equivalente mínimo, sem novas funcionalidades:
 - **Navegação:** a sidebar que já existe (`AppSidebar`, shadcn) fica com exatamente **3 itens na mesma ordem e com os mesmos ícones**: Mapa, Novo pico (abre `/spot/new-spot`), Perfil. Hoje ela tem "Pesquisar pico", "Lista de picos", "Cadastrar novo pico", "Ver meu perfil"; os dois primeiros saem (a busca já está no mapa). Em >= 1024 a sidebar fica como trilho de 72 com ícone + rótulo `caption`; abaixo de 1024 vira gaveta (já existe). Item ativo: fundo `primary-soft`, traço de spray e peso 700. "Novo pico" com o mesmo sticker laranja da tab bar.
@@ -271,16 +271,18 @@ Por que não "Escuro/Noite" como terceira: o Standard já troca para noite no te
 **UX-H18. Web só adapta a navegação existente.** A sidebar já existe; reduzi-la aos mesmos 3 itens dá paridade sem criar componente novo. Marcado para aprovação.
 **UX-H19. Prévia ao vivo dos filtros.** O dono pediu que marcar um adesivo atualize a contagem do topo. Como todos os picos já estão no cliente, a prévia é grátis e responde "quantos picos vou ver?" antes de aplicar; o "Aplicar" continua existindo para não recarregar a query do backend a cada toque (UX-P14).
 
-## 14. Pendências para o dono
+## 14. Decisões do dono sobre a Home (2026-10-23)
 
-Decididas: D39 a D43 (E8, conforme a recomendação do PO). Restam as escolhas abaixo; **cada uma tem a recomendação como padrão no protótipo e a alternativa alternável no topo dele** (exceto P4, P7 e P8):
-1. **P2. Títulos de seção do filtro:** fita com Inter (recomendado, UX-H8) ou Permanent Marker 24? *Alternável no protótipo.*
-2. **P3. Terceira camada:** Concreto (monocromático, recomendado) ou Noite? *Alternável.*
-3. **P4. Lembrar a camada escolhida:** no aparelho, entre aberturas do app (recomendado) ou só na sessão, como os filtros?
-4. **P5. Rótulo da aba:** "Novo pico" (padrão de frase do DS, recomendado) ou "Novo Pico"? *Alternável.*
-5. **P6. Contagem:** "picos na área" (visível no mapa, recomendado) ou "picos carregados" (total)? *Alternável.*
-6. **P7. Web:** sidebar com os 3 itens (recomendado) ou navegação no topo? Camadas no web como Dialog (regra atual, no protótipo) ou popover não modal?
-7. **P8. Tokens novos** da seção 11 entram no DS v3 (GP-102)?
+O dono aprovou o protótipo ("o protótipo está perfeito"), ou seja, as recomendações padrão abaixo:
+1. **P2. Títulos de seção do filtro:** fita com Inter (UX-H8).
+2. **P3. Terceira camada:** Concreto (monocromático).
+3. **P4. Lembrar a camada escolhida:** **no aparelho**, entre aberturas do app. O dono decidiu explicitamente.
+4. **P5. Rótulo da aba:** "Novo pico".
+5. **P6. Contagem:** "picos na área" (picos visíveis no mapa).
+6. **P7. Web:** sidebar com os 3 itens; camadas como Dialog do Radix com identidade, como no protótipo.
+7. **P8. Tokens novos** da seção 11 entram no DS v3 (GP-102).
+
+Pendente:
 8. **P9. Figma:** desenhar os frames a partir do protótipo quando houver cota (upgrade ou renovação do plano Starter).
 
 ## 15. Fora de escopo / pós-MVP
