@@ -1,5 +1,7 @@
 import { ArrowLeft } from 'lucide-react-native';
+import type { ReactNode, Ref } from 'react';
 import { ScrollView } from 'react-native';
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, useTheme } from 'tamagui';
 import { elevation, radius, space } from '../../../../config/tamagui/tokens';
@@ -71,6 +73,12 @@ type ContentProps = {
   onBack: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  /** Seção "Avaliações", abaixo das ações do autor. */
+  reviewsSection?: ReactNode;
+  /** Barra fixa inferior ("Avaliar este pico"). */
+  bottomBar?: ReactNode;
+  onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  scrollRef?: Ref<ScrollView>;
 };
 
 export const SpotDetailsContent = ({
@@ -78,13 +86,22 @@ export const SpotDetailsContent = ({
   onBack,
   onEdit,
   onDelete,
+  reviewsSection,
+  bottomBar,
+  onScroll,
+  scrollRef,
 }: ContentProps) => {
   const rows = infoRows(spot);
   const hasRating = spot.reviewsCount > 0 && spot.ratingAverage != null;
 
   return (
     <View flex={1} backgroundColor="$bg">
-      <ScrollView contentContainerStyle={{ paddingBottom: space[8] }}>
+      <ScrollView
+        ref={scrollRef}
+        onScroll={onScroll}
+        scrollEventThrottle={100}
+        contentContainerStyle={{ paddingBottom: space[8] }}
+      >
         <Gallery images={spot.images ?? []} spotName={spot.name} />
 
         <View padding={space[4]} gap={space[4]}>
@@ -154,8 +171,12 @@ export const SpotDetailsContent = ({
               </View>
             </View>
           ) : null}
+
+          {reviewsSection}
         </View>
       </ScrollView>
+
+      {bottomBar}
 
       <SafeAreaView
         edges={['top']}
