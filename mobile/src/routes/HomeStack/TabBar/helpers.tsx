@@ -6,7 +6,6 @@ type TabInfoProps = {
   Icon: LucideIcon;
 };
 
-const defaultIconSize = 15;
 
 const HomeTabInfo: TabInfoProps = {
   label: 'Mapa',
@@ -28,3 +27,10 @@ export const tabInfoMapper = new Map<string, TabInfoProps>([
   [Route.Profile, ProfileTabInfo],
   [Route.NewSpot, NewSpotTabInfo],
 ]);
+
+/** Telas de formulário do Perfil: a TabBar some para dar espaço ao teclado (UX-P4). */
+export const PROFILE_FORM_SCREENS = ['ProfileEdit', 'ChangePassword', 'DeleteAccount'];
+
+export const shouldHideTabBar = (focusedRouteName?: string): boolean =>
+  focusedRouteName !== undefined &&
+  PROFILE_FORM_SCREENS.includes(focusedRouteName);

@@ -1,0 +1,9 @@
+input ChangePasswordInput {
+  currentPassword: String!
+  newPassword: String!
+}
+
+extend type Mutation {
+  # Mantém a sessão atual e não invalida tokens (D33).
+  changePassword(props: ChangePasswordInput!): Response @Authenticated
+}

@@ -226,7 +226,6 @@ export const NewSpotDetailsTemplate = () => {
             <Button
               className="self-start bg-yellow-400 mt-5 hover:bg-yellow-500"
               onClick={() => {
-                console.log('clicking');
                 handleSubmit(submitHandler)();
               }}
               disabled={isLoading}

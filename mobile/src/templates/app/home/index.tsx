@@ -1,11 +1,13 @@
+import { useEffect, useRef } from 'react';
 import { Plus } from 'lucide-react-native';
 import { View, useTheme } from 'tamagui';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import type { BottomSheetModal } from '@gorhom/bottom-sheet';
 import * as S from './styles';
 import { Map } from '../../../components/Map';
 import {
   AlertBanner,
-  EmptyState,
+  BottomSheet,
   SpotPreview,
   Text,
 } from '../../../atomic/ds';
@@ -20,6 +22,23 @@ import { homeStrings, useHome } from './useHome';
 export const HomeTemplate = () => {
   const theme = useTheme();
   const home = useHome();
+  const emptySheetRef = useRef<BottomSheetModal>(null);
+
+  // O vazio é um estado persistente da Home, não um evento: abre ao aparecer
+  // e volta a abrir se o vazio reaparecer depois de fechado por gesto.
+  useEffect(() => {
+    if (home.isEmpty && !home.selected && home.emptySheetOpen) {
+      emptySheetRef.current?.present();
+    }
+  }, [home.isEmpty, home.selected, home.emptySheetOpen]);
+
+  // Sem pico selecionado o resumo some; o sheet do vazio não deve reaparecer
+  // por cima do detalhe enquanto ele estiver aberto.
+  useEffect(() => {
+    if (home.selected) {
+      emptySheetRef.current?.dismiss();
+    }
+  }, [home.selected]);
 
   return (
     <S.Container>
@@ -103,27 +122,15 @@ export const HomeTemplate = () => {
         </View>
       ) : null}
 
-      {home.isEmpty && !home.selected ? (
-        <View
-          position="absolute"
-          left={0}
-          right={0}
-          bottom={0}
-          backgroundColor="$surface"
-          borderTopLeftRadius={radius.xl}
-          borderTopRightRadius={radius.xl}
-          zIndex={zIndex.sheet}
-          {...elevation[3]}
-          testID="home-empty"
-        >
-          <EmptyState
-            title={homeStrings.emptyTitle}
-            description={homeStrings.emptyDescription}
-            actionLabel={homeStrings.emptyAction}
-            onActionPress={home.createSpot}
-          />
-        </View>
-      ) : null}
+      <BottomSheet
+        ref={emptySheetRef}
+        withBackdrop={false}
+        title={homeStrings.emptyTitle}
+        description={homeStrings.emptyDescription}
+        primaryLabel={homeStrings.emptyAction}
+        onPrimaryPress={home.createSpot}
+        onClose={home.dismissEmptySheet}
+      />
     </S.Container>
   );
 };

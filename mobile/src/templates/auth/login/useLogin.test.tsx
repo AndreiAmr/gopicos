@@ -1,6 +1,7 @@
 import { act, renderHook } from '@testing-library/react-native';
 import { useLogin } from './useLogin';
 import { clearSession, saveSession } from '../../../services/session';
+import { loginStrings } from './logic';
 
 const mockReset = jest.fn();
 const mockNavigate = jest.fn();
@@ -96,5 +97,15 @@ describe('useLogin', () => {
     mockParams = { notice: 'sessionExpired' };
     await renderHook(() => useLogin());
     expect(clearSession).toHaveBeenCalled();
+  });
+
+  it('vindo de Excluir conta traz o aviso, o e-mail preenchido e o texto da spec', async () => {
+    mockParams = { email: 'x@y.com', notice: 'accountDeleted' };
+    const { result } = await renderHook(() => useLogin());
+    expect(result.current.notice).toBe('accountDeleted');
+    expect(result.current.control._defaultValues.email).toBe('x@y.com');
+    expect(loginStrings.notices.accountDeleted).toBe(
+      'Conta excluída. Se quiser voltar, entre com seu e-mail e senha e ela será reativada.',
+    );
   });
 });
