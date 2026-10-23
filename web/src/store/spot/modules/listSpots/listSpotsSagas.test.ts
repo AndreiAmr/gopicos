@@ -12,7 +12,7 @@ vi.mock('./listSpotsRepository', () => ({
 }));
 
 const getListSpots = vi.mocked(listSpotsRepository.getListSpots);
-const spots = [{ id: '1', name: 'Praça' }] as unknown as IListSpots;
+const spots = [{ id: '1', name: 'Praça' }] as unknown as IListSpots[];
 
 describe('getListSpotsAsync', () => {
   beforeEach(() => vi.resetAllMocks());
