@@ -1,247 +1,310 @@
-import { Input } from '@/atomic/atoms/input';
-import { InputMask } from '@/atomic/atoms/inputMask';
-import { ImagesSelect } from './ImagesSelect';
-import { Textarea } from '@/atomic/atoms/textarea';
-import { Divisor } from '@/atomic/atoms/divisor';
-import { Map } from '@/components/map';
-import { useNewSpotDetails } from './useNewSpotDetails';
-import { MapPolygon } from '@/components/map/polygon';
-import { OptionProps, Select } from '@/atomic/atoms/select';
-import { Checkbox } from '@/atomic/atoms/checkbox';
+import { Controller } from 'react-hook-form';
+import { Navigate } from 'react-router';
 
-import { formatCurrency } from '@/utils/currency';
-import { Spinner } from '@/atomic/atoms/spinner';
 import { Button } from '@/atomic/atoms/button';
+import { Checkbox } from '@/atomic/atoms/checkbox';
+import { Input } from '@/atomic/atoms/input';
+import { Text } from '@/atomic/atoms/text';
+import { Textarea } from '@/atomic/atoms/textarea';
+import { AlertBanner } from '@/atomic/molecules/alertBanner';
+import { Stepper } from '@/atomic/molecules/stepper';
+import { MODALITY_OPTIONS } from '@/domain/spot/newSpotForm';
+import { cn } from '@/lib/utils';
+import { MiniMap } from '@/pages/app/spot/details/MiniMap';
+import { URL } from '@/routes/url';
 
-const modalityOptions: OptionProps[] = [
-  {
-    label: 'Street',
-    value: 'street',
-  },
-  {
-    label: 'Vertical',
-    value: 'vertical',
-  },
-  {
-    label: 'Ambos',
-    value: 'both',
-  },
-];
+import { PhotoPicker } from './PhotoPicker';
+import { useNewSpotDetails } from './useNewSpotDetails';
+
+type SegmentedProps = {
+  label: string;
+  options: { value: boolean; label: string }[];
+  value: boolean;
+  disabled?: boolean;
+  onChange: (value: boolean) => void;
+};
+
+const Segmented = ({ label, options, value, disabled, onChange }: SegmentedProps) => (
+  <div className="flex flex-col gap-1">
+    <span className="text-body-sm font-semibold text-gp-text">{label}</span>
+    <div role="radiogroup" aria-label={label} className="flex gap-2">
+      {options.map((option) => (
+        <button
+          key={option.label}
+          type="button"
+          role="radio"
+          aria-checked={value === option.value}
+          disabled={disabled}
+          onClick={() => onChange(option.value)}
+          className={cn(
+            'h-11 flex-1 rounded-md border text-body-sm font-semibold outline-none focus-visible:ring-2 focus-visible:ring-gp-focus disabled:opacity-40',
+            value === option.value
+              ? 'border-gp-primary bg-gp-primary text-gp-on-primary'
+              : 'border-gp-border bg-gp-surface text-gp-text',
+          )}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  </div>
+);
 
 export const NewSpotDetailsTemplate = () => {
-  const {
-    mapRef,
-    spotFake,
-    register,
-    isLoadingReverseGeocoding,
-    handleSubmit,
-    errors,
-    setValue,
-    alwaysOpen,
-    equipamentRequired,
-    hasCoverage,
-    isPaid,
-    submitHandler,
-    setSelectedFiles,
-    isLoading,
-  } = useNewSpotDetails();
+  const page = useNewSpotDetails();
+  const { form } = page;
+  const { register, control, formState, watch } = form;
+  const { errors } = formState;
+  const isPaid = watch('isPaid');
+  const alwaysOpen = watch('alwaysOpen');
+  const name = watch('name');
+
+  if (!page.hasLocation) {
+    return <Navigate to={URL.NEW_SPOT} replace />;
+  }
 
   return (
-    <div className="pt-12 pb-10  px-10 bg-gray-50  border ">
-      <h1 className="text-xl font-medium text-gray-800">
-        Escreva as informações sobre o pico
-      </h1>
-      <p className="text-sm text-gray-600">
-        Forneça o máximo de detalhes possíveis para as outras pessoas
-        localizarem o pico com mais facilidade
-      </p>
+    <div className="flex w-full justify-center px-4 py-8">
+      <form
+        noValidate
+        onSubmit={page.submit}
+        className="flex w-full max-w-140 flex-col gap-6"
+      >
+        <Stepper current={2} total={2} />
+        <Text variant="h1" as="h1" className="font-title">
+          Detalhes do pico
+        </Text>
 
-      <div className="flex flex-col gap-6 ">
-        <ImagesSelect
-          error={errors.images?.message}
-          onFilesChange={setSelectedFiles}
-        />
-        <Input
-          label="Nome"
-          placeholder="Digite aqui..."
-          error={errors.name?.message}
-          aria-invalid={!!errors.name?.message}
-          {...register('name', { required: true })}
-        />
-
-        <Textarea
-          label="Descrição"
-          placeholder="Escreva aqui a descrição do pico"
-          {...register('description', { required: true })}
-          error={errors.description?.message}
-          aria-invalid={!!errors.description?.message}
-        />
-        <Divisor className="w-[95%] mx-auto" />
-
-        <h1 className="text-xl font-medium text-gray-800">
-          Informações de endereço
-        </h1>
-
-        <div className="h-70 w-full rounded-xl overflow-hidden shadow-md">
-          <Map mapRef={mapRef} scrollZoom={false} dragPan={false}>
-            <MapPolygon spot={spotFake} />
-          </Map>
-        </div>
-
-        <div className="flex gap-8 ">
-          <Input
-            label="Rua"
-            placeholder="Digite aqui..."
-            className="bg-white shadow "
-            containerStyle="w-full"
-            isLoading={isLoadingReverseGeocoding}
-            {...register('road', { required: true })}
-            error={errors.road?.message}
-            aria-invalid={!!errors.road?.message}
+        <section aria-label="Local marcado" className="flex flex-col gap-2">
+          <MiniMap
+            coordinates={{
+              type: 'Polygon',
+              coordinates: [[...page.points, page.points[0]]],
+            }}
+            name={name.trim() || 'novo pico'}
+            className="h-35"
           />
-          <Input
-            label="Bairro"
-            placeholder="Digite aqui..."
-            className="bg-white shadow "
-            containerStyle="w-full"
-            isLoading={isLoadingReverseGeocoding}
-            {...register('suburb', { required: true })}
-            error={errors.suburb?.message}
-            aria-invalid={!!errors.suburb?.message}
-          />
-        </div>
-
-        <div className="flex gap-8 ">
-          <Input
-            label="Número"
-            placeholder="Digite aqui..."
-            className="bg-white  shadow "
-            containerStyle="w-full"
-            {...register('number')}
-          />
-          <Input
-            label="Complemento"
-            placeholder="Digite aqui..."
-            className="bg-white  shadow "
-            containerStyle="w-full"
-            {...register('complement')}
-          />
-        </div>
-        <Textarea
-          label="Pontos de referência"
-          placeholder="Escreva aqui a descrição do pico"
-          {...register('reference')}
-          error={errors.reference?.message}
-          aria-invalid={!!errors.reference?.message}
-        />
-
-        <Divisor className="w-[95%] mx-auto" />
-
-        <div className="flex flex-col gap-4">
-          <h1 className="text-xl font-medium text-gray-800">Adicionais</h1>
-
-          <Select
-            title="Modalidade"
-            placeholder="Selecione"
-            options={modalityOptions}
-            {...register('modality', { required: true })}
-            error={errors.modality?.message}
-            onChange={(value) => setValue('modality', value)}
-          />
-          <div className="flex flex-col gap-3">
-            <Checkbox
-              id="equipament-required"
-              label="Equipamento de segurança obrigatório"
-              onClick={() =>
-                setValue('equipamentRequired', !equipamentRequired)
-              }
-            />
-            <Checkbox
-              id="entry-paid"
-              label="Entrada paga"
-              onClick={() => setValue('isPaid', !isPaid)}
-            />
-            {isPaid && (
-              <>
-                <InputMask
-                  label="Preço da entrada"
-                  {...register('entryAmount')}
-                  replacement={{ _: /\d/ }}
-                  mask="R$ __________"
-                  placeholder="R$ 0,00"
-                  containerStyle="w-full"
-                  onChange={(e) => {
-                    const formatted = formatCurrency(e.target.value);
-
-                    setValue('entryAmount', formatted);
-                  }}
-                  error={errors.entryAmount?.message}
-                  aria-invalid={!!errors.entryAmount?.message}
-                />
-              </>
-            )}
-            <Checkbox
-              id="always-open"
-              label="Sempre aberto"
-              onClick={() => setValue('alwaysOpen', !alwaysOpen)}
-              defaultChecked={alwaysOpen}
-            />
-
-            {!alwaysOpen && (
-              <div className="flex gap-2  flex-1 ">
-                <Input
-                  label="Das"
-                  type="time"
-                  id="time-picker"
-                  step="1"
-                  defaultValue=""
-                  className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                  containerStyle="w-full"
-                  {...register('openingTime')}
-                  error={errors.openingTime?.message}
-                  aria-invalid={!!errors.openingTime?.message}
-                />
-
-                <Input
-                  label="Até"
-                  type="time"
-                  id="time-picker"
-                  step="1"
-                  defaultValue=""
-                  className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                  containerStyle="w-full"
-                  {...register('closingTime')}
-                  error={errors.closingTime?.message}
-                  aria-invalid={!!errors.closingTime?.message}
-                />
-              </div>
-            )}
-
-            <Checkbox
-              id="has-coverage"
-              label="Tem proteção contra chuva"
-              onClick={() => setValue('hasCoverage', !hasCoverage)}
-            />
-
+          <div className="flex items-center justify-between">
+            <Text variant="body-sm" tone="muted">
+              Local marcado, {page.points.length} pontos
+            </Text>
             <Button
-              className="self-start bg-yellow-400 mt-5 hover:bg-yellow-500"
-              onClick={() => {
-                handleSubmit(submitHandler)();
-              }}
-              disabled={isLoading}
+              type="button"
+              variant="link"
+              size="sm"
+              onClick={page.changeLocation}
+              disabled={page.submitting}
             >
-              {isLoading ? (
-                <>
-                  <Spinner />
-                  Cadastrando
-                </>
-              ) : (
-                'Cadastrar pico'
-              )}
+              Alterar
             </Button>
           </div>
+        </section>
+
+        <PhotoPicker
+          photos={page.photos}
+          error={page.photoError}
+          disabled={page.submitting}
+          onAdd={page.handleAddPhotos}
+          onRemove={page.handleRemovePhoto}
+        />
+
+        <Input
+          id="spot-name"
+          label="Nome"
+          maxLength={80}
+          readOnly={page.submitting}
+          error={errors.name?.message}
+          {...register('name')}
+        />
+
+        <Textarea
+          id="spot-description"
+          label="Descrição"
+          maxLength={1000}
+          readOnly={page.submitting}
+          error={errors.description?.message}
+          aria-invalid={!!errors.description}
+          {...register('description')}
+        />
+
+        <Controller
+          control={control}
+          name="modality"
+          render={({ field }) => (
+            <div className="flex flex-col gap-2">
+              <span
+                id="spot-modality-label"
+                className={cn(
+                  'text-body-sm font-semibold text-gp-text',
+                  errors.modality && 'text-gp-error',
+                )}
+              >
+                Modalidade
+              </span>
+              <div
+                role="radiogroup"
+                aria-labelledby="spot-modality-label"
+                className="flex flex-wrap gap-2"
+              >
+                {MODALITY_OPTIONS.map((option, index) => (
+                  <button
+                    key={option.value}
+                    id={index === 0 ? 'spot-modality' : undefined}
+                    type="button"
+                    role="radio"
+                    aria-checked={field.value === option.value}
+                    disabled={page.submitting}
+                    onClick={() => field.onChange(option.value)}
+                    onBlur={field.onBlur}
+                    className={cn(
+                      'h-11 rounded-full border px-4 text-body-sm font-semibold outline-none focus-visible:ring-2 focus-visible:ring-gp-focus disabled:opacity-40',
+                      field.value === option.value
+                        ? 'border-gp-primary bg-gp-primary text-gp-on-primary'
+                        : 'border-gp-border bg-gp-surface text-gp-text',
+                    )}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+              {errors.modality ? (
+                <p className="text-caption text-gp-error">
+                  {errors.modality.message}
+                </p>
+              ) : null}
+            </div>
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="isPaid"
+          render={({ field }) => (
+            <Segmented
+              label="Entrada"
+              value={field.value}
+              disabled={page.submitting}
+              onChange={field.onChange}
+              options={[
+                { value: false, label: 'Gratuito' },
+                { value: true, label: 'Pago' },
+              ]}
+            />
+          )}
+        />
+        {isPaid ? (
+          <Input
+            id="spot-entryAmount"
+            label="Valor"
+            placeholder="R$ 20"
+            readOnly={page.submitting}
+            error={errors.entryAmount?.message}
+            {...register('entryAmount')}
+          />
+        ) : null}
+
+        <Controller
+          control={control}
+          name="alwaysOpen"
+          render={({ field }) => (
+            <label className="flex min-h-11 cursor-pointer items-center justify-between gap-3">
+              <span className="text-body-sm font-semibold text-gp-text">
+                Aberto 24 horas
+              </span>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={field.value}
+                aria-label="Aberto 24 horas"
+                disabled={page.submitting}
+                onClick={() => field.onChange(!field.value)}
+                className={cn(
+                  'relative h-7 w-12 shrink-0 rounded-full outline-none transition-colors focus-visible:ring-2 focus-visible:ring-gp-focus disabled:opacity-40',
+                  field.value ? 'bg-gp-primary' : 'bg-gp-border',
+                )}
+              >
+                <span
+                  className={cn(
+                    'absolute top-1 left-1 size-5 rounded-full bg-gp-surface shadow-1 transition-transform',
+                    field.value && 'translate-x-5',
+                  )}
+                />
+              </button>
+            </label>
+          )}
+        />
+        {!alwaysOpen ? (
+          <Input
+            id="spot-openingHours"
+            label="Horário de funcionamento"
+            placeholder="Seg a sex, 8h às 22h"
+            readOnly={page.submitting}
+            error={errors.openingHours?.message}
+            {...register('openingHours')}
+          />
+        ) : null}
+
+        <div className="flex flex-col gap-3">
+          <Controller
+            control={control}
+            name="hasCoverage"
+            render={({ field }) => (
+              <Checkbox
+                id="spot-hasCoverage"
+                label="Coberto"
+                checked={field.value}
+                disabled={page.submitting}
+                onCheckedChange={(checked) => field.onChange(checked === true)}
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="equipmentRequired"
+            render={({ field }) => (
+              <Checkbox
+                id="spot-equipmentRequired"
+                label="Exige equipamento de proteção"
+                checked={field.value}
+                disabled={page.submitting}
+                onCheckedChange={(checked) => field.onChange(checked === true)}
+              />
+            )}
+          />
         </div>
-      </div>
+
+        <p className="sr-only" role="status" aria-live="polite">
+          {page.announcement}
+        </p>
+
+        {page.banner ? (
+          <AlertBanner
+            variant="error"
+            action={
+              page.banner.network
+                ? { label: 'Tentar novamente', onClick: () => void page.submit() }
+                : undefined
+            }
+          >
+            {page.banner.message}
+          </AlertBanner>
+        ) : null}
+
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
+          <Button
+            type="button"
+            variant="ghost"
+            size="lg"
+            disabled={page.submitting}
+            onClick={page.changeLocation}
+          >
+            Voltar
+          </Button>
+          <Button type="submit" size="lg" loading={page.submitting}>
+            Criar pico
+          </Button>
+        </div>
+      </form>
     </div>
   );
 };

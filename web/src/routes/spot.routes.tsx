@@ -1,6 +1,7 @@
 import { AppLayout } from '@/pages/_layouts/AppLayout';
 import NewSpotLayout from '@/pages/_layouts/NewSpotLayout';
-import { NewSpot } from '@/pages/app/spot/newSpot';
+import { NewSpotMapTemplate } from '@/templates/spot/newSpot/NewSpotMap';
+import { NewSpotDetailsTemplate } from '@/templates/spot/newSpot/NewSpotDetails';
 import { SpotDetailsPage } from '@/pages/app/spot/details';
 import { RouteObject } from 'react-router';
 
@@ -15,11 +16,11 @@ export const spotRoutes: RouteObject[] = [
         children: [
           {
             path: '/spot/new-spot',
-            element: <NewSpot />,
+            element: <NewSpotMapTemplate />,
           },
           {
             path: '/spot/new-spot/details',
-            element: <>spot details</>,
+            element: <NewSpotDetailsTemplate />,
           },
         ],
       },

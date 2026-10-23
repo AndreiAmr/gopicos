@@ -7,14 +7,16 @@ import type { LngLatBoundsLike } from 'react-map-gl/mapbox';
 import { buildPolygonCollection, polygonRing } from '@/domain/spot/spot';
 import type { SpotCoordinates } from '@/domain/spot/spot';
 import { mapColors } from '@/components/map/colors';
+import { cn } from '@/lib/utils';
 
 type MiniMapProps = {
   coordinates: SpotCoordinates;
   name: string;
+  className?: string;
 };
 
-/** Mini-mapa estático (408x180) com o polígono do pico enquadrado. */
-export const MiniMap = ({ coordinates, name }: MiniMapProps) => {
+/** Mini-mapa estático (408x180 por padrão) com o polígono do pico enquadrado. */
+export const MiniMap = ({ coordinates, name, className }: MiniMapProps) => {
   const data = useMemo(
     () =>
       polygonRing(coordinates)
@@ -39,7 +41,10 @@ export const MiniMap = ({ coordinates, name }: MiniMapProps) => {
 
   return (
     <div
-      className="h-45 w-full overflow-hidden rounded-lg border border-gp-divider"
+      className={cn(
+        'h-45 w-full overflow-hidden rounded-lg border border-gp-divider',
+        className,
+      )}
       role="img"
       aria-label={`Mapa com a área de ${name}`}
     >
