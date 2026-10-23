@@ -48,7 +48,8 @@ const items: NavGroupProps[] = [
       {
         title: 'Ver meu perfil',
         icon: User,
-        tooltip: 'Ver meu perfil tooltip',
+        tooltip: 'Ver meu perfil',
+        linkTo: '/perfil',
       },
     ],
   },

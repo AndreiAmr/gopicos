@@ -7,6 +7,7 @@ import { PageNotFound } from '@/pages/error/PageNotFound';
 import { createBrowserRouter } from 'react-router';
 import { spotRoutes } from './spot.routes';
 import { signUpRoutes } from './auth.routes';
+import { profileRoutes } from './profile.routes';
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,7 @@ const router = createBrowserRouter([
   },
   ...spotRoutes,
   ...signUpRoutes,
+  ...profileRoutes,
 ]);
 
 export { router };
