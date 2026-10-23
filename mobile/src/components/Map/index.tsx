@@ -32,8 +32,6 @@ import {
   pinImageExpression,
 } from './MapImages';
 
-/** A partir deste zoom os polígonos aparecem; mais longe, só os pins. */
-const POLYGON_MIN_ZOOM = 15;
 /** Cluster nativo (spec 11): raio em px e zoom a partir do qual todo pico aparece solto. */
 const CLUSTER_RADIUS = 50;
 const CLUSTER_MAX_ZOOM = 14;
@@ -304,6 +302,7 @@ export const Map = forwardRef<MapHandle, MapProps>(
 
         <MapImages ref={imagesRef} key={scheme} labels={labels} />
 
+        {/* Polígonos sempre visíveis e preenchidos, em qualquer zoom (GP-134). */}
         <ShapeSource
           id="spots-polygons"
           shape={buildPolygonCollection(spots, selectedId)}
@@ -316,19 +315,16 @@ export const Map = forwardRef<MapHandle, MapProps>(
         >
           <FillLayer
             id="spots-fill"
-            minZoomLevel={POLYGON_MIN_ZOOM}
             style={layerStyles.fill}
           />
           <LineLayer
             id="spots-line"
-            minZoomLevel={POLYGON_MIN_ZOOM}
             filter={['!', ['get', 'selected']]}
             style={layerStyles.line}
           />
           {/* Selecionado: contorno 3 px `primary-text` tracejado 6/3. */}
           <LineLayer
             id="spots-line-selected"
-            minZoomLevel={POLYGON_MIN_ZOOM}
             filter={['get', 'selected']}
             style={layerStyles.lineSelected}
           />
