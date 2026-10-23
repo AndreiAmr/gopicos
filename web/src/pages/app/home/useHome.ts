@@ -15,6 +15,8 @@ import {
   type SpotSummary,
 } from '@/domain/spot/spot';
 import { URL } from '@/routes/url';
+import { loadViewport, saveViewport } from '@/utils/mapViewport';
+import type { ViewStateChangeEvent } from 'react-map-gl/mapbox';
 import { announceSpot, cycleSpot } from './logic';
 
 export const useHome = () => {
@@ -135,6 +137,13 @@ export const useHome = () => {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [selectedId]);
 
+  // Voltar do detalhe reabre o mapa onde a pessoa estava (UX-F4).
+  const initialViewState = useMemo(() => loadViewport() ?? undefined, []);
+  const handleMoveEnd = useCallback((event: ViewStateChangeEvent) => {
+    const { longitude, latitude, zoom } = event.viewState;
+    saveViewport({ longitude, latitude, zoom });
+  }, []);
+
   const createSpot = useCallback(() => navigate(URL.NEW_SPOT), [navigate]);
 
   const isEmpty = !isLoading && !isError && spots.length === 0;
@@ -155,6 +164,8 @@ export const useHome = () => {
     clearSelection,
     handleMapClick,
     handleMapKeyDown,
+    initialViewState,
+    handleMoveEnd,
     createSpot,
     retry: fetchSpots,
   };
