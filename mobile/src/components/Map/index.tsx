@@ -10,6 +10,7 @@ import {
 import * as S from './styles';
 import { mapColors } from '../../config/tamagui/tokens';
 import { SpotPin } from '../../atomic/ds';
+import type { CameraTarget } from '../../domain/place/place';
 import {
   SpotSummary,
   buildPolygonCollection,
@@ -28,6 +29,9 @@ type MapProps = {
   onMapPress?: () => void;
   /** Posição do usuário em [lng, lat], quando a permissão foi concedida. */
   onUserLocation?: (position: [number, number]) => void;
+  /** Lugar buscado: a câmera voa até ele (sem animação com "reduzir movimento"). */
+  placeTarget?: CameraTarget | null;
+  placeAnimationMs?: number;
 };
 
 export const Map = ({
@@ -37,6 +41,8 @@ export const Map = ({
   onSelectSpot,
   onMapPress,
   onUserLocation,
+  placeTarget = null,
+  placeAnimationMs = 800,
 }: MapProps) => {
   const selected = selectedId
     ? spots.find(spot => spot.id === selectedId)
@@ -50,7 +56,29 @@ export const Map = ({
       attributionEnabled={false}
       onPress={() => onMapPress?.()}
     >
-      {selectedCenter ? (
+      {placeTarget && !selectedCenter ? (
+        placeTarget.type === 'bounds' ? (
+          <Camera
+            bounds={{
+              ne: placeTarget.ne,
+              sw: placeTarget.sw,
+              paddingTop: 96,
+              paddingBottom: 96,
+              paddingLeft: 32,
+              paddingRight: 32,
+            }}
+            animationDuration={placeAnimationMs}
+            animationMode="flyTo"
+          />
+        ) : (
+          <Camera
+            centerCoordinate={placeTarget.center}
+            zoomLevel={placeTarget.zoom}
+            animationDuration={placeAnimationMs}
+            animationMode="flyTo"
+          />
+        )
+      ) : selectedCenter ? (
         <Camera
           centerCoordinate={selectedCenter}
           animationDuration={400}

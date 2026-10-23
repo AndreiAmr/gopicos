@@ -36,7 +36,16 @@ const getErrorPassword = (
 const getSuccessPassword = (state: ApplicationState): boolean =>
   getState(state).changePassword.success;
 
+const getIsLoadingDelete = (state: ApplicationState): boolean =>
+  getState(state).deleteAccount.isLoading;
+
+const getErrorDelete = (
+  state: ApplicationState,
+): UserProfileOperationError | null => getState(state).deleteAccount.error;
+
 export const userProfileSelectors = {
+  getIsLoadingDelete,
+  getErrorDelete,
   getIsLoadingPassword,
   getErrorPassword,
   getSuccessPassword,

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { AccessibilityInfo } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useSpotsQuery } from '../../../hooks/query/spots/useSpotsQuery';
@@ -8,6 +9,7 @@ import {
   formatDistance,
   polygonCenter,
 } from '../../../domain/spot/spot';
+import { CameraTarget, Place, cameraTarget } from '../../../domain/place/place';
 import type { RootStackParamList } from '../../../routes/types';
 
 export const homeStrings = {
@@ -31,7 +33,15 @@ export const useHome = () => {
   );
   // Controla o sheet do estado vazio. O vazio é um estado persistente (não um
   // evento): abrimos quando ele aparece e deixamos o usuário fechar por gesto.
+  const [placeTarget, setPlaceTarget] = useState<CameraTarget | null>(null);
+  const [reduceMotion, setReduceMotion] = useState(false);
   const [emptySheetOpen, setEmptySheetOpen] = useState(true);
+
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled()
+      .then(setReduceMotion)
+      .catch(() => undefined);
+  }, []);
 
   // Sessão expirada: limpa o token e volta ao Login com o aviso.
   useEffect(() => {
@@ -89,7 +99,16 @@ export const useHome = () => {
     loading: loading && spots.length === 0,
     hasError: error && !unauthenticated,
     isEmpty: empty,
-    select: setSelectedId,
+    select: (id: string) => {
+      setPlaceTarget(null);
+      setSelectedId(id);
+    },
+    placeTarget,
+    placeAnimationMs: reduceMotion ? 0 : 800,
+    selectPlace: (place: Place) => {
+      setSelectedId(null);
+      setPlaceTarget(cameraTarget(place));
+    },
     clearSelection: () => setSelectedId(null),
     emptySheetOpen,
     dismissEmptySheet: () => setEmptySheetOpen(false),

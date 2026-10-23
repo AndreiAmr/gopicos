@@ -5,6 +5,7 @@ import {
   LockIcon,
   LogOutIcon,
   MapPinIcon,
+  Trash2Icon,
   StarIcon,
   UserIcon,
   type LucideIcon,
@@ -21,6 +22,7 @@ import {
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { NavigationSetter } from '@/NavigationSetter';
+import { DeleteAccountDialog } from '@/pages/app/profile/delete/DeleteAccountDialog';
 import { PROFILE_STRINGS } from '@/pages/app/profile/profileLogic';
 import { URL } from '@/routes/url';
 import { logout } from '@/utils/logout';
@@ -35,6 +37,8 @@ const MENU: MenuItem[] = [
   { to: URL.PROFILE_REVIEWS, label: 'Minhas avaliações', icon: StarIcon },
 ];
 
+export type ProfileOutletContext = { openDeleteAccount: () => void };
+
 const itemClass = 'flex min-h-12 items-center gap-3 rounded-md px-3 text-body-strong outline-none focus-visible:ring-2 focus-visible:ring-gp-focus';
 
 /**
@@ -43,6 +47,7 @@ const itemClass = 'flex min-h-12 items-center gap-3 rounded-md px-3 text-body-st
  */
 export const ProfileLayout = () => {
   const [confirmingLogout, setConfirmingLogout] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const location = useLocation();
 
   // Troca de rota: o título da aba e o foco da área de conteúdo.
@@ -101,12 +106,24 @@ export const ProfileLayout = () => {
             <LogOutIcon className="size-5" aria-hidden="true" />
             {PROFILE_STRINGS.logout}
           </button>
+
+          {/* Ação destrutiva por último, afastada das demais (UX-P16). */}
+          <button
+            type="button"
+            onClick={() => setDeleting(true)}
+            className={cn(itemClass, 'mt-6 text-gp-error hover:bg-gp-sunken')}
+          >
+            <Trash2Icon className="size-5" aria-hidden="true" />
+            Excluir conta
+          </button>
         </nav>
 
         <main className="w-full max-w-[640px] flex-1">
-          <Outlet />
+          <Outlet context={{ openDeleteAccount: () => setDeleting(true) } satisfies ProfileOutletContext} />
         </main>
       </div>
+
+      <DeleteAccountDialog open={deleting} onOpenChange={setDeleting} />
 
       <Dialog open={confirmingLogout} onOpenChange={setConfirmingLogout}>
         <DialogContent>

@@ -83,3 +83,54 @@ export const hasProfileChanges = (
 ): boolean =>
   current.firstName.trim() !== saved.firstName.trim() ||
   current.lastName.trim() !== saved.lastName.trim();
+
+export const DELETE_STRINGS = {
+  title: 'Excluir conta',
+  headline: 'Sua conta será desativada.',
+  hiddenProfile:
+    'Seu perfil deixa de aparecer. Seu nome e e-mail ficam ocultos para outras pessoas.',
+  averages: 'As notas das suas avaliações continuam contando na média dos picos.',
+  reactivate:
+    'Você pode reativar a conta quando quiser: é só entrar de novo com seu e-mail e senha.',
+  password: 'Senha',
+  passwordHint: 'Digite sua senha para confirmar.',
+  emptyPassword: 'Informe sua senha para continuar.',
+  submit: 'Excluir conta',
+  cancel: 'Cancelar',
+  dangerText:
+    'Sua conta será desativada. Você pode reativá-la entrando de novo com seu e-mail e senha.',
+} as const;
+
+/**
+ * Item "picos e avaliações continuam..." (spec 7.2). Com contagens cita só o que
+ * existe (singular correto); ambas zero omite (null); sem contagens, texto genérico.
+ */
+export const keepsActivityText = (
+  spotsCount?: number | null,
+  reviewsCount?: number | null,
+): string | null => {
+  const suffix =
+    'continuam no GoPicos, com o autor mostrado como "Usuário Desativado".';
+
+  if (typeof spotsCount !== 'number' || typeof reviewsCount !== 'number') {
+    return `Seus picos e avaliações ${suffix}`;
+  }
+
+  if (spotsCount === 0 && reviewsCount === 0) return null;
+
+  const spots =
+    spotsCount === 1 ? '1 pico' : spotsCount > 1 ? `${spotsCount} picos` : '';
+  const reviews =
+    reviewsCount === 1
+      ? '1 avaliação'
+      : reviewsCount > 1
+        ? `${reviewsCount} avaliações`
+        : '';
+  const items = [spots, reviews].filter(Boolean).join(' e ');
+  const single = spotsCount + reviewsCount === 1;
+  let possessive = 'Seus';
+  if (single) possessive = spotsCount === 1 ? 'Seu' : 'Sua';
+  const rest = single ? suffix.replace('continuam', 'continua') : suffix;
+
+  return `${possessive} ${items} ${rest}`;
+};

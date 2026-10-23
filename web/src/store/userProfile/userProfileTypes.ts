@@ -12,6 +12,10 @@ export enum UserProfileActionTypes {
   SET_IS_LOADING_PASSWORD = '@userProfile/password/SET_IS_LOADING_PASSWORD',
   SET_ERROR_PASSWORD = '@userProfile/password/SET_ERROR_PASSWORD',
   SET_SUCCESS_PASSWORD = '@userProfile/password/SET_SUCCESS_PASSWORD',
+
+  DELETE_ACCOUNT_ASYNC = '@userProfile/delete/DELETE_ACCOUNT_ASYNC',
+  SET_IS_LOADING_DELETE = '@userProfile/delete/SET_IS_LOADING_DELETE',
+  SET_ERROR_DELETE = '@userProfile/delete/SET_ERROR_DELETE',
 }
 
 /** Perfil do usuário logado (query `me`). */
@@ -50,6 +54,10 @@ export interface IUserProfileState {
     /** true depois de trocar a senha; a tela limpa os campos e zera. */
     success: boolean;
   };
+  deleteAccount: {
+    isLoading: boolean;
+    error: UserProfileOperationError | null;
+  };
 }
 
 export interface IUpdateProfileInput {
@@ -69,6 +77,7 @@ export interface IUserProfilePayload {
   operationError?: UserProfileOperationError | null;
   input?: IUpdateProfileInput;
   passwordInput?: IChangePasswordInput;
+  password?: string;
   success?: boolean;
 }
 
