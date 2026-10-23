@@ -1,9 +1,10 @@
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { MapPin } from 'lucide-react-native';
+
 import { useCallback } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Text, useTheme, View } from 'tamagui';
-import { tabInfoMapper } from './helpers';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import { shouldHideTabBar, tabInfoMapper } from './helpers';
 
 type TabBarProps = BottomTabBarProps & {};
 
@@ -17,6 +18,11 @@ export const TabBar = ({ state, navigation }: TabBarProps) => {
     },
     [navigation],
   );
+
+  const focusedRoute = state.routes[state.index];
+  if (shouldHideTabBar(getFocusedRouteNameFromRoute(focusedRoute))) {
+    return null;
+  }
 
   return (
     <View

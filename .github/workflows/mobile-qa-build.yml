@@ -43,6 +43,7 @@ jobs:
           fi
 
       - name: Aguardar Deploy do Backend
+        id: wait_backend_deploy
         if: steps.backend_changes.outputs.changed == 'true'
         uses: lewagon/wait-on-check-action@v1.3.4
         with:
@@ -65,8 +66,8 @@ jobs:
       - name: Instalar dependências
         run: yarn install --frozen-lockfile
 
-      # 🎯 INJEÇÃO DA URL DO RENDER NO .ENV
-      # Você pode chumbar a URL aqui ou usar uma Secret do GitHub (recomendado)
+      # 🎯 INJEÇÃO DA URL DO BACKEND DE QA NO .ENV
+      # Usa a secret API_QA_URL para o APK apontar para o backend de QA.
       - name: Configurar Variáveis de Ambiente de QA
         run: |
           echo "API_URL=${{ secrets.API_QA_URL }}" > .env
@@ -100,7 +101,7 @@ jobs:
         with:
           tag_name: qa-build-${{ github.sha }}
           name: "Build de QA (Mobile) - Commit ${{ github.sha }}"
-          body: "APK gerado automaticamente apontando para o backend do Render."
+          body: "APK gerado automaticamente apontando para o backend de QA."
           draft: false
           prerelease: true
           files: mobile/android/app/build/outputs/apk/release/app-release.apk
@@ -108,22 +109,47 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Notificar no Discord com Link Direto
-        uses: Ilshidur/action-discord@master
+        uses: Ilshidur/action-discord@0.4.0
         env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_MOBILE || secrets.DISCORD_WEBHOOK }}
         with:
           args: |
-            ✅ **Novo APK de QA Disponível!** 
-            A branch \`development\` foi atualizada com sucesso.
-            📲 **Baixar APK:** https://github.com/${{ github.repository }}/releases/download/qa-build-${{ github.sha }}/app-release.apk
+            ✅ **APK de QA disponível**
+
+            📲 Baixar: ${{ github.server_url }}/${{ github.repository }}/releases/download/qa-build-${{ github.sha }}/app-release.apk
+
+            🌿 Branch: `${{ github.ref_name }}`
+            👤 Autor: `${{ github.actor }}`
+            📝 Commit: `${{ github.event.head_commit.message }}`
+
+      # Falha do backend não deve alarmar o canal do mobile — o canal
+      # qa-backend já notifica a causa. Aqui só informamos que o APK não foi
+      # gerado, para ninguém procurar um bug de mobile que não existe.
+      - name: Notificar build bloqueado pelo backend
+        if: failure() && steps.wait_backend_deploy.outcome == 'failure'
+        uses: Ilshidur/action-discord@0.4.0
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_MOBILE || secrets.DISCORD_WEBHOOK }}
+        with:
+          args: |
+            ⚠️ **APK de QA não foi gerado**
+
+            O deploy do backend falhou, então este build foi interrompido antes de compilar.
+            A causa está sendo tratada no canal **qa-backend**.
+
+            🔍 Logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Notificar ERRO no Discord
-        if: failure()
-        uses: Ilshidur/action-discord@master
+        if: failure() && steps.wait_backend_deploy.outcome != 'failure'
+        uses: Ilshidur/action-discord@0.4.0
         env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_MOBILE || secrets.DISCORD_WEBHOOK }}
         with:
           args: |
-            ❌ **Deu ruim no Build de QA do Mobile!**
-            A compilação da branch \`development\` falhou.
-            🔍 **Logs:** https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            ❌ **Falha no build do APK de QA**
+
+            🌿 Branch: `${{ github.ref_name }}`
+            👤 Autor: `${{ github.actor }}`
+            📝 Commit: `${{ github.event.head_commit.message }}`
+
+            🔍 Logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

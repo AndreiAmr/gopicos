@@ -2,11 +2,16 @@ import {
   executeAnonymous,
   executeAuthenticated,
 } from '../../../../test/graphql';
-import { createUser, tokenFor } from '../../../../test/factories';
+import {
+  createSpot,
+  createSpotReview,
+  createUser,
+  tokenFor,
+} from '../../../../test/factories';
 import { prisma, useTestDatabase } from '../../../../test/db';
 
-const ME = `query { me { id name firstName lastName email createdAt } }`;
-const GET_PROFILE = `query { getProfile { id name firstName lastName email createdAt } }`;
+const ME = `query { me { id name firstName lastName email createdAt spotsCount reviewsCount } }`;
+const GET_PROFILE = `query { getProfile { id name firstName lastName email createdAt spotsCount reviewsCount } }`;
 
 describe('query me / getProfile (integração)', () => {
   useTestDatabase();
@@ -28,7 +33,25 @@ describe('query me / getProfile (integração)', () => {
       lastName: 'Hawk',
       email: 'skate@test.com',
       createdAt: user.createdAt.toISOString(),
+      spotsCount: 0,
+      reviewsCount: 0,
     });
+  });
+
+  it('conta só os picos e avaliações do próprio usuário (D35)', async () => {
+    const user = await createUser();
+    const other = await createUser();
+    const otherSpot = await createSpot({ authorId: other.id });
+    await createSpot({ authorId: user.id });
+    await createSpot({ authorId: user.id });
+    await createSpotReview({ authorId: user.id, spotId: otherSpot.id });
+    await createSpotReview({ authorId: other.id, spotId: otherSpot.id });
+
+    const { data, errors } = await executeAuthenticated(tokenFor(user), ME);
+
+    expect(errors).toBeUndefined();
+    expect(data.me.spotsCount).toBe(2);
+    expect(data.me.reviewsCount).toBe(1);
   });
 
   it('getProfile é alias de me', async () => {

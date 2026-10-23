@@ -32,6 +32,8 @@ export const createSpot = async (
     authorId: string;
     name: string;
     description: string;
+    isPaid: boolean;
+    hasCoverage: boolean;
     modality:
       | 'street'
       | 'park'
@@ -50,9 +52,9 @@ export const createSpot = async (
       authorId,
       modality: overrides.modality ?? 'street',
       equipmentRequired: false,
-      isPaid: false,
+      isPaid: overrides.isPaid ?? false,
       alwaysOpen: true,
-      hasCoverage: false,
+      hasCoverage: overrides.hasCoverage ?? false,
       // GeoJSON em ordem [lng, lat]
       coordinates: {
         type: 'Polygon',
