@@ -1,7 +1,7 @@
 # Spec de UX - Picos, fechamento (web, mobile, filtros, nota no mapa e avatar)
 
 Complementa `docs/design/specs/picos.md` e `docs/design/specs/perfil.md` (ambas em `main`). Fecha as issues que estavam em "Em Design": #35, #38, #40, #44, #45, #47, #48, #49, #50, #56, #57, #58, #59, #60 e #72.
-Base: `docs/design/design-system.md` v2.0. **Nenhum token novo.** Decisões novas: **UX-F1 a UX-F14** (seção 9). Onde esta spec e a `picos.md` divergirem, vale esta.
+Base: `docs/design/design-system.md` v2.0. **Nenhum token novo.** Decisões novas: **UX-F1 a UX-F15** (seção 9). Onde esta spec e a `picos.md` divergirem, vale esta.
 Protótipo: `docs/design/prototipos/picos-fechamento.html` (abrir no navegador). Figma: ver seção 13.
 
 ## 1. Mapa de cobertura (o que cada issue tem)
@@ -17,7 +17,7 @@ Protótipo: `docs/design/prototipos/picos-fechamento.html` (abrir no navegador).
 | #50 Filtros | picos.md 10 | Seção 8: nota mínima agora existe no backend, layout web, estados |
 | #56 a #59 Avaliações | picos.md 9A | Seção 10: web (dialog, "Carregar mais", foco) e fluxo mobile consolidado |
 | #60 Nota no mapa | picos.md 9A.5 | Seção 11: pin, agrupamento, resumo, acessibilidade |
-| #72 Avatar | perfil.md 9 | Seção 12: fluxo completo, onde o avatar aparece, requisitos de backend |
+| #72 Avatar | perfil.md 9 | Seção 12: **adiada, fora do MVP** (referência futura). No MVP, só iniciais |
 
 ## 2. Home web (#35)
 
@@ -93,9 +93,10 @@ Conteúdo e microcopy em picos.md 10. Atualizações:
 **UX-F9. Busca com "Cancelar" e restauração do texto.** Evita deixar a pessoa presa a um termo digitado pela metade com o mapa escurecido.
 **UX-F10. Nota mínima fica no MVP.** O backend já suporta `minRating`; cortar seria perder um critério da issue sem economia.
 **UX-F11. Filtros: E entre seções, OU dentro de modalidade.** Corresponde ao critério ("Gratuito" e "Coberto" juntos) e ao modelo mental de marcar vários tipos de pico.
-**UX-F12. Pin só com nota, nada de contagem.** O pin é pequeno e lido de longe; a contagem fica no resumo (seção 11).
-**UX-F13. Avatar com foto é opcional e nunca bloqueia nada.** Iniciais continuam sendo o padrão; quem não quiser enviar foto não vê diferença.
-**UX-F14. Foto de perfil visível só em contexto público mínimo.** Aparece no próprio perfil, no header e nas avaliações; nunca para conta desativada (regra de privacidade do perfil).
+**UX-F12. Cluster de pins no MVP (web e mobile).** Em zoom longe, muitos pins viram ruído e escondem a nota; agrupar mantém o mapa legível e é barato porque o Mapbox tem cluster nativo. O pin individual segue só com nota; a contagem fica no resumo e no cluster (seção 11).
+**UX-F15. "Carregar mais" na web e rolagem infinita no mobile.** Aprovado pelo dono: cada plataforma usa o padrão nativo dela para paginar avaliações.
+**UX-F13. Avatar com foto adiado (fora do MVP).** No MVP o `Avatar` mostra só iniciais em todas as telas; a seção 12 fica como referência. Quando existir, foto é opcional e nunca bloqueia nada.
+**UX-F14. (Futura, vale quando o avatar com foto for ativado.) Foto de perfil visível só em contexto público mínimo.** Aparece no próprio perfil, no header e nas avaliações; nunca para conta desativada (regra de privacidade do perfil).
 
 ## 10. Avaliações (#56 mobile, #57 web, #58 e #59 editar/excluir)
 
@@ -117,18 +118,24 @@ Fluxo e microcopy em picos.md 9A. Resumo por plataforma e acréscimos:
 
 - Arredondamento a **1 casa decimal**, vírgula (pt-BR); 5,0 mostra "5,0". Contagem acima de 999 vira "999+".
 - Estrelas no resumo são preenchidas por arredondamento ao inteiro mais próximo, mas o número exato sempre acompanha (nunca só cor).
-- **Pins sobrepostos:** em zoom longe, se dois pins se tocam, o de maior nota fica por cima; o clique seleciona o de cima e, ao fechar, o seguinte pode ser alcançado aproximando o zoom. Não há agrupamento (cluster) no MVP.
+- **Cluster (decisão do dono, web e mobile):** pins próximos se agrupam em um círculo com a contagem de picos. Implementação com o cluster nativo do Mapbox: fonte GeoJSON com `cluster: true` no `react-map-gl` (web) e `ShapeSource` com `cluster` no `@rnmapbox/maps` (mobile).
+  - **Parâmetros:** `clusterRadius` 50 (px), `clusterMaxZoom` 14 (a partir do zoom 15 todo pico aparece solto, alinhado à troca para polígonos, UX-P3). Ajuste fino com o Dev.
+  - **Visual (círculo com a contagem em Inter 600):** 2 a 9 picos = diâmetro 36; 10 a 49 = 44; 50 ou mais = 52. Fundo `primary` (`#F97316` claro, `#FB923C` escuro), texto `on-primary`, borda 2 em `#18181B` no claro e `surface` no escuro, sombra do pin. Contagem acima de 99 mostra "99+".
+  - **Interação:** toque ou clique no cluster aproxima o mapa até expandi-lo (animação curta; sem animação com "reduzir movimento"). O cluster não abre o resumo.
+  - **Nota média agrupada:** o cluster **não mostra nota** (uma média de picos diferentes enganaria). A nota aparece de novo no pin individual ao expandir.
+  - **Selecionado:** o pico selecionado nunca entra em cluster (permanece solto enquanto o resumo está aberto).
+  - **Acessibilidade:** rótulo "{N} picos nesta área, toque para aproximar" (web: "clique para aproximar"); alvo mínimo 44; web: clusters e pins focáveis pelo teclado com `[`/`]` (seção 2), `Enter` aproxima.
 - **Acessibilidade:** rótulo do pin "{Nome}, nota 4,6 de 5, 23 avaliações" ou "{Nome}, sem avaliações"; alvo de toque do pin 44x44 mesmo com visual de 26.
 - **Dark mode:** `star` do tema escuro (#FBBF24); pin `surface` escuro com borda `border`.
 - **Atualização:** o dado vem da listagem enriquecida de picos (nota e contagem); sem requisições por pin.
 
-## 12. Foto de perfil / avatar (#72)
+## 12. Foto de perfil / avatar (#72) - adiada, fora do MVP (decisão do dono em 2026-10-23)
 
-Antes estava especificado como "fora do MVP" (perfil.md 9). A issue está agora em Design, então esta é a spec completa; **implementação só depois da aprovação do dono**.
+A issue #72 foi para o Backlog com prioridade Won't. **No MVP o avatar mostra apenas iniciais** (perfil, header, avaliações, "Criado por"). O conteúdo abaixo fica como referência para uma fase futura.
 
 **Objetivo:** a pessoa troca a foto que aparece no próprio perfil, no header e nas avaliações.
 
-**Onde aparece:** `Avatar` com foto quando houver, iniciais quando não: perfil (xl 96), header web (32), `ReviewItem` (32), "Criado por" no detalhe (24, só com nome público; desativado sem avatar). **Nunca** para conta desativada.
+**Onde aparecerá (quando ativado; no MVP vale só iniciais em todos estes lugares):** `Avatar` com foto quando houver, iniciais quando não: perfil (xl 96), header web (32), `ReviewItem` (32), "Criado por" no detalhe (24, só com nome público; desativado sem avatar). **Nunca** para conta desativada.
 
 **Entrada:** no perfil, o avatar xl vira botão com selo de câmera 28 no canto inferior direito e rótulo "Alterar foto de perfil". Web também tem "Alterar foto" na tela de editar dados.
 
@@ -157,9 +164,10 @@ Antes estava especificado como "fora do MVP" (perfil.md 9). A issue está agora 
 - **Figma:** DS em https://www.figma.com/design/cFlDLcx1lxM6RouTMSrJQN. As contas do dono estão no plano Starter e o MCP já bateu o limite de chamadas na entrega anterior; por isso as telas desta rodada ficaram em HTML estático. Quando houver cota, desenhar a partir do protótipo na página "Telas".
 
 ## 14. Ideias pós-MVP
-Cluster de pins; lista alternativa de picos próximos; reordenar/escolher capa; busca de pico por nome; ver perfil público de outro usuário a partir do avatar; filtros salvos.
+Lista alternativa de picos próximos; reordenar/escolher capa; busca de pico por nome; ver perfil público de outro usuário a partir do avatar; filtros salvos.
 
-## 15. Pendências para o dono
-1. Aprovar o avatar com foto no MVP (#72 era Could): exige issue de backend (upload e campo no usuário).
-2. Confirmar o "Carregar mais" (web) e o scroll infinito (mobile) como padrões diferentes.
-3. Aprovar que o agrupamento de pins fique fora do MVP (UX-F12/seção 11).
+## 15. Decisões do dono (2026-10-23)
+1. **#72 foto de perfil:** fora do MVP, não priorizada (Backlog, Won't). A seção 12 fica como referência; no MVP vale só iniciais.
+2. **"Carregar mais" (web) e rolagem infinita (mobile):** aprovado (UX-F15).
+3. **Cluster de pins:** entra no MVP, web e mobile, com o cluster nativo do Mapbox (seção 11, UX-F12).
+4. **Figma:** aprovado desenhar as telas a partir do protótipo quando houver cota. **Pendência futura**, não feita agora.
