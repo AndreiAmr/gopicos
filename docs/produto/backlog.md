@@ -1193,16 +1193,12 @@ Decididas em 2026-10-22. D1 e D4 foram alteradas pelo dono; D1–D13 seguem a re
 | D36 | Nome do autor em contextos públicos | "Nome S." (nome e inicial do sobrenome). |
 | D37 | Limite do nome no perfil | 40 caracteres para o nome e 40 para o sobrenome (como no cadastro, GP-081). |
 | D38 | Modais: bottom sheet em todo lugar? | **Decidido pelo dono em 2026-10-23:** no app mobile, todo modal, diálogo, confirmação, menu de ação ou picker vira bottom sheet com `@gorhom/bottom-sheet`. No web/desktop continua o diálogo (Radix Dialog), como no DS v2, princípio 5; no web o trabalho é aplicar a identidade de grafite aos diálogos existentes. |
+| D39 | Exceções à regra "todo modal vira sheet" no mobile | **Decidido pelo dono em 2026-10-23 (recomendação do PO):** Ficam fora: telas nativas do sistema (câmera, galeria, pedidos de permissão, compartilhar), toasts (não são modais), sugestões da busca de lugar (lista inline sob o campo, para não esconder o mapa) e um visualizador de fotos em tela cheia, se existir. Todo o resto vira sheet. |
+| D40 | Confirmação que nasce dentro de um sheet (ex.: descartar avaliação em edição) | **Decidido pelo dono em 2026-10-23 (recomendação do PO):** Não empilhar dois sheets: a confirmação troca o conteúdo do mesmo sheet ("Descartar avaliação?" com "Descartar" e "Continuar editando"). Evita sheet sobre sheet e sobreposição. |
+| D41 | Alcance da identidade: o DS v2 (seção 13.6) proíbe a camada de marca em telas densas (mapa, detalhe, lista) | **Decidido pelo dono em 2026-10-23 (recomendação do PO):** Liberar em todas as telas com limites: tipografia de tag só em títulos fixos de tela e marca (nunca em conteúdo do usuário, como nome do pico ou avaliação, nem em campos, botões, erros); textura e adesivos nos cabeçalhos, cantos e estados vazios; no mapa, só pins/polígonos e controles estilizados, sem textura sobre o mapa. |
+| D42 | Tom da microcopy com gíria de skate | **Decidido pelo dono em 2026-10-23 (recomendação do PO):** Glossário curto aprovado pelo dono (ex.: "pico", "rolê", "sessão", "dropar", "colar no pico"), usado em títulos, vazios, sucessos e convites. Erros, segurança, exclusão de conta e textos legais continuam diretos e sem gíria. |
+| D43 | Tipografia de tag | **Decidido pelo dono em 2026-10-23 (recomendação do PO):** Manter Permanent Marker (legível) para títulos; o lettering mais "tag/pichação" entra só como arte vetorial na marca, ilustrações e adesivos, nunca como fonte de texto. |
 
-## Decisões pendentes do dono (E8 - Identidade de rua e interação)
-
-| # | Decisão | Recomendação do PO |
-|---|---|---|
-| D39 | Exceções à regra "todo modal vira sheet" no mobile | Ficam fora: telas nativas do sistema (câmera, galeria, pedidos de permissão, compartilhar), toasts (não são modais), sugestões da busca de lugar (lista inline sob o campo, para não esconder o mapa) e um visualizador de fotos em tela cheia, se existir. Todo o resto vira sheet. |
-| D40 | Confirmação que nasce dentro de um sheet (ex.: descartar avaliação em edição) | Não empilhar dois sheets: a confirmação troca o conteúdo do mesmo sheet ("Descartar avaliação?" com "Descartar" e "Continuar editando"). Evita sheet sobre sheet e sobreposição. |
-| D41 | Alcance da identidade: o DS v2 (seção 13.6) proíbe a camada de marca em telas densas (mapa, detalhe, lista) | Liberar em todas as telas com limites: tipografia de tag só em títulos fixos de tela e marca (nunca em conteúdo do usuário, como nome do pico ou avaliação, nem em campos, botões, erros); textura e adesivos nos cabeçalhos, cantos e estados vazios; no mapa, só pins/polígonos e controles estilizados, sem textura sobre o mapa. |
-| D42 | Tom da microcopy com gíria de skate | Glossário curto aprovado pelo dono (ex.: "pico", "rolê", "sessão", "dropar", "colar no pico"), usado em títulos, vazios, sucessos e convites. Erros, segurança, exclusão de conta e textos legais continuam diretos e sem gíria. |
-| D43 | Tipografia de tag | Manter Permanent Marker (legível) para títulos; o lettering mais "tag/pichação" entra só como arte vetorial na marca, ilustrações e adesivos, nunca como fonte de texto. |
 
 ## Resumo de priorização
 Total: 103 histórias - Must 74, Should 23, Could 2, Won't 4 (atualizar ao alterar o backlog). E8 (2026-10-23): 30 histórias - Must 21, Should 9.
