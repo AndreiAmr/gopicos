@@ -13,6 +13,7 @@ import type { RootStackParamList } from '../../../routes/types';
 export const homeStrings = {
   loading: 'Carregando picos...',
   error: 'Não foi possível carregar os picos. Verifique sua conexão.',
+  mapError: 'Não foi possível carregar o mapa. Tente novamente mais tarde.',
   emptyTitle: 'Nenhum pico por aqui ainda',
   emptyDescription: 'Seja o primeiro a cadastrar um pico nesta região.',
   emptyAction: 'Cadastrar o primeiro pico',

@@ -11,6 +11,10 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { StyleSheet, useColorScheme } from 'react-native';
 import { config } from './src/config/tamagui/tamagui.config';
 import { ToastProvider } from './src/atomic/ds';
+import { initMapbox } from './src/config/mapbox';
+
+// Antes de qualquer MapView.
+initMapbox();
 
 const styles = StyleSheet.create({
   root: {
