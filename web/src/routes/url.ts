@@ -10,4 +10,6 @@ export enum URL {
 
   PROFILE = '/perfil',
   PROFILE_PASSWORD = '/perfil/senha',
+  PROFILE_SPOTS = '/perfil/picos',
+  PROFILE_REVIEWS = '/perfil/avaliacoes',
 }

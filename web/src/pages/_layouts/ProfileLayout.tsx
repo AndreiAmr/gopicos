@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link, Navigate, NavLink, Outlet, useLocation } from 'react-router';
-import { ArrowLeftIcon, LockIcon, LogOutIcon, Trash2Icon, UserIcon, type LucideIcon } from 'lucide-react';
+import {
+  ArrowLeftIcon,
+  LockIcon,
+  LogOutIcon,
+  MapPinIcon,
+  Trash2Icon,
+  StarIcon,
+  UserIcon,
+  type LucideIcon,
+} from 'lucide-react';
 
 import { Button } from '@/atomic/atoms/button';
 import {
@@ -24,6 +33,8 @@ type MenuItem = { to: string; label: string; icon: LucideIcon; end?: boolean };
 const MENU: MenuItem[] = [
   { to: URL.PROFILE, label: PROFILE_STRINGS.myData, icon: UserIcon, end: true },
   { to: URL.PROFILE_PASSWORD, label: 'Alterar senha', icon: LockIcon },
+  { to: URL.PROFILE_SPOTS, label: 'Meus picos', icon: MapPinIcon },
+  { to: URL.PROFILE_REVIEWS, label: 'Minhas avaliações', icon: StarIcon },
 ];
 
 export type ProfileOutletContext = { openDeleteAccount: () => void };
