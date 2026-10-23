@@ -1,7 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
-import { notify } from '@/lib/notify';
 import { spotPageTitle } from '@/domain/spot/details';
 import { useSpotDetailsQuery } from '@/queries/spotDetails/useSpotDetailsQuery';
 import { logout } from '@/utils/logout';
@@ -24,9 +23,5 @@ export const useSpotDetailsPage = () => {
 
   const onEdit = useCallback(() => navigate(`/spot/${id}/edit`), [id, navigate]);
 
-  const onDelete = useCallback(() => {
-    notify.info('Disponível em breve.');
-  }, []);
-
-  return { id, spot, status, refetch, onEdit, onDelete };
+  return { id, spot, status, refetch, onEdit };
 };

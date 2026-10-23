@@ -14,7 +14,6 @@ export const SpotDetailsPage = () => {
       <ReadySpotDetails
         spot={page.spot}
         onEdit={page.onEdit}
-        onDelete={page.onDelete}
         refreshSpot={page.refetch}
       />
     );

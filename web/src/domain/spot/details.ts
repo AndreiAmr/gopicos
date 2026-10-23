@@ -34,6 +34,15 @@ export const spotDetailsStrings = {
   photoFailed: 'Não foi possível carregar a foto',
   noPhotos: 'Sem fotos',
   noDescription: 'Este pico ainda não tem descrição.',
+  deleteTitle: 'Excluir este pico?',
+  deleteDescription:
+    'Esta ação não pode ser desfeita. O pico, as fotos e as avaliações dele serão removidos.',
+  deleteConfirm: 'Excluir pico',
+  deleteCancel: 'Cancelar',
+  deleteError: 'Não foi possível excluir. Tente novamente.',
+  deleteForbidden: 'Só quem criou o pico pode excluí-lo.',
+  deleteDone: 'Pico excluído.',
+  deleteAlreadyGone: 'Este pico já não existe.',
 } as const;
 
 /** `<title>` da aba: "{Nome do pico} - GoPicos". */
