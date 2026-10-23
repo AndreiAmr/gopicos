@@ -1,4 +1,5 @@
 import {
+  IChangePasswordInput,
   IUpdateProfileInput,
   IUserProfile,
   IUserProfileAction,
@@ -43,6 +44,30 @@ const setErrorUpdate = (
   payload: { operationError },
 });
 
+const changePasswordAsync = (
+  passwordInput: IChangePasswordInput,
+): IUserProfileAction => ({
+  type: UserProfileActionTypes.CHANGE_PASSWORD_ASYNC,
+  payload: { passwordInput },
+});
+
+const setIsLoadingPassword = (isLoading: boolean): IUserProfileAction => ({
+  type: UserProfileActionTypes.SET_IS_LOADING_PASSWORD,
+  payload: { isLoading },
+});
+
+const setErrorPassword = (
+  operationError: UserProfileOperationError | null,
+): IUserProfileAction => ({
+  type: UserProfileActionTypes.SET_ERROR_PASSWORD,
+  payload: { operationError },
+});
+
+const setSuccessPassword = (success: boolean): IUserProfileAction => ({
+  type: UserProfileActionTypes.SET_SUCCESS_PASSWORD,
+  payload: { success },
+});
+
 export const userProfileActions = {
   getMeAsync,
   setMe,
@@ -51,4 +76,8 @@ export const userProfileActions = {
   updateProfileAsync,
   setIsLoadingUpdate,
   setErrorUpdate,
+  changePasswordAsync,
+  setIsLoadingPassword,
+  setErrorPassword,
+  setSuccessPassword,
 };

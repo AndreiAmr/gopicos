@@ -7,6 +7,11 @@ export enum UserProfileActionTypes {
   UPDATE_PROFILE_ASYNC = '@userProfile/update/UPDATE_PROFILE_ASYNC',
   SET_IS_LOADING_UPDATE = '@userProfile/update/SET_IS_LOADING_UPDATE',
   SET_ERROR_UPDATE = '@userProfile/update/SET_ERROR_UPDATE',
+
+  CHANGE_PASSWORD_ASYNC = '@userProfile/password/CHANGE_PASSWORD_ASYNC',
+  SET_IS_LOADING_PASSWORD = '@userProfile/password/SET_IS_LOADING_PASSWORD',
+  SET_ERROR_PASSWORD = '@userProfile/password/SET_ERROR_PASSWORD',
+  SET_SUCCESS_PASSWORD = '@userProfile/password/SET_SUCCESS_PASSWORD',
 }
 
 /** Perfil do usuário logado (query `me`). */
@@ -39,11 +44,22 @@ export interface IUserProfileState {
     isLoading: boolean;
     error: UserProfileOperationError | null;
   };
+  changePassword: {
+    isLoading: boolean;
+    error: UserProfileOperationError | null;
+    /** true depois de trocar a senha; a tela limpa os campos e zera. */
+    success: boolean;
+  };
 }
 
 export interface IUpdateProfileInput {
   firstName: string;
   lastName: string;
+}
+
+export interface IChangePasswordInput {
+  currentPassword: string;
+  newPassword: string;
 }
 
 export interface IUserProfilePayload {
@@ -52,6 +68,8 @@ export interface IUserProfilePayload {
   loadError?: UserProfileLoadError | null;
   operationError?: UserProfileOperationError | null;
   input?: IUpdateProfileInput;
+  passwordInput?: IChangePasswordInput;
+  success?: boolean;
 }
 
 export type IUserProfileAction = {

@@ -9,4 +9,5 @@ export enum URL {
   NEW_SPOT = '/spot/new-spot',
 
   PROFILE = '/perfil',
+  PROFILE_PASSWORD = '/perfil/senha',
 }

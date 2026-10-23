@@ -17,6 +17,8 @@ import {
 } from './userProfileTypes';
 
 export const PROFILE_UPDATED_MESSAGE = 'Perfil atualizado.';
+export const PASSWORD_CHANGED_MESSAGE = 'Senha alterada.';
+export const WRONG_CURRENT_PASSWORD_MESSAGE = 'Senha atual incorreta.';
 
 /** Sessão inválida: apaga o token e volta ao Login com o aviso de sessão expirada. */
 export function* handleSessionExpired() {
@@ -74,9 +76,45 @@ export function* updateProfileAsync(action: IUserProfileAction) {
   }
 }
 
+/** Troca de senha: a sessão atual continua válida (D33), nada é limpo além do formulário. */
+export function* changePasswordAsync(action: IUserProfileAction) {
+  const input = action.payload?.passwordInput;
+  if (!input) return;
+
+  try {
+    yield put(userProfileActions.setIsLoadingPassword(true));
+    yield put(userProfileActions.setErrorPassword(null));
+    yield put(userProfileActions.setSuccessPassword(false));
+
+    yield call(userProfileRepository.changePassword, input);
+
+    yield put(userProfileActions.setSuccessPassword(true));
+    yield call(notify.success, PASSWORD_CHANGED_MESSAGE);
+  } catch (error) {
+    if (isUnauthenticated(error)) {
+      yield call(handleSessionExpired);
+    } else {
+      yield put(
+        userProfileActions.setErrorPassword(
+          classifyOperationError(error, {
+            fields: ['newPassword', 'currentPassword'],
+            invalidCredentials: {
+              field: 'currentPassword',
+              message: WRONG_CURRENT_PASSWORD_MESSAGE,
+            },
+          }),
+        ),
+      );
+    }
+  } finally {
+    yield put(userProfileActions.setIsLoadingPassword(false));
+  }
+}
+
 const userProfileSagas = [
   takeLatest(UserProfileActionTypes.GET_ME_ASYNC, getMeAsync),
   takeLatest(UserProfileActionTypes.UPDATE_PROFILE_ASYNC, updateProfileAsync),
+  takeLatest(UserProfileActionTypes.CHANGE_PASSWORD_ASYNC, changePasswordAsync),
 ];
 
 export default userProfileSagas;

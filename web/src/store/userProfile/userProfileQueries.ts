@@ -19,6 +19,14 @@ export const meQuery = gql`
   }
 `;
 
+export const changePasswordMutation = gql`
+  mutation ChangePassword($props: ChangePasswordInput!) {
+    changePassword(props: $props) {
+      message
+    }
+  }
+`;
+
 export const updateProfileMutation = gql`
   mutation UpdateProfile($props: UpdateProfileInput!) {
     updateProfile(props: $props) {
