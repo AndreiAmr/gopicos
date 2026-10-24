@@ -6,6 +6,8 @@ import type { SpotDetails } from '../../../../domain/spot/details';
 import { reviewStrings } from '../../../../domain/spot/reviews';
 import { useDeleteSpotFlow } from '../useDeleteSpotFlow';
 import { useReviewsFlow } from '../useReviewsFlow';
+import { useDeleteReviewFlow } from '../useDeleteReviewFlow';
+import { DeleteReviewSheet } from './DeleteReviewSheet';
 import { DeleteSpotSheet } from './DeleteSpotSheet';
 import { ReviewFormSheet } from './ReviewFormSheet';
 import { ReviewsSection } from './ReviewsSection';
@@ -27,6 +29,7 @@ export const ReadySpotDetails = ({
 }: ReadySpotDetailsProps) => {
   const flow = useReviewsFlow({ spotId: spot.id, refreshSpot });
   const deleteFlow = useDeleteSpotFlow(spot.id);
+  const deleteReview = useDeleteReviewFlow(flow.propagate);
   const { reviews } = flow;
   const hasMine = Boolean(reviews.myReview);
 
@@ -76,6 +79,8 @@ export const ReadySpotDetails = ({
               moreError={reviews.moreError}
               onRetry={() => reviews.reload()}
               onRetryMore={reviews.loadMore}
+              onEditMine={flow.openEdit}
+              onDeleteMine={review => deleteReview.open(review.id)}
             />
           </View>
         }
@@ -90,14 +95,25 @@ export const ReadySpotDetails = ({
           onClose={deleteFlow.clearError}
         />
       ) : (
-        <ReviewFormSheet
-          ref={flow.sheetRef}
-          submitting={flow.submitting}
-          error={flow.error}
-          commentError={flow.commentError}
-          onSubmit={flow.submit}
-          onClose={flow.clearErrors}
-        />
+        <>
+          <ReviewFormSheet
+            ref={flow.sheetRef}
+            initial={flow.editing}
+            submitting={flow.submitting}
+            error={flow.error}
+            commentError={flow.commentError}
+            onSubmit={flow.submit}
+            onClose={flow.clearErrors}
+          />
+          <DeleteReviewSheet
+            ref={deleteReview.sheetRef}
+            deleting={deleteReview.deleting}
+            error={deleteReview.error}
+            onConfirm={deleteReview.confirm}
+            onCancel={deleteReview.cancel}
+            onClose={deleteReview.clearError}
+          />
+        </>
       )}
     </>
   );
