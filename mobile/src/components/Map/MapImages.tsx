@@ -132,12 +132,23 @@ export type MapImagesHandle = { refreshAll: () => void };
  * antes do layout e do desenho do SVG: a imagem fica vazia ou nem é
  * registrada e os pins somem. Por isso refazemos a foto depois que as views
  * estão desenhadas (e de novo quando o estilo termina de carregar).
+ *
+ * O `Images` só registra no estilo as imagens que já eram filhas dele quando
+ * entrou no mapa: uma imagem montada depois nunca aparece (GP-132). Por isso
+ * o conjunto de imagens é fixo (todos os rótulos possíveis) e o componente
+ * não é remontado; a troca de tema só refaz as fotos (`scheme`).
  */
 export const REFRESH_DELAYS_MS = [60, 300, 1000, 2500];
 
 /** Imagens do estilo (pins, pin selecionado e clusters) desenhadas a partir de views. */
-export const MapImages = forwardRef<MapImagesHandle, { labels: string[] }>(
-  ({ labels }, ref) => {
+type MapImagesProps = {
+  labels: string[];
+  /** Tema atual: ao mudar, as fotos são refeitas com as novas cores. */
+  scheme?: string;
+};
+
+export const MapImages = forwardRef<MapImagesHandle, MapImagesProps>(
+  ({ labels, scheme }, ref) => {
     const clusterKeys = Object.keys(CLUSTER_SIZES) as Array<keyof typeof CLUSTER_SIZES>;
     const refs = useMemo(
       () =>
@@ -156,7 +167,7 @@ export const MapImages = forwardRef<MapImagesHandle, { labels: string[] }>(
     useEffect(() => {
       const timers = REFRESH_DELAYS_MS.map(delay => setTimeout(refreshAll, delay));
       return () => timers.forEach(clearTimeout);
-    }, [refreshAll, labels]);
+    }, [refreshAll, labels, scheme]);
 
     let i = 0;
     return (

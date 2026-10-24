@@ -37,6 +37,19 @@ export const pinText = (spot: Pick<SpotSummary, 'ratingAverage' | 'reviewsCount'
     ? `★ ${spot.ratingAverage.toFixed(1).replace('.', ',')}`
     : 'Novo';
 
+/**
+ * Todos os rótulos possíveis do pin ("Novo" e "★ 0,0" a "★ 5,0"). O mapa
+ * desenha uma imagem por rótulo; registrá-las todas de uma vez, antes de o
+ * mapa carregar, garante que existam quando os picos chegarem da API: o
+ * `@rnmapbox/maps` não registra no estilo imagens montadas depois (GP-132).
+ */
+export const PIN_LABELS: string[] = [
+  'Novo',
+  ...Array.from({ length: 51 }, (_, tenths) =>
+    pinText({ ratingAverage: tenths / 10, reviewsCount: 1 }),
+  ),
+];
+
 const ratingSentence = (
   spot: Pick<SpotSummary, 'ratingAverage' | 'reviewsCount'>,
 ): string =>

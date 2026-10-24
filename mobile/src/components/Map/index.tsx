@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useRef } from 'react';
 import Mapbox, {
   type FillLayerStyle,
   type LineLayerStyle,
@@ -18,6 +18,7 @@ import * as S from './styles';
 import { MapBounds, isValidCoordinate } from '../../domain/map/area';
 import { ColorScheme, MapLayer, mapStyleFor } from '../../domain/map/layers';
 import {
+  PIN_LABELS,
   SpotSummary,
   buildPointCollection,
   buildPolygonCollection,
@@ -179,11 +180,9 @@ export const Map = forwardRef<MapHandle, MapProps>(
       : null;
     const style = mapStyleFor(layer, scheme);
 
-    // Uma imagem por rótulo distinto ("★ 4,6", "Novo").
-    const labels = useMemo(
-      () => Array.from(new Set(spots.map(spot => pinText(spot)))).sort(),
-      [spots],
-    );
+    // Uma imagem por rótulo possível ("★ 4,6", "Novo"), fixa: imagens montadas
+    // depois que o mapa carregou não entram no estilo e os pins somem (GP-132).
+    const labels = PIN_LABELS;
 
     // Estilos das camadas (cores do tema; fora do JSX).
     const layerStyles: {
@@ -300,7 +299,7 @@ export const Map = forwardRef<MapHandle, MapProps>(
           }}
         />
 
-        <MapImages ref={imagesRef} key={scheme} labels={labels} />
+        <MapImages ref={imagesRef} labels={labels} scheme={scheme} />
 
         {/* Polígonos sempre visíveis e preenchidos, em qualquer zoom (GP-134). */}
         <ShapeSource
